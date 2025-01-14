@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-primary-light via-primary to-primary-dark text-white">
+    <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-[#F2FCE2] via-white to-[#F2FCE2] text-black">
       <div className="container mx-auto px-6 py-16 text-center">
+        <img src="/logo.png" alt="Amplified Information" className="mx-auto mb-8 w-[400px] max-w-full" />
         <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fadeIn">
           Amplifying Your Data Systems
         </h1>
@@ -12,7 +13,7 @@ export const Hero = () => {
           Expert consulting services to transform your data infrastructure and drive business growth
         </p>
         <Button 
-          className="bg-white text-primary hover:bg-gray-100 animate-fadeIn"
+          className="bg-[#86C232] text-white hover:bg-[#61892F] animate-fadeIn"
           style={{ animationDelay: "0.4s" }}
         >
           Get Started <ArrowRight className="ml-2 h-4 w-4" />
