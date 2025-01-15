@@ -17,11 +17,11 @@ export const Contact = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-primary" />
-                  <span>contact@amplified.info</span>
+                  <span>mark@amplified.info</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="w-5 h-5 text-primary" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+1 (613) 859-3905</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <MapPin className="w-5 h-5 text-primary" />
