@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart, LineChart, PieChart, Graph } from "lucide-react";
+import { BarChart, LineChart, PieChart } from "lucide-react";
 
 const AnalyticsInsights = () => {
   return (
@@ -55,7 +55,7 @@ const AnalyticsInsights = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
-                <Graph className="w-8 h-8 text-primary shrink-0" />
+                <BarChart className="w-8 h-8 text-primary shrink-0" />
                 <div>
                   <h2 className="text-2xl font-semibold mb-2">Custom Reporting</h2>
                   <p className="text-muted-foreground">
