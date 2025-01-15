@@ -8,6 +8,10 @@ import Services from "./pages/Services";
 import Demo from "./pages/Demo";
 import WhyUs from "./pages/WhyUs";
 import Contact from "./pages/Contact";
+import DataArchitecture from "./pages/DataArchitecture";
+import CloudIntegration from "./pages/CloudIntegration";
+import SecuritySolutions from "./pages/SecuritySolutions";
+import AnalyticsInsights from "./pages/AnalyticsInsights";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +27,10 @@ const App = () => (
           <Route path="/demo" element={<Demo />} />
           <Route path="/why-us" element={<WhyUs />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/services/data-architecture" element={<DataArchitecture />} />
+          <Route path="/services/cloud-integration" element={<CloudIntegration />} />
+          <Route path="/services/security-solutions" element={<SecuritySolutions />} />
+          <Route path="/services/analytics-insights" element={<AnalyticsInsights />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
