@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export const Hero = () => {
   return (
@@ -12,12 +13,25 @@ export const Hero = () => {
         <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90 animate-fadeIn" style={{ animationDelay: "0.2s" }}>
           Expert consulting services to transform your data infrastructure and drive business growth
         </p>
-        <Button 
-          className="bg-[#86C232] text-white hover:bg-[#61892F] animate-fadeIn"
-          style={{ animationDelay: "0.4s" }}
-        >
-          Get Started <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link to="/services">
+            <Button 
+              className="bg-[#86C232] text-white hover:bg-[#61892F] animate-fadeIn"
+              style={{ animationDelay: "0.4s" }}
+            >
+              Our Services <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+          <Link to="/demo">
+            <Button 
+              variant="outline"
+              className="border-[#86C232] text-[#86C232] hover:bg-[#86C232] hover:text-white animate-fadeIn"
+              style={{ animationDelay: "0.5s" }}
+            >
+              View Demo
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
     </section>
