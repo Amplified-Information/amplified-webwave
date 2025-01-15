@@ -25,7 +25,7 @@ export const Contact = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <MapPin className="w-5 h-5 text-primary" />
-                  <span>123 Business Ave, Suite 100<br />Enterprise City, ST 12345</span>
+                  <span>3473 Dove Creek Road<br />Courtenay, BC V9J 1P3</span>
                 </div>
               </div>
             </div>
