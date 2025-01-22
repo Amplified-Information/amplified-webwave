@@ -13,7 +13,11 @@ export const Navigation = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
-            <img src="logo.png" alt="Amplified Information" className="h-8" />
+            <img 
+              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" 
+              alt="Amplified Information" 
+              className="h-8 object-contain" 
+            />
           </Link>
           <div className="hidden md:flex space-x-8">
             <Link
