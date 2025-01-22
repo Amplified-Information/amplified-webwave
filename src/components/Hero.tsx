@@ -7,7 +7,7 @@ export const Hero = () => {
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-[#F2FCE2] via-white to-[#F2FCE2] text-black">
       <div className="container mx-auto px-6 py-16 text-center">
         <img 
-          src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" 
+          src="/lovable-uploads/3a3e4cdb-8e48-4974-a61d-031ff4d0ec36.png" 
           alt="Amplified Information" 
           className="mx-auto mb-8 w-[400px] max-w-full object-contain" 
         />
