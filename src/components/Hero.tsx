@@ -6,7 +6,7 @@ export const Hero = () => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-[#F2FCE2] via-white to-[#F2FCE2] text-black">
       <div className="container mx-auto px-6 py-16 text-center">
-        <img src="logo.png" alt="Amplified Information" className="mx-auto mb-8 w-[400px] max-w-full" />
+        <img src="/logo.png" alt="Amplified Information" className="mx-auto mb-8 w-[400px] max-w-full" />
         <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fadeIn">
           Amplify the Signal, Eliminate the Noise
         </h1>
@@ -22,7 +22,7 @@ export const Hero = () => {
               Our Services <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
-          <Link to="/demo">
+          <Link to="/demo/overview">
             <Button 
               variant="outline"
               className="border-[#86C232] text-[#86C232] hover:bg-[#86C232] hover:text-white animate-fadeIn"
