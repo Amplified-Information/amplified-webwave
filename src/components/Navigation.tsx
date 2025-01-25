@@ -54,7 +54,7 @@ export const Navigation = () => {
                 location.pathname.startsWith("/demo") && "text-primary font-semibold"
               )}
             >
-              Demo
+              Demos
             </Link>
             <Link
               to="/contact"
