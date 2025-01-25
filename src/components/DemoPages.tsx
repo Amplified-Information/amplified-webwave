@@ -4,24 +4,44 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 export const DemoPages = () => {
   const demos = [
     {
-      title: "Overview",
-      description: "Get a comprehensive look at our platform capabilities",
-      path: "/demo/overview"
-    },
-    {
       title: "Data Integration",
-      description: "See how we seamlessly connect different data sources",
-      path: "/demo/integration"
+      description: "Connect and synchronize data from multiple sources seamlessly",
+      path: "/demo/data-integration"
     },
     {
-      title: "Analytics Dashboard",
-      description: "Experience our powerful analytics visualization tools",
-      path: "/demo/analytics"
+      title: "Real-time Analytics",
+      description: "Monitor and analyze data streams in real-time",
+      path: "/demo/real-time-analytics"
     },
     {
       title: "Security Features",
-      description: "Explore our robust security implementation",
-      path: "/demo/security"
+      description: "Explore our comprehensive security implementations",
+      path: "/demo/security-features"
+    },
+    {
+      title: "Cloud Infrastructure",
+      description: "Scale your infrastructure with cloud-native solutions",
+      path: "/demo/cloud-infrastructure"
+    },
+    {
+      title: "Machine Learning",
+      description: "Implement AI/ML models for predictive analytics",
+      path: "/demo/machine-learning"
+    },
+    {
+      title: "Data Visualization",
+      description: "Create interactive dashboards and reports",
+      path: "/demo/data-visualization"
+    },
+    {
+      title: "API Integration",
+      description: "Connect with external services through our API platform",
+      path: "/demo/api-integration"
+    },
+    {
+      title: "Automated Workflows",
+      description: "Build and manage automated data processing pipelines",
+      path: "/demo/automated-workflows"
     }
   ];
 
