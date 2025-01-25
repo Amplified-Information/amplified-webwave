@@ -42,7 +42,7 @@ const DemoOverview = () => {
       <Navigation />
       <div className="container mx-auto px-6 py-20">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Demo</h1>
+          <h1 className="text-4xl font-bold mb-4">Demos</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Explore our platform's capabilities through these interactive demonstrations
           </p>
