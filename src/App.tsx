@@ -15,6 +15,14 @@ import DemoOverview from "./pages/demos/DemoOverview";
 import DemoIntegration from "./pages/demos/DemoIntegration";
 import DemoAnalytics from "./pages/demos/DemoAnalytics";
 import DemoSecurity from "./pages/demos/DemoSecurity";
+import DataIntegrationDemo from "./pages/demos/DataIntegrationDemo";
+import RealTimeAnalyticsDemo from "./pages/demos/RealTimeAnalyticsDemo";
+import SecurityFeaturesDemo from "./pages/demos/SecurityFeaturesDemo";
+import CloudInfrastructureDemo from "./pages/demos/CloudInfrastructureDemo";
+import MachineLearningDemo from "./pages/demos/MachineLearningDemo";
+import DataVisualizationDemo from "./pages/demos/DataVisualizationDemo";
+import ApiIntegrationDemo from "./pages/demos/ApiIntegrationDemo";
+import AutomatedWorkflowsDemo from "./pages/demos/AutomatedWorkflowsDemo";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +45,14 @@ const App = () => (
           <Route path="/demo/integration" element={<DemoIntegration />} />
           <Route path="/demo/analytics" element={<DemoAnalytics />} />
           <Route path="/demo/security" element={<DemoSecurity />} />
+          <Route path="/demo/data-integration" element={<DataIntegrationDemo />} />
+          <Route path="/demo/real-time-analytics" element={<RealTimeAnalyticsDemo />} />
+          <Route path="/demo/security-features" element={<SecurityFeaturesDemo />} />
+          <Route path="/demo/cloud-infrastructure" element={<CloudInfrastructureDemo />} />
+          <Route path="/demo/machine-learning" element={<MachineLearningDemo />} />
+          <Route path="/demo/data-visualization" element={<DataVisualizationDemo />} />
+          <Route path="/demo/api-integration" element={<ApiIntegrationDemo />} />
+          <Route path="/demo/automated-workflows" element={<AutomatedWorkflowsDemo />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
