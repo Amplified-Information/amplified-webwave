@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
+import { Cloud } from "lucide-react";
 
 const CloudInfrastructureDemo = () => {
   return (
@@ -7,6 +8,7 @@ const CloudInfrastructureDemo = () => {
       <Navigation />
       <div className="container mx-auto px-6 py-20">
         <div className="text-center mb-12">
+          <Cloud className="w-12 h-12 mx-auto mb-4 text-primary" />
           <h1 className="text-4xl font-bold mb-4">Cloud Infrastructure</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Scale your infrastructure with cloud-native solutions
@@ -16,16 +18,21 @@ const CloudInfrastructureDemo = () => {
         <Card className="mb-8">
           <CardContent className="p-6">
             <img
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+              src="https://images.unsplash.com/photo-1451187580459-43490279c0fa"
               alt="Cloud Infrastructure Demo"
               className="w-full h-64 object-cover rounded-lg mb-6"
             />
             <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Coming Soon</h2>
+              <h2 className="text-2xl font-semibold">Features Coming Soon</h2>
               <p className="text-gray-600">
-                Our cloud infrastructure demonstration is being configured. 
-                Check back soon to explore our scalable cloud solutions.
+                Our cloud infrastructure demonstration will showcase:
               </p>
+              <ul className="list-disc pl-6 space-y-2 text-gray-600">
+                <li>Auto-scaling capabilities</li>
+                <li>Load balancing and high availability</li>
+                <li>Containerization and orchestration</li>
+                <li>Cloud resource management</li>
+              </ul>
             </div>
           </CardContent>
         </Card>
