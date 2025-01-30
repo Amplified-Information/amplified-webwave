@@ -13,7 +13,7 @@ export const DemoPages = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Link to="/demo/overview" className="group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:bg-green-50">
+            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:bg-primary/10">
               <CardHeader>
                 <CardTitle>Data Integration Demo</CardTitle>
                 <CardDescription>
@@ -23,7 +23,7 @@ export const DemoPages = () => {
             </Card>
           </Link>
           <Link to="/demo/overview" className="group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:bg-green-50">
+            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:bg-primary/10">
               <CardHeader>
                 <CardTitle>Analytics Dashboard</CardTitle>
                 <CardDescription>
@@ -33,7 +33,7 @@ export const DemoPages = () => {
             </Card>
           </Link>
           <Link to="/demo/overview" className="group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:bg-green-50">
+            <Card className="h-full hover:shadow-lg transition-all duration-300 group-hover:bg-primary/10">
               <CardHeader>
                 <CardTitle>Security Features</CardTitle>
                 <CardDescription>

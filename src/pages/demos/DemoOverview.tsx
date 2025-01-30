@@ -60,7 +60,7 @@ const DemoOverview = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {demos.map((demo) => (
             <Link to={demo.path} key={demo.path} className="group">
-              <Card className="hover:shadow-lg transition-all duration-300 group-hover:bg-green-50">
+              <Card className="hover:shadow-lg transition-all duration-300 group-hover:bg-primary/10">
                 <CardHeader>
                   <CardTitle>{demo.title}</CardTitle>
                   <CardDescription>{demo.description}</CardDescription>
