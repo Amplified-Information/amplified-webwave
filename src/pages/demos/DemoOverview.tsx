@@ -1,3 +1,4 @@
+import { Navigation } from "@/components/Navigation";
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -46,25 +47,28 @@ const DemoOverview = () => {
   ];
 
   return (
-    <div className="py-20">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold mb-4">Interactive Demos</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Explore our platform's capabilities through these interactive demonstrations
-        </p>
-      </div>
+    <div className="min-h-screen bg-white">
+      <Navigation />
+      <div className="container mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Demos</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Explore our platform's capabilities through these interactive demonstrations
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {demos.map((demo) => (
-          <Link to={demo.path} key={demo.path} className="group">
-            <Card className="hover:shadow-lg transition-all duration-300 group-hover:bg-primary/10">
-              <CardHeader>
-                <CardTitle>{demo.title}</CardTitle>
-                <CardDescription>{demo.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {demos.map((demo) => (
+            <Link to={demo.path} key={demo.path} className="group">
+              <Card className="hover:shadow-lg transition-all duration-300 group-hover:bg-primary/10">
+                <CardHeader>
+                  <CardTitle>{demo.title}</CardTitle>
+                  <CardDescription>{demo.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
