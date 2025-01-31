@@ -1,6 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+// Capital cities data with their coordinates
+const CAPITAL_CITIES = [
+  { name: 'London', lat: 51.5074, lng: -0.1278 },
+  { name: 'Paris', lat: 48.8566, lng: 2.3522 },
+  { name: 'Tokyo', lat: 35.6762, lng: 139.6503 },
+  { name: 'Washington DC', lat: 38.9072, lng: -77.0369 },
+  { name: 'Beijing', lat: 39.9042, lng: 116.4074 },
+  { name: 'Moscow', lat: 55.7558, lng: 37.6173 },
+  { name: 'Brasília', lat: -15.7975, lng: -47.8919 },
+  { name: 'New Delhi', lat: 28.6139, lng: 77.2090 },
+  { name: 'Canberra', lat: -35.2809, lng: 149.1300 },
+  { name: 'Cairo', lat: 30.0444, lng: 31.2357 }
+];
+
 const Globe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<{
@@ -10,6 +24,18 @@ const Globe = () => {
     globe: THREE.Mesh;
     points: THREE.Points;
   } | null>(null);
+
+  // Convert lat/lng to 3D coordinates
+  const latLngToVector3 = (lat: number, lng: number, radius: number) => {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lng + 180) * (Math.PI / 180);
+
+    const x = -(radius * Math.sin(phi) * Math.cos(theta));
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const y = radius * Math.cos(phi);
+
+    return new THREE.Vector3(x, y, z);
+  };
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -27,46 +53,43 @@ const Globe = () => {
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     containerRef.current.appendChild(renderer.domElement);
 
-    // Create globe
+    // Create globe with textures
     const globeGeometry = new THREE.SphereGeometry(2, 64, 64);
+    const textureLoader = new THREE.TextureLoader();
+    
     const globeMaterial = new THREE.MeshPhongMaterial({
-      map: new THREE.TextureLoader().load('/earth-texture.jpg'),
-      bumpMap: new THREE.TextureLoader().load('/earth-bump.jpg'),
+      map: textureLoader.load('/earth-texture.jpg'),
+      bumpMap: textureLoader.load('/earth-bump.jpg'),
       bumpScale: 0.1,
-      specularMap: new THREE.TextureLoader().load('/earth-specular.jpg'),
+      specularMap: textureLoader.load('/earth-specular.jpg'),
       specular: new THREE.Color('grey'),
       shininess: 10,
     });
+    
     const globe = new THREE.Mesh(globeGeometry, globeMaterial);
 
-    // Add random data points
+    // Add capital cities as points
     const pointsGeometry = new THREE.BufferGeometry();
-    const pointsCount = 100;
-    const positions = new Float32Array(pointsCount * 3);
-    const colors = new Float32Array(pointsCount * 3);
+    const positions = new Float32Array(CAPITAL_CITIES.length * 3);
+    const colors = new Float32Array(CAPITAL_CITIES.length * 3);
 
-    for (let i = 0; i < pointsCount; i++) {
-      // Generate random spherical coordinates
-      const phi = Math.random() * Math.PI * 2;
-      const theta = Math.random() * Math.PI;
-      const radius = 2.1; // Slightly larger than globe radius
+    CAPITAL_CITIES.forEach((city, i) => {
+      const position = latLngToVector3(city.lat, city.lng, 2.1); // Slightly larger than globe radius
+      positions[i * 3] = position.x;
+      positions[i * 3 + 1] = position.y;
+      positions[i * 3 + 2] = position.z;
 
-      // Convert to Cartesian coordinates
-      positions[i * 3] = radius * Math.sin(theta) * Math.cos(phi);
-      positions[i * 3 + 1] = radius * Math.sin(theta) * Math.sin(phi);
-      positions[i * 3 + 2] = radius * Math.cos(theta);
-
-      // Random colors (green to match theme)
-      colors[i * 3] = 0.5;
-      colors[i * 3 + 1] = 0.8;
-      colors[i * 3 + 2] = 0.2;
-    }
+      // Purple color to match theme
+      colors[i * 3] = 0.43;     // R: 110/255
+      colors[i * 3 + 1] = 0.35; // G: 89/255
+      colors[i * 3 + 2] = 0.65; // B: 166/255
+    });
 
     pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const pointsMaterial = new THREE.PointsMaterial({
-      size: 0.1,
+      size: 0.15,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
     });
@@ -78,7 +101,7 @@ const Globe = () => {
     scene.add(points);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040);
+    const ambientLight = new THREE.AmbientLight(0x404040, 1);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(5, 3, 5);
     scene.add(ambientLight);
