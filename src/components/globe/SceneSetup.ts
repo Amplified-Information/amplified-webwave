@@ -22,6 +22,31 @@ export const setupScene = (container: HTMLDivElement) => {
   controls.minDistance = 3;
   controls.maxDistance = 10;
 
+  // Add stars
+  const starsGeometry = new THREE.BufferGeometry();
+  const starsMaterial = new THREE.PointsMaterial({
+    color: 0xFFFFFF,
+    size: 0.05,
+    transparent: true,
+    opacity: 0.8,
+  });
+
+  const starsVertices = [];
+  for (let i = 0; i < 10000; i++) {
+    const x = (Math.random() - 0.5) * 100;
+    const y = (Math.random() - 0.5) * 100;
+    const z = (Math.random() - 0.5) * 100;
+    starsVertices.push(x, y, z);
+  }
+
+  starsGeometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(starsVertices, 3)
+  );
+
+  const stars = new THREE.Points(starsGeometry, starsMaterial);
+  scene.add(stars);
+
   const ambientLight = new THREE.AmbientLight(0x404040, 2);
   scene.add(ambientLight);
   
