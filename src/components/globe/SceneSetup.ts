@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { latLngToVector3 } from './utils';
 
 export const setupScene = (container: HTMLDivElement) => {
   const scene = new THREE.Scene();
@@ -28,7 +29,12 @@ export const setupScene = (container: HTMLDivElement) => {
   directionalLight.position.set(5, 3, 5);
   scene.add(directionalLight);
 
-  camera.position.z = 5;
+  // Convert Courtenay's coordinates to 3D position
+  const courtenayPosition = latLngToVector3(49.6835, -124.9957, 5);
+  camera.position.copy(courtenayPosition);
+  
+  // Point camera towards the globe's center
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   return { scene, camera, renderer, controls };
 };
