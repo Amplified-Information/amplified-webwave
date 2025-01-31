@@ -20,7 +20,7 @@ const DataVisualizationDemo = () => {
           <CardContent className="p-6">
             <Globe />
             <div className="mt-6 space-y-4">
-              <h2 className="text-2xl font-semibold">Interactive Globe Visualization</h2>
+              <h2 className="text-2xl font-semibold">Interactive Globe Visualization (under development)</h2>
               <p className="text-gray-600">
                 This visualization demonstrates global data distribution using Three.js. 
                 The globe automatically rotates and displays data points across different locations.
