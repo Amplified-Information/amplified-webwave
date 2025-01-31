@@ -1,102 +1,11 @@
 import { Navigation } from "@/components/Navigation";
-import { useQuery } from "@tanstack/react-query";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-
-interface Rate {
-  id: string;
-  Terms: string;
-  BankRate: string;
-  OurRate: string;
-  BankMonthly: string;
-  OurMonthly: string;
-  Savings: string;
-  updated_at: string;
-}
-
-interface RatesResponse {
-  Rates: Rate[];
-}
-
-const formatPercentage = (value: string) => {
-  const num = parseFloat(value);
-  return num.toFixed(2) + '%';
-};
-
-const formatMoney = (value: string) => {
-  const num = parseFloat(value.replace(/[^0-9.-]+/g, ''));
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(num);
-};
+import { useRates } from "@/hooks/useRates";
+import { RatesTable } from "@/components/RatesTable";
 
 const ApiIntegrationDemo = () => {
-  const { toast } = useToast();
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["rates"],
-    queryFn: async () => {
-      console.log("Starting rates fetch...");
-      
-      console.log("Fetching API key from Supabase...");
-      const { data: apiKey, error: secretError } = await supabase
-        .from('secrets')
-        .select('value')
-        .eq('name', 'MORTGAGE_API_KEY')
-        .single();
-
-      if (secretError) {
-        console.error("Supabase secret error:", secretError);
-        throw new Error('Failed to fetch API key');
-      }
-
-      if (!apiKey?.value) {
-        console.error("No API key found");
-        throw new Error('API key not found in Supabase');
-      }
-
-      console.log("Making API request to rates endpoint...");
-      const response = await fetch(
-        "https://secure.dominionintranet.ca/rest/rates",
-        {
-          headers: {
-            'apikey': apiKey.value
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        console.error("API response error:", response.status, response.statusText);
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
-      }
-
-      const data: RatesResponse = await response.json();
-      console.log("Rates data received:", data);
-      return data;
-    },
-    meta: {
-      onError: (error: Error) => {
-        console.error("Query error:", error);
-        toast({
-          title: "Error",
-          description: error.message || "Failed to load rates",
-          variant: "destructive",
-        });
-      }
-    }
-  });
-
+  const { data, isLoading, error } = useRates();
   const filteredRates = data?.Rates.filter((rate) => parseInt(rate.id) <= 8) || [];
 
   return (
@@ -175,40 +84,7 @@ const ApiIntegrationDemo = () => {
 
             {data && (
               <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-primary/10">
-                      <TableHead className="font-semibold text-primary">Terms</TableHead>
-                      <TableHead className="font-semibold text-primary">Bank Rate</TableHead>
-                      <TableHead className="font-semibold text-primary">Our Rate</TableHead>
-                      <TableHead className="font-semibold text-primary">Monthly Bank Payment</TableHead>
-                      <TableHead className="font-semibold text-primary">Your Monthly Payment</TableHead>
-                      <TableHead className="font-semibold text-primary">Your Monthly Savings</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRates.map((rate, index) => (
-                      <TableRow
-                        key={rate.id}
-                        className={`
-                          transition-colors
-                          hover:bg-primary/5 
-                          cursor-pointer
-                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                        `}
-                      >
-                        <TableCell className="font-medium">{rate.Terms}</TableCell>
-                        <TableCell>{formatPercentage(rate.BankRate)}</TableCell>
-                        <TableCell>{formatPercentage(rate.OurRate)}</TableCell>
-                        <TableCell>{formatMoney(rate.BankMonthly)}</TableCell>
-                        <TableCell>{formatMoney(rate.OurMonthly)}</TableCell>
-                        <TableCell className="text-green-600 font-medium">
-                          {formatMoney(rate.Savings)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <RatesTable rates={filteredRates} />
               </div>
             )}
           </CardContent>
