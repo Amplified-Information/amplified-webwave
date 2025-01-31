@@ -2,7 +2,7 @@ import { CheckCircle } from "lucide-react";
 
 const reasons = [
   "20+ years of industry experience",
-  <a href="https://tdwi.org/cbip" target="_blank" rel="noopener noreferrer" className="hover:underline">CBIP Certified expert consultant</a>,
+  <a href="https://tdwi.org/cbip" target="_blank" rel="noopener noreferrer" className="hover:underline">CBIP certified expert consultant</a>,
   "Tailored solutions for your business",
   "24/7 technical support",
   "Proven track record of success",
