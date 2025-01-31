@@ -11,6 +11,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
 import { createClient } from '@supabase/supabase-js';
+import { useToast } from "@/hooks/use-toast";
 
 interface Rate {
   id: string;
@@ -41,22 +42,36 @@ const formatMoney = (value: string) => {
 };
 
 const ApiIntegrationDemo = () => {
+  const { toast } = useToast();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
+      console.log("Starting rates fetch...");
+      
       const supabase = createClient(
         import.meta.env.VITE_SUPABASE_URL,
         import.meta.env.VITE_SUPABASE_ANON_KEY
       );
       
+      console.log("Fetching API key from Supabase...");
       const { data: apiKey, error: secretError } = await supabase
         .from('secrets')
         .select('value')
         .eq('name', 'MORTGAGE_API_KEY')
         .single();
 
-      if (secretError) throw new Error('Failed to fetch API key');
-      
+      if (secretError) {
+        console.error("Supabase secret error:", secretError);
+        throw new Error('Failed to fetch API key');
+      }
+
+      if (!apiKey?.value) {
+        console.error("No API key found");
+        throw new Error('API key not found in Supabase');
+      }
+
+      console.log("Making API request to rates endpoint...");
       const response = await fetch(
         "https://secure.dominionintranet.ca/rest/rates",
         {
@@ -67,11 +82,22 @@ const ApiIntegrationDemo = () => {
       );
       
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        console.error("API response error:", response.status, response.statusText);
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
       }
+
       const data: RatesResponse = await response.json();
+      console.log("Rates data received:", data);
       return data;
     },
+    onError: (error) => {
+      console.error("Query error:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to load rates",
+        variant: "destructive",
+      });
+    }
   });
 
   const filteredRates = data?.Rates.filter((rate) => parseInt(rate.id) <= 8) || [];
@@ -136,12 +162,18 @@ const ApiIntegrationDemo = () => {
               </h2>
             </div>
 
-            {isLoading && <p className="text-center py-4">Loading rates...</p>}
+            {isLoading && (
+              <div className="text-center py-8">
+                <p className="text-gray-600">Loading rates...</p>
+              </div>
+            )}
             
             {error && (
-              <p className="text-center text-red-500 py-4">
-                Error loading rates. Please try again later.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-red-500">
+                  {error instanceof Error ? error.message : "Error loading rates. Please try again later."}
+                </p>
+              </div>
             )}
 
             {data && (
