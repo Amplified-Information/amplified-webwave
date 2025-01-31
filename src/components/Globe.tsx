@@ -53,6 +53,7 @@ const Globe = () => {
     label.style.fontSize = '14px';
     label.style.pointerEvents = 'none';
     label.style.display = 'none';
+    label.style.transform = 'translate(-50%, -100%)'; // Center the label above the cursor
     containerRef.current.appendChild(label);
     labelRef.current = label;
 
@@ -166,8 +167,8 @@ const Globe = () => {
           const city = CAPITAL_CITIES[index];
           labelRef.current.textContent = city.name;
           labelRef.current.style.display = 'block';
-          labelRef.current.style.left = `${event.clientX - rect.left + 10}px`;
-          labelRef.current.style.top = `${event.clientY - rect.top + 10}px`;
+          labelRef.current.style.left = `${event.clientX}px`;
+          labelRef.current.style.top = `${event.clientY}px`;
         }
       } else {
         labelRef.current.style.display = 'none';
