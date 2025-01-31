@@ -23,42 +23,21 @@ export const useRates = () => {
   return useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
-      console.log("Starting rates fetch...");
+      console.log("Starting rates fetch from Edge Function...");
       
-      const { data: secrets, error: secretError } = await supabase
-        .from('secrets')
-        .select('*')
-        .eq('name', 'MORTGAGE_API_KEY')
-        .limit(1);
-
-      console.log("Supabase query result:", { secrets, secretError });
-
-      if (secretError) {
-        console.error("Supabase secret error:", secretError);
-        throw new Error('Failed to fetch API key');
-      }
-
-      if (!secrets || secrets.length === 0) {
-        console.error("No API key found in secrets table");
-        throw new Error('MORTGAGE_API_KEY not found in Supabase secrets table. Please ensure it has been added.');
-      }
-
-      const apiKey = secrets[0].value;
-      console.log("API key retrieved successfully");
-
-      console.log("Making API request to rates endpoint...");
       const response = await fetch(
-        "https://secure.dominionintranet.ca/rest/rates",
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-mortgage-rates`,
         {
           headers: {
-            'apikey': apiKey
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
           }
         }
       );
-      
+
       if (!response.ok) {
-        console.error("API response error:", response.status, response.statusText);
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        const error = await response.json();
+        console.error("Edge Function error:", error);
+        throw new Error(error.error || 'Failed to fetch rates');
       }
 
       const data: RatesResponse = await response.json();
