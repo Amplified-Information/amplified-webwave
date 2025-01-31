@@ -44,15 +44,20 @@ const formatMoney = (value: string) => {
 const ApiIntegrationDemo = () => {
   const { toast } = useToast();
 
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
       console.log("Starting rates fetch...");
       
-      const supabase = createClient(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_ANON_KEY
-      );
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.error("Supabase credentials missing");
+        throw new Error('Supabase configuration is missing');
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseAnonKey);
       
       console.log("Fetching API key from Supabase...");
       const { data: apiKey, error: secretError } = await supabase
@@ -90,13 +95,15 @@ const ApiIntegrationDemo = () => {
       console.log("Rates data received:", data);
       return data;
     },
-    onError: (error) => {
-      console.error("Query error:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to load rates",
-        variant: "destructive",
-      });
+    meta: {
+      onError: (error: Error) => {
+        console.error("Query error:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load rates",
+          variant: "destructive",
+        });
+      }
     }
   });
 
