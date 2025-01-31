@@ -18,6 +18,7 @@ const CAPITAL_CITIES = [
 
 const Globe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<{
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
@@ -41,6 +42,19 @@ const Globe = () => {
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Create label element
+    const label = document.createElement('div');
+    label.style.position = 'absolute';
+    label.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    label.style.color = 'white';
+    label.style.padding = '4px 8px';
+    label.style.borderRadius = '4px';
+    label.style.fontSize = '14px';
+    label.style.pointerEvents = 'none';
+    label.style.display = 'none';
+    containerRef.current.appendChild(label);
+    labelRef.current = label;
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -122,14 +136,45 @@ const Globe = () => {
     scene.add(points);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 2); // Increased intensity
+    const ambientLight = new THREE.AmbientLight(0x404040, 2);
     scene.add(ambientLight);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Increased intensity
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
     directionalLight.position.set(5, 3, 5);
     scene.add(directionalLight);
 
     camera.position.z = 5;
+
+    // Raycaster for point interaction
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    // Handle mouse move for labels
+    const onMouseMove = (event: MouseEvent) => {
+      if (!containerRef.current || !labelRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / containerRef.current.clientWidth) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / containerRef.current.clientHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(points);
+
+      if (intersects.length > 0) {
+        const index = intersects[0].index;
+        if (index !== undefined && index < CAPITAL_CITIES.length) {
+          const city = CAPITAL_CITIES[index];
+          labelRef.current.textContent = city.name;
+          labelRef.current.style.display = 'block';
+          labelRef.current.style.left = `${event.clientX - rect.left + 10}px`;
+          labelRef.current.style.top = `${event.clientY - rect.top + 10}px`;
+        }
+      } else {
+        labelRef.current.style.display = 'none';
+      }
+    };
+
+    containerRef.current.addEventListener('mousemove', onMouseMove);
 
     // Animation
     const animate = () => {
@@ -158,7 +203,11 @@ const Globe = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       if (containerRef.current) {
+        containerRef.current.removeEventListener('mousemove', onMouseMove);
         containerRef.current.removeChild(renderer.domElement);
+        if (labelRef.current) {
+          containerRef.current.removeChild(labelRef.current);
+        }
       }
       scene.remove(globe);
       scene.remove(points);
