@@ -76,21 +76,23 @@ const CanadianCitiesWeather = () => {
                   <div>
                     <div className="text-3xl font-bold text-blue-600">{coldest.cityName}</div>
                     <div className="text-xl text-blue-500">{coldest.temperature}°C</div>
-                    <div className="text-sm text-blue-400">{coldest.province}</div>
                   </div>
                 </TableCell>
                 <TableCell className="border-0 text-right">
-                  {PROVINCIAL_FLAGS[coldest.province] && (
-                    <img 
-                      src={PROVINCIAL_FLAGS[coldest.province]} 
-                      alt={`${coldest.province} flag`}
-                      className="h-16 w-24 object-cover rounded shadow-sm ml-auto"
-                      onError={(e) => {
-                        console.error('Error loading flag:', e.currentTarget.src);
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  )}
+                  <div className="flex flex-col items-end">
+                    {PROVINCIAL_FLAGS[coldest.province] && (
+                      <img 
+                        src={PROVINCIAL_FLAGS[coldest.province]} 
+                        alt={`${coldest.province} flag`}
+                        className="h-16 w-24 object-cover rounded shadow-sm"
+                        onError={(e) => {
+                          console.error('Error loading flag:', e.currentTarget.src);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
+                    <div className="text-sm text-blue-400 mt-2">{coldest.province}</div>
+                  </div>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -109,21 +111,23 @@ const CanadianCitiesWeather = () => {
                   <div>
                     <div className="text-3xl font-bold text-red-600">{warmest.cityName}</div>
                     <div className="text-xl text-red-500">{warmest.temperature}°C</div>
-                    <div className="text-sm text-red-400">{warmest.province}</div>
                   </div>
                 </TableCell>
                 <TableCell className="border-0 text-right">
-                  {PROVINCIAL_FLAGS[warmest.province] && (
-                    <img 
-                      src={PROVINCIAL_FLAGS[warmest.province]} 
-                      alt={`${warmest.province} flag`}
-                      className="h-16 w-24 object-cover rounded shadow-sm ml-auto"
-                      onError={(e) => {
-                        console.error('Error loading flag:', e.currentTarget.src);
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  )}
+                  <div className="flex flex-col items-end">
+                    {PROVINCIAL_FLAGS[warmest.province] && (
+                      <img 
+                        src={PROVINCIAL_FLAGS[warmest.province]} 
+                        alt={`${warmest.province} flag`}
+                        className="h-16 w-24 object-cover rounded shadow-sm"
+                        onError={(e) => {
+                          console.error('Error loading flag:', e.currentTarget.src);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
+                    <div className="text-sm text-red-400 mt-2">{warmest.province}</div>
+                  </div>
                 </TableCell>
               </TableRow>
             </TableBody>
