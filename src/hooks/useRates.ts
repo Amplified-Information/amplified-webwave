@@ -27,9 +27,10 @@ export const useRates = () => {
       
       const { data: secrets, error: secretError } = await supabase
         .from('secrets')
-        .select('value')
-        .eq('name', 'MORTGAGE_API_KEY')
-        .limit(1);
+        .select('*')
+        .eq('name', 'MORTGAGE_API_KEY');
+
+      console.log("Supabase query result:", { secrets, secretError });
 
       if (secretError) {
         console.error("Supabase secret error:", secretError);
@@ -37,11 +38,12 @@ export const useRates = () => {
       }
 
       if (!secrets || secrets.length === 0) {
-        console.error("No API key found");
+        console.error("No API key found in secrets table");
         throw new Error('API key not found in Supabase');
       }
 
       const apiKey = secrets[0].value;
+      console.log("API key retrieved successfully");
 
       console.log("Making API request to rates endpoint...");
       const response = await fetch(
