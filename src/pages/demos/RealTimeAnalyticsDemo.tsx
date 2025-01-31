@@ -11,9 +11,17 @@ const RealTimeAnalyticsDemo = () => {
         <div className="text-center mb-12">
           <ChartBar className="w-12 h-12 mx-auto mb-4 text-primary" />
           <h1 className="text-4xl font-bold mb-4">Real-time Analytics</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Monitor and analyze data streams in real-time
-          </p>
+          <div className="max-w-3xl mx-auto space-y-4 text-gray-600">
+            <p className="text-lg">
+              This demo showcases real-time data processing and visualization capabilities using live weather data from across Canada. 
+              The dashboard updates automatically every 5 minutes, displaying current temperatures and humidity levels for major Canadian cities.
+            </p>
+            <p className="text-lg">
+              Features include dynamic temperature extremes tracking, provincial averages visualization, and a sortable data table - 
+              demonstrating our platform's ability to handle live data streams, perform real-time calculations, and present insights through 
+              interactive visualizations.
+            </p>
+          </div>
         </div>
 
         <Card className="mb-8">
