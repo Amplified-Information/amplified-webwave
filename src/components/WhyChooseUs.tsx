@@ -1,4 +1,5 @@
 import { CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const reasons = [
   "20+ years of industry experience",
@@ -6,7 +7,7 @@ const reasons = [
   "Tailored solutions for your business",
   "End-to-end project guidance",
   "Proven track record of success",
-  "Industry-leading methodologies",
+  <Link to="/methodologies" className="hover:underline">Industry-leading methodologies</Link>,
 ];
 
 export const WhyChooseUs = () => {
