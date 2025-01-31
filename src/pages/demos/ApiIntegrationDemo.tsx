@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Rate {
@@ -43,12 +43,6 @@ const formatMoney = (value: string) => {
 
 const ApiIntegrationDemo = () => {
   const { toast } = useToast();
-
-  // Initialize Supabase client
-  const supabase = createClient(
-    'https://aqpvwlvwbhxjlzwjlxvr.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxcHZ3bHZ3Ymh4amx6d2pseHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY2ODI2NzcsImV4cCI6MjAyMjI1ODY3N30.Nh83ebqzf1iGHTaGzxkdQjIGYgUyyqwpPGH_wn4j_qE'
-  );
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
