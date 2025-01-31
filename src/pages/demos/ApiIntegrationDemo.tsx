@@ -92,6 +92,19 @@ const ApiIntegrationDemo = () => {
 
         <Card className="mt-8">
           <CardContent className="p-6">
+            <a 
+              href="https://cuttingedgemortgage.ca/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block mb-8 hover:opacity-95 transition-opacity"
+            >
+              <img
+                src="/lovable-uploads/87c4bef0-cf92-4982-8c47-e07cce2a7334.png"
+                alt="West Coast Cutting Edge Mortgage Banner"
+                className="w-full rounded-lg shadow-md"
+              />
+            </a>
+
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
                 Current Canadian Mortgage Rates{" "}
