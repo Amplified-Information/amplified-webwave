@@ -2,18 +2,22 @@ import * as THREE from 'three';
 
 // Capital cities data with their coordinates
 export const CAPITAL_CITIES = [
-  { name: 'London', lat: 51.5074, lng: -0.1278 },
-  { name: 'Paris', lat: 48.8566, lng: 2.3522 },
-  { name: 'Tokyo', lat: 35.6762, lng: 139.6503 },
-  { name: 'Washington DC', lat: 38.9072, lng: -77.0369 },
-  { name: 'Beijing', lat: 39.9042, lng: 116.4074 },
-  { name: 'Moscow', lat: 55.7558, lng: 37.6173 },
-  { name: 'Brasília', lat: -15.7975, lng: -47.8919 },
-  { name: 'New Delhi', lat: 28.6139, lng: 77.2090 },
-  { name: 'Canberra', lat: -35.2809, lng: 149.1300 },
-  { name: 'Cairo', lat: 30.0444, lng: 31.2357 },
-  { name: 'Ottawa', lat: 45.4215, lng: -75.6972 },
-  { name: 'Courtenay', lat: 49.6835, lng: -124.9957 }
+  // Canadian Provincial and Territorial Capitals
+  { name: 'Victoria', lat: 48.4284, lng: -123.3656 },     // British Columbia
+  { name: 'Edmonton', lat: 53.5461, lng: -113.4938 },     // Alberta
+  { name: 'Regina', lat: 50.4452, lng: -104.6189 },       // Saskatchewan
+  { name: 'Winnipeg', lat: 49.8951, lng: -97.1384 },      // Manitoba
+  { name: 'Toronto', lat: 43.6532, lng: -79.3832 },       // Ontario
+  { name: 'Quebec City', lat: 46.8139, lng: -71.2080 },   // Quebec
+  { name: 'Fredericton', lat: 45.9636, lng: -66.6431 },   // New Brunswick
+  { name: 'Halifax', lat: 44.6488, lng: -63.5752 },       // Nova Scotia
+  { name: 'Charlottetown', lat: 46.2382, lng: -63.1311 }, // Prince Edward Island
+  { name: "St. John's", lat: 47.5615, lng: -52.7126 },    // Newfoundland and Labrador
+  { name: 'Whitehorse', lat: 60.7212, lng: -135.0568 },   // Yukon
+  { name: 'Yellowknife', lat: 62.4540, lng: -114.3718 },  // Northwest Territories
+  { name: 'Iqaluit', lat: 63.7467, lng: -68.5170 },       // Nunavut
+  { name: 'Ottawa', lat: 45.4215, lng: -75.6972 },        // National Capital
+  { name: 'Courtenay', lat: 49.6835, lng: -124.9957 }     // Keep Courtenay for reference
 ];
 
 export const latLngToVector3 = (lat: number, lng: number, radius: number) => {
