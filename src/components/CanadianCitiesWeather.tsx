@@ -4,8 +4,9 @@ import WeatherTable from './WeatherTable';
 import ProvinceAveragesChart from './ProvinceAveragesChart';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { WeatherData } from '@/types/weather';
-import { Thermometer, Droplets } from 'lucide-react';
+import { Thermometer } from 'lucide-react';
 import { format } from 'date-fns';
+import { PROVINCIAL_FLAGS } from '@/data/provincialFlags';
 
 const fetchWeatherData = async (): Promise<WeatherData[]> => {
   const promises = CANADIAN_CITIES.map(async (city) => {
@@ -67,11 +68,22 @@ const CanadianCitiesWeather = () => {
             <Thermometer className="h-6 w-6 text-blue-600" />
             <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Coldest City in Canada Right Now</h3>
           </div>
-          <div className="text-3xl font-bold text-blue-600">
-            {coldest.cityName}
-          </div>
-          <div className="text-xl text-blue-500">
-            {coldest.temperature}°C
+          <div className="flex items-center gap-4">
+            <div>
+              <div className="text-3xl font-bold text-blue-600">
+                {coldest.cityName}
+              </div>
+              <div className="text-xl text-blue-500">
+                {coldest.temperature}°C
+              </div>
+            </div>
+            {PROVINCIAL_FLAGS[coldest.province] && (
+              <img 
+                src={PROVINCIAL_FLAGS[coldest.province]} 
+                alt={`${coldest.province} flag`}
+                className="h-12 w-16 object-cover rounded shadow-sm"
+              />
+            )}
           </div>
         </div>
 
@@ -80,11 +92,22 @@ const CanadianCitiesWeather = () => {
             <Thermometer className="h-6 w-6 text-red-600" />
             <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">Warmest City in Canada Right Now</h3>
           </div>
-          <div className="text-3xl font-bold text-red-600">
-            {warmest.cityName}
-          </div>
-          <div className="text-xl text-red-500">
-            {warmest.temperature}°C
+          <div className="flex items-center gap-4">
+            <div>
+              <div className="text-3xl font-bold text-red-600">
+                {warmest.cityName}
+              </div>
+              <div className="text-xl text-red-500">
+                {warmest.temperature}°C
+              </div>
+            </div>
+            {PROVINCIAL_FLAGS[warmest.province] && (
+              <img 
+                src={PROVINCIAL_FLAGS[warmest.province]} 
+                alt={`${warmest.province} flag`}
+                className="h-12 w-16 object-cover rounded shadow-sm"
+              />
+            )}
           </div>
         </div>
       </div>
