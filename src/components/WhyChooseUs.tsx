@@ -3,7 +3,16 @@ import { Link } from "react-router-dom";
 
 const reasons = [
   "20+ years of industry experience",
-  <a href="https://tdwi.org/cbip" target="_blank" rel="noopener noreferrer" className="hover:underline">CBIP certified expert consultant</a>,
+  <div className="flex items-center gap-3">
+    <img 
+      src="/lovable-uploads/f50a8f6c-1a61-46ac-8e5f-bda51fdb2300.png" 
+      alt="CBIP Logo" 
+      className="h-6 w-auto"
+    />
+    <a href="https://tdwi.org/cbip" target="_blank" rel="noopener noreferrer" className="hover:underline">
+      CBIP certified expert consultant
+    </a>
+  </div>,
   "Tailored solutions for your business",
   "End-to-end project guidance",
   "Proven track record of success",
