@@ -29,6 +29,14 @@ const CanadianCitiesWeather = () => {
     refetchInterval: 300000, // Refetch every 5 minutes
   });
 
+  const getTemperatureExtremes = (data: WeatherData[]) => {
+    const sortedByTemp = [...data].sort((a, b) => a.temperature - b.temperature);
+    return {
+      coldest: sortedByTemp[0],
+      warmest: sortedByTemp[sortedByTemp.length - 1]
+    };
+  };
+
   if (isLoading) {
     return <div className="text-center py-8">Loading weather data...</div>;
   }
@@ -37,15 +45,27 @@ const CanadianCitiesWeather = () => {
     return <div className="text-center py-8 text-red-500">Error loading weather data</div>;
   }
 
-  return weatherData ? (
+  if (!weatherData) return null;
+
+  const { coldest, warmest } = getTemperatureExtremes(weatherData);
+
+  return (
     <div>
       <ProvinceAveragesChart weatherData={weatherData} />
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-lg">
+          <span className="text-blue-600">The coldest city right now is {coldest.cityName} ({coldest.temperature}°C)</span>
+        </div>
+        <div className="text-lg">
+          <span className="text-red-600">The warmest city right now is {warmest.cityName} ({warmest.temperature}°C)</span>
+        </div>
+      </div>
       <h2 className="text-2xl font-semibold mb-4">Real-time Canadian Cities Weather Data</h2>
       <div className="mt-8">
         <WeatherTable weatherData={weatherData} />
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default CanadianCitiesWeather;
