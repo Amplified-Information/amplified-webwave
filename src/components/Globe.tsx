@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Capital cities data with their coordinates
 const CAPITAL_CITIES = [
@@ -21,6 +22,7 @@ const Globe = () => {
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
     renderer: THREE.WebGLRenderer;
+    controls: OrbitControls;
     globe: THREE.Mesh;
     points: THREE.Points;
   } | null>(null);
@@ -52,6 +54,13 @@ const Globe = () => {
     
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     containerRef.current.appendChild(renderer.domElement);
+
+    // Add OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 3;
+    controls.maxDistance = 10;
 
     // Create globe with textures
     const globeGeometry = new THREE.SphereGeometry(2, 64, 64);
@@ -112,10 +121,7 @@ const Globe = () => {
     // Animation
     const animate = () => {
       requestAnimationFrame(animate);
-
-      globe.rotation.y += 0.002;
-      points.rotation.y += 0.002;
-
+      controls.update();
       renderer.render(scene, camera);
     };
 
@@ -131,7 +137,7 @@ const Globe = () => {
     window.addEventListener('resize', handleResize);
 
     // Store refs for cleanup
-    globeRef.current = { scene, camera, renderer, globe, points };
+    globeRef.current = { scene, camera, renderer, controls, globe, points };
 
     animate();
 
