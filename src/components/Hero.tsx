@@ -28,11 +28,10 @@ export const Hero = () => {
           </Link>
           <Link to="/demo/overview">
             <Button 
-              variant="outline"
-              className="border-[#86C232] text-[#86C232] hover:bg-[#86C232] hover:text-white animate-fadeIn"
+              className="bg-[#86C232] text-white hover:bg-[#61892F] animate-fadeIn"
               style={{ animationDelay: "0.5s" }}
             >
-              Interact with Demos
+              Interact with Demos <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </div>
