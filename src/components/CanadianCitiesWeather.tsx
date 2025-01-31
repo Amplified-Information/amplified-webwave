@@ -24,9 +24,18 @@ const CANADIAN_CITIES: City[] = [
   { name: "Ottawa", province: "Ontario", latitude: 45.4215, longitude: -75.6972 },
   { name: "Edmonton", province: "Alberta", latitude: 53.5461, longitude: -113.4938 },
   { name: "Winnipeg", province: "Manitoba", latitude: 49.8951, longitude: -97.1384 },
+  { name: "Quebec City", province: "Quebec", latitude: 46.8139, longitude: -71.2080 },
+  { name: "Hamilton", province: "Ontario", latitude: 43.2557, longitude: -79.8711 },
   { name: "Halifax", province: "Nova Scotia", latitude: 44.6488, longitude: -63.5752 },
+  { name: "Victoria", province: "British Columbia", latitude: 48.4284, longitude: -123.3656 },
   { name: "St. John's", province: "Newfoundland", latitude: 47.5615, longitude: -52.7126 },
-  { name: "Regina", province: "Saskatchewan", latitude: 50.4452, longitude: -104.6189 }
+  { name: "Saskatoon", province: "Saskatchewan", latitude: 52.1332, longitude: -106.6700 },
+  { name: "Regina", province: "Saskatchewan", latitude: 50.4452, longitude: -104.6189 },
+  { name: "Charlottetown", province: "Prince Edward Island", latitude: 46.2382, longitude: -63.1311 },
+  { name: "Fredericton", province: "New Brunswick", latitude: 45.9636, longitude: -66.6431 },
+  { name: "Yellowknife", province: "Northwest Territories", latitude: 62.4540, longitude: -114.3718 },
+  { name: "Whitehorse", province: "Yukon", latitude: 60.7212, longitude: -135.0568 },
+  { name: "Iqaluit", province: "Nunavut", latitude: 63.7467, longitude: -68.5170 }
 ];
 
 interface WeatherData {
@@ -67,63 +76,25 @@ const CanadianCitiesWeather = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>City</TableHead>
-              <TableHead>Province</TableHead>
-              <TableHead>Temperature (°C)</TableHead>
+    <div className="rounded-lg border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>City</TableHead>
+            <TableHead>Province</TableHead>
+            <TableHead>Temperature (°C)</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {weatherData?.map((city) => (
+            <TableRow key={city.cityName}>
+              <TableCell className="font-medium">{city.cityName}</TableCell>
+              <TableCell>{city.province}</TableCell>
+              <TableCell>{city.temperature}°C</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {weatherData?.map((city) => (
-              <TableRow key={city.cityName}>
-                <TableCell className="font-medium">{city.cityName}</TableCell>
-                <TableCell>{city.province}</TableCell>
-                <TableCell>{city.temperature}°C</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="relative w-full h-[400px] rounded-lg border overflow-hidden">
-        <svg
-          viewBox="0 0 1000 800"
-          className="w-full h-full"
-          style={{ background: '#f0f9ff' }}
-        >
-          {/* Simplified map of Canada */}
-          <path
-            d="M50,400 C100,350 200,300 300,250 C400,200 500,150 600,200 C700,250 800,300 900,350 L950,750 L50,750 Z"
-            fill="#e5e7eb"
-            stroke="#9ca3af"
-            strokeWidth="2"
-          />
-          
-          {weatherData?.map((city, index) => {
-            const x = CANADIAN_CITIES[index].longitude * -5 + 500;
-            const y = CANADIAN_CITIES[index].latitude * -8 + 800;
-            
-            return (
-              <g key={city.cityName} transform={`translate(${x},${y})`}>
-                <circle r="5" fill="#6E59A5" />
-                <text
-                  x="10"
-                  y="5"
-                  fontSize="12"
-                  fill="#374151"
-                  className="font-medium"
-                >
-                  {city.cityName} ({city.temperature}°C)
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
