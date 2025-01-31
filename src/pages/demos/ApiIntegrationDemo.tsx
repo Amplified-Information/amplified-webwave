@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
+import { createClient } from '@supabase/supabase-js';
 
 interface Rate {
   id: string;
@@ -43,9 +44,28 @@ const ApiIntegrationDemo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
-      const response = await fetch(
-        "https://secure.dominionintranet.ca/rest/rates?apikey=ec13af76-366f-11e7-bb05-000c297aee86"
+      const supabase = createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY
       );
+      
+      const { data: apiKey, error: secretError } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'MORTGAGE_API_KEY')
+        .single();
+
+      if (secretError) throw new Error('Failed to fetch API key');
+      
+      const response = await fetch(
+        "https://secure.dominionintranet.ca/rest/rates",
+        {
+          headers: {
+            'apikey': apiKey.value
+          }
+        }
+      );
+      
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
