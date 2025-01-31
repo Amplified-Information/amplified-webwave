@@ -119,9 +119,9 @@ const ApiIntegrationDemo = () => {
                       <TableHead className="font-semibold text-primary">Terms</TableHead>
                       <TableHead className="font-semibold text-primary">Bank Rate</TableHead>
                       <TableHead className="font-semibold text-primary">Our Rate</TableHead>
-                      <TableHead className="font-semibold text-primary">Bank Monthly</TableHead>
-                      <TableHead className="font-semibold text-primary">Our Monthly</TableHead>
-                      <TableHead className="font-semibold text-primary">Savings</TableHead>
+                      <TableHead className="font-semibold text-primary">Monthly Bank Payment</TableHead>
+                      <TableHead className="font-semibold text-primary">Your Monthly Payment</TableHead>
+                      <TableHead className="font-semibold text-primary">Your Monthly Savings</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
