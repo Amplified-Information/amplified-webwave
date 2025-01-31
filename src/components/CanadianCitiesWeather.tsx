@@ -60,6 +60,12 @@ const CanadianCitiesWeather = () => {
   const { coldest, warmest } = getTemperatureExtremes(weatherData);
   const currentTime = format(new Date(), "MMMM d, yyyy 'at' h:mm aa");
 
+  // Debug logging
+  console.log('Coldest city province:', coldest.province);
+  console.log('Coldest city flag path:', PROVINCIAL_FLAGS[coldest.province]);
+  console.log('Warmest city province:', warmest.province);
+  console.log('Warmest city flag path:', PROVINCIAL_FLAGS[warmest.province]);
+
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="grid gap-6 md:grid-cols-2">
@@ -76,12 +82,19 @@ const CanadianCitiesWeather = () => {
               <div className="text-xl text-blue-500">
                 {coldest.temperature}°C
               </div>
+              <div className="text-sm text-blue-400">
+                {coldest.province}
+              </div>
             </div>
             {PROVINCIAL_FLAGS[coldest.province] && (
               <img 
                 src={PROVINCIAL_FLAGS[coldest.province]} 
                 alt={`${coldest.province} flag`}
                 className="h-12 w-16 object-cover rounded shadow-sm"
+                onError={(e) => {
+                  console.error('Error loading flag:', e.currentTarget.src);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             )}
           </div>
@@ -100,12 +113,19 @@ const CanadianCitiesWeather = () => {
               <div className="text-xl text-red-500">
                 {warmest.temperature}°C
               </div>
+              <div className="text-sm text-red-400">
+                {warmest.province}
+              </div>
             </div>
             {PROVINCIAL_FLAGS[warmest.province] && (
               <img 
                 src={PROVINCIAL_FLAGS[warmest.province]} 
                 alt={`${warmest.province} flag`}
                 className="h-12 w-16 object-cover rounded shadow-sm"
+                onError={(e) => {
+                  console.error('Error loading flag:', e.currentTarget.src);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             )}
           </div>
