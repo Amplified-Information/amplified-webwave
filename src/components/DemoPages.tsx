@@ -66,8 +66,8 @@ export const DemoPages = () => {
             >
               <Card className={`h-full transition-all duration-300 ${
                 demo.isActive 
-                  ? 'hover:shadow-lg hover:bg-green-50' 
-                  : 'hover:shadow-lg hover:bg-primary/10'
+                  ? 'hover:shadow-lg hover:bg-[#F2FCE2]' 
+                  : 'hover:shadow-lg hover:bg-[#F2FCE2]/50'
               }`}>
                 <CardHeader>
                   <CardTitle>{demo.title}</CardTitle>
