@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -8,25 +8,88 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { WeatherData } from '@/types/weather';
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface WeatherTableProps {
   weatherData: WeatherData[];
 }
 
+type SortField = 'cityName' | 'province' | 'temperature' | 'humidity';
+type SortDirection = 'asc' | 'desc';
+
 const WeatherTable = ({ weatherData }: WeatherTableProps) => {
+  const [sortField, setSortField] = useState<SortField>('cityName');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedData = [...weatherData].sort((a, b) => {
+    const multiplier = sortDirection === 'asc' ? 1 : -1;
+    
+    if (sortField === 'temperature' || sortField === 'humidity') {
+      return (a[sortField] - b[sortField]) * multiplier;
+    }
+    
+    return a[sortField].localeCompare(b[sortField]) * multiplier;
+  });
+
   return (
     <div className="rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>City</TableHead>
-            <TableHead>Province</TableHead>
-            <TableHead>Temperature (°C)</TableHead>
-            <TableHead>Humidity (%)</TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('cityName')}
+                className="h-8 w-full flex items-center justify-between"
+              >
+                City
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('province')}
+                className="h-8 w-full flex items-center justify-between"
+              >
+                Province
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('temperature')}
+                className="h-8 w-full flex items-center justify-between"
+              >
+                Temperature (°C)
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('humidity')}
+                className="h-8 w-full flex items-center justify-between"
+              >
+                Humidity (%)
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {weatherData?.map((city) => (
+          {sortedData.map((city) => (
             <TableRow key={city.cityName}>
               <TableCell className="font-medium">{city.cityName}</TableCell>
               <TableCell>{city.province}</TableCell>
