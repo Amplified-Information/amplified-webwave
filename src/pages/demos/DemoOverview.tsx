@@ -62,9 +62,9 @@ const DemoOverview = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {demos.map((demo) => (
               <Link 
-                to={demo.isActive ? demo.path : "#"} 
+                to={demo.path}
                 key={demo.path} 
-                className={`group relative ${!demo.isActive && 'cursor-not-allowed'}`}
+                className="group relative"
               >
                 <Card className={`h-full transition-all duration-300 ${
                   demo.isActive 
