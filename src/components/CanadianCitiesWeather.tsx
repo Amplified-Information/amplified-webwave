@@ -4,6 +4,7 @@ import WeatherTable from './WeatherTable';
 import ProvinceAveragesChart from './ProvinceAveragesChart';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { WeatherData } from '@/types/weather';
+import { Thermometer, Droplets } from 'lucide-react';
 
 const fetchWeatherData = async (): Promise<WeatherData[]> => {
   const promises = CANADIAN_CITIES.map(async (city) => {
@@ -38,7 +39,14 @@ const CanadianCitiesWeather = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading weather data...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-primary/20"></div>
+          <div className="text-lg">Loading weather data...</div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -50,19 +58,44 @@ const CanadianCitiesWeather = () => {
   const { coldest, warmest } = getTemperatureExtremes(weatherData);
 
   return (
-    <div>
-      <ProvinceAveragesChart weatherData={weatherData} />
-      <div className="flex justify-between items-center mb-6">
-        <div className="text-lg">
-          <span className="text-blue-600">The coldest city right now is {coldest.cityName} ({coldest.temperature}°C)</span>
+    <div className="space-y-8 animate-fadeIn">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
+          <div className="flex items-center gap-3 mb-2">
+            <Thermometer className="h-6 w-6 text-blue-600" />
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Coldest City</h3>
+          </div>
+          <div className="text-3xl font-bold text-blue-600">
+            {coldest.cityName}
+          </div>
+          <div className="text-xl text-blue-500">
+            {coldest.temperature}°C
+          </div>
         </div>
-        <div className="text-lg">
-          <span className="text-red-600">The warmest city right now is {warmest.cityName} ({warmest.temperature}°C)</span>
+
+        <div className="p-6 rounded-lg bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
+          <div className="flex items-center gap-3 mb-2">
+            <Thermometer className="h-6 w-6 text-red-600" />
+            <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">Warmest City</h3>
+          </div>
+          <div className="text-3xl font-bold text-red-600">
+            {warmest.cityName}
+          </div>
+          <div className="text-xl text-red-500">
+            {warmest.temperature}°C
+          </div>
         </div>
       </div>
-      <h2 className="text-2xl font-semibold mb-4">Real-time Canadian Cities Weather Data</h2>
-      <div className="mt-8">
-        <WeatherTable weatherData={weatherData} />
+
+      <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm transition-all hover:shadow-xl">
+        <ProvinceAveragesChart weatherData={weatherData} />
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Real-time Canadian Cities Weather Data</h2>
+        <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm">
+          <WeatherTable weatherData={weatherData} />
+        </div>
       </div>
     </div>
   );
