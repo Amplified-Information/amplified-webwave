@@ -10,7 +10,7 @@ const reasons = [
       className="h-6 w-auto"
     />
     <a href="https://tdwi.org/cbip" target="_blank" rel="noopener noreferrer" className="hover:underline">
-      CBIP certified expert consultant
+      Certified expert consultant
     </a>
   </div>,
   "Tailored solutions for your business",
