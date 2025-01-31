@@ -44,20 +44,16 @@ const formatMoney = (value: string) => {
 const ApiIntegrationDemo = () => {
   const { toast } = useToast();
 
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  // Initialize Supabase client
+  const supabase = createClient(
+    'https://aqpvwlvwbhxjlzwjlxvr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxcHZ3bHZ3Ymh4amx6d2pseHZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY2ODI2NzcsImV4cCI6MjAyMjI1ODY3N30.Nh83ebqzf1iGHTaGzxkdQjIGYgUyyqwpPGH_wn4j_qE'
+  );
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
       console.log("Starting rates fetch...");
-      
-      if (!supabaseUrl || !supabaseAnonKey) {
-        console.error("Supabase credentials missing");
-        throw new Error('Supabase configuration is missing');
-      }
-
-      const supabase = createClient(supabaseUrl, supabaseAnonKey);
       
       console.log("Fetching API key from Supabase...");
       const { data: apiKey, error: secretError } = await supabase
