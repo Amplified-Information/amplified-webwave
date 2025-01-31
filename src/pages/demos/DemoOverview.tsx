@@ -12,7 +12,8 @@ const DemoOverview = () => {
     {
       title: "Real-time Analytics",
       description: "Monitor and analyze data streams in real-time",
-      path: "/demo/real-time-analytics"
+      path: "/demo/real-time-analytics",
+      isActive: true
     },
     {
       title: "Security Features",
