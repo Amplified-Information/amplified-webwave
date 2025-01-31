@@ -64,7 +64,7 @@ const ApiIntegrationDemo = () => {
           <Code className="w-12 h-12 mx-auto mb-4 text-primary" />
           <h1 className="text-4xl font-bold mb-4">API Integration</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Connect with external services through our API platform
+            Connect with external services through an API call
           </p>
         </div>
 
