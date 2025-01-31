@@ -109,7 +109,7 @@ const ApiIntegrationDemo = () => {
               <h2 className="text-2xl font-semibold text-gray-800">
                 Current Canadian Mortgage Rates{" "}
                 {data && (
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className="text-sm font-normal text-green-600">
                     (Updated on: {filteredRates[0]?.updated_at})
                   </span>
                 )}
