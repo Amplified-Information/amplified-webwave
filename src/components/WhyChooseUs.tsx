@@ -4,7 +4,7 @@ const reasons = [
   "20+ years of industry experience",
   <a href="https://tdwi.org/cbip" target="_blank" rel="noopener noreferrer" className="hover:underline">CBIP certified expert consultant</a>,
   "Tailored solutions for your business",
-  "24/7 technical support",
+  "End-to-end project guidance",
   "Proven track record of success",
   "Industry-leading methodologies",
 ];
