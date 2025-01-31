@@ -68,11 +68,33 @@ const ApiIntegrationDemo = () => {
           </p>
         </div>
 
+        <Card className="mt-8 mb-8">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">About This API</h2>
+            <div className="space-y-4 text-gray-600">
+              <p>
+                This demo showcases real-time integration with a Canadian mortgage rates API. 
+                The API provides up-to-date mortgage rate information, allowing for direct 
+                comparison between bank rates and our competitive offerings.
+              </p>
+              <div className="bg-primary/5 p-4 rounded-lg">
+                <h3 className="font-semibold text-primary mb-2">Key API Features:</h3>
+                <ul className="list-disc list-inside space-y-2">
+                  <li>Real-time rate updates throughout the business day</li>
+                  <li>Comprehensive comparison between bank rates and our rates</li>
+                  <li>Monthly payment calculations for different term lengths</li>
+                  <li>Potential savings calculations based on rate differences</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="mt-8">
           <CardContent className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
-                Rates Table{" "}
+                Current Canadian Mortgage Rates{" "}
                 {data && (
                   <span className="text-sm font-normal text-gray-500">
                     (Updated on: {filteredRates[0]?.updated_at})
