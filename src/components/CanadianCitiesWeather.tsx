@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import WeatherTable from './WeatherTable';
+import ProvinceAveragesChart from './ProvinceAveragesChart';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { WeatherData } from '@/types/weather';
 
@@ -36,7 +37,12 @@ const CanadianCitiesWeather = () => {
     return <div className="text-center py-8 text-red-500">Error loading weather data</div>;
   }
 
-  return weatherData ? <WeatherTable weatherData={weatherData} /> : null;
+  return weatherData ? (
+    <div>
+      <WeatherTable weatherData={weatherData} />
+      <ProvinceAveragesChart weatherData={weatherData} />
+    </div>
+  ) : null;
 };
 
 export default CanadianCitiesWeather;

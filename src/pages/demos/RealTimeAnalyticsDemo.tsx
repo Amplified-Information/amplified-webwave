@@ -2,6 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartBar } from "lucide-react";
 import CanadianCitiesWeather from "@/components/CanadianCitiesWeather";
+import ProvinceAveragesChart from "@/components/ProvinceAveragesChart";
 
 const RealTimeAnalyticsDemo = () => {
   return (
@@ -17,28 +18,6 @@ const RealTimeAnalyticsDemo = () => {
         </div>
 
         <Card className="mb-8">
-          <CardContent className="p-6">
-            <img
-              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f"
-              alt="Real-time Analytics Demo"
-              className="w-full h-64 object-cover rounded-lg mb-6"
-            />
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Features Coming Soon</h2>
-              <p className="text-gray-600">
-                Our real-time analytics platform will demonstrate:
-              </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600">
-                <li>Live data visualization and dashboards</li>
-                <li>Customizable metrics and KPIs</li>
-                <li>Trend analysis and forecasting</li>
-                <li>Automated reporting systems</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
           <CardContent className="p-6">
             <h2 className="text-2xl font-semibold mb-6">Canadian Cities Weather Data</h2>
             <CanadianCitiesWeather />
