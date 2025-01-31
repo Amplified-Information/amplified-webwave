@@ -68,9 +68,7 @@ const Globe = () => {
     
     const globeMaterial = new THREE.MeshPhongMaterial({
       map: textureLoader.load('/earth-texture.jpg'),
-      bumpMap: textureLoader.load('/earth-bump.jpg'),
       bumpScale: 0.1,
-      specularMap: textureLoader.load('/earth-specular.jpg'),
       specular: new THREE.Color('grey'),
       shininess: 10,
     });
