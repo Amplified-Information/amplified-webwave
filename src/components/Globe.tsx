@@ -106,7 +106,7 @@ const Globe = () => {
     
     const globe = new THREE.Mesh(globeGeometry, globeMaterial);
 
-    // Add capital cities as points
+    // Add capital cities as points with improved appearance
     const pointsGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(CAPITAL_CITIES.length * 3);
     const colors = new Float32Array(CAPITAL_CITIES.length * 3);
@@ -117,19 +117,46 @@ const Globe = () => {
       positions[i * 3 + 1] = position.y;
       positions[i * 3 + 2] = position.z;
 
-      // Purple color to match theme
-      colors[i * 3] = 0.43;     // R: 110/255
-      colors[i * 3 + 1] = 0.35; // G: 89/255
-      colors[i * 3 + 2] = 0.65; // B: 166/255
+      // Brighter purple color with higher saturation
+      colors[i * 3] = 0.6;     // R: Higher red value
+      colors[i * 3 + 1] = 0.4; // G: Adjusted green
+      colors[i * 3 + 2] = 0.9; // B: Higher blue value for more vibrant purple
     });
 
     pointsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     pointsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const pointsMaterial = new THREE.PointsMaterial({
-      size: 0.15,
+      size: 0.12, // Slightly smaller size
       vertexColors: true,
       blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.8,
+      sizeAttenuation: true, // Points change size based on distance
+      map: (() => {
+        // Create a circular point texture
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const context = canvas.getContext('2d')!;
+        
+        // Create gradient for a glowing effect
+        const gradient = context.createRadialGradient(
+          32, 32, 0,
+          32, 32, 32
+        );
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 64, 64);
+        
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        return texture;
+      })()
     });
 
     const points = new THREE.Points(pointsGeometry, pointsMaterial);
