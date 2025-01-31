@@ -25,25 +25,25 @@ export const useRates = () => {
     queryFn: async () => {
       console.log("Starting rates fetch...");
       
-      const { data: secret, error: secretError } = await supabase
+      const { data: secrets, error: secretError } = await supabase
         .from('secrets')
         .select('*')
         .eq('name', 'MORTGAGE_API_KEY')
-        .maybeSingle();
+        .limit(1);
 
-      console.log("Supabase query result:", { secret, secretError });
+      console.log("Supabase query result:", { secrets, secretError });
 
       if (secretError) {
         console.error("Supabase secret error:", secretError);
         throw new Error('Failed to fetch API key');
       }
 
-      if (!secret) {
+      if (!secrets || secrets.length === 0) {
         console.error("No API key found in secrets table");
         throw new Error('MORTGAGE_API_KEY not found in Supabase secrets table. Please ensure it has been added.');
       }
 
-      const apiKey = secret.value;
+      const apiKey = secrets[0].value;
       console.log("API key retrieved successfully");
 
       console.log("Making API request to rates endpoint...");
