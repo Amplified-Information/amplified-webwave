@@ -25,28 +25,30 @@ export const useRates = () => {
     queryFn: async () => {
       console.log("Starting rates fetch...");
       
-      const { data: apiKey, error: secretError } = await supabase
+      const { data: secrets, error: secretError } = await supabase
         .from('secrets')
         .select('value')
         .eq('name', 'MORTGAGE_API_KEY')
-        .single();
+        .limit(1);
 
       if (secretError) {
         console.error("Supabase secret error:", secretError);
         throw new Error('Failed to fetch API key');
       }
 
-      if (!apiKey?.value) {
+      if (!secrets || secrets.length === 0) {
         console.error("No API key found");
         throw new Error('API key not found in Supabase');
       }
+
+      const apiKey = secrets[0].value;
 
       console.log("Making API request to rates endpoint...");
       const response = await fetch(
         "https://secure.dominionintranet.ca/rest/rates",
         {
           headers: {
-            'apikey': apiKey.value
+            'apikey': apiKey
           }
         }
       );
