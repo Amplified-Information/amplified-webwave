@@ -40,6 +40,7 @@ const CanadianCitiesWeather = () => {
   return weatherData ? (
     <div>
       <ProvinceAveragesChart weatherData={weatherData} />
+      <h2 className="text-2xl font-semibold mb-4">Real-time Canadian Cities Weather Data</h2>
       <div className="mt-8">
         <WeatherTable weatherData={weatherData} />
       </div>

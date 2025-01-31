@@ -2,7 +2,6 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartBar } from "lucide-react";
 import CanadianCitiesWeather from "@/components/CanadianCitiesWeather";
-import ProvinceAveragesChart from "@/components/ProvinceAveragesChart";
 
 const RealTimeAnalyticsDemo = () => {
   return (
@@ -19,7 +18,6 @@ const RealTimeAnalyticsDemo = () => {
 
         <Card className="mb-8">
           <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-6">Canadian Cities Weather Data</h2>
             <CanadianCitiesWeather />
           </CardContent>
         </Card>
