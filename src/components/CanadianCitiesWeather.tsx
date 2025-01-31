@@ -2,10 +2,9 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import WeatherTable from './WeatherTable';
 import ProvinceAveragesChart from './ProvinceAveragesChart';
-import TemperatureHeatMap from './TemperatureHeatMap';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { WeatherData } from '@/types/weather';
-import { Thermometer } from 'lucide-react';
+import { Thermometer, Droplets } from 'lucide-react';
 
 const fetchWeatherData = async (): Promise<WeatherData[]> => {
   const promises = CANADIAN_CITIES.map(async (city) => {
@@ -86,10 +85,6 @@ const CanadianCitiesWeather = () => {
             {warmest.temperature}°C
           </div>
         </div>
-      </div>
-
-      <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm transition-all hover:shadow-xl">
-        <TemperatureHeatMap weatherData={weatherData} />
       </div>
 
       <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm transition-all hover:shadow-xl">
