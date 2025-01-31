@@ -1,11 +1,59 @@
 import { Navigation } from "@/components/Navigation";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
-import { useRates } from "@/hooks/useRates";
-import { RatesTable } from "@/components/RatesTable";
+
+interface Rate {
+  id: string;
+  Terms: string;
+  BankRate: string;
+  OurRate: string;
+  BankMonthly: string;
+  OurMonthly: string;
+  Savings: string;
+  updated_at: string;
+}
+
+interface RatesResponse {
+  Rates: Rate[];
+}
+
+const formatPercentage = (value: string) => {
+  const num = parseFloat(value);
+  return num.toFixed(2) + '%';
+};
+
+const formatMoney = (value: string) => {
+  const num = parseFloat(value.replace(/[^0-9.-]+/g, ''));
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(num);
+};
 
 const ApiIntegrationDemo = () => {
-  const { data, isLoading, error } = useRates();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["rates"],
+    queryFn: async () => {
+      const response = await fetch(
+        "https://secure.dominionintranet.ca/rest/rates?apikey=ec13af76-366f-11e7-bb05-000c297aee86"
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data: RatesResponse = await response.json();
+      return data;
+    },
+  });
+
   const filteredRates = data?.Rates.filter((rate) => parseInt(rate.id) <= 8) || [];
 
   return (
@@ -68,23 +116,50 @@ const ApiIntegrationDemo = () => {
               </h2>
             </div>
 
-            {isLoading && (
-              <div className="text-center py-8">
-                <p className="text-gray-600">Loading rates...</p>
-              </div>
-            )}
+            {isLoading && <p className="text-center py-4">Loading rates...</p>}
             
             {error && (
-              <div className="text-center py-8">
-                <p className="text-red-500">
-                  {error instanceof Error ? error.message : "Error loading rates. Please try again later."}
-                </p>
-              </div>
+              <p className="text-center text-red-500 py-4">
+                Error loading rates. Please try again later.
+              </p>
             )}
 
             {data && (
               <div className="overflow-x-auto">
-                <RatesTable rates={filteredRates} />
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-primary/10">
+                      <TableHead className="font-semibold text-primary">Terms</TableHead>
+                      <TableHead className="font-semibold text-primary">Bank Rate</TableHead>
+                      <TableHead className="font-semibold text-primary">Our Rate</TableHead>
+                      <TableHead className="font-semibold text-primary">Monthly Bank Payment</TableHead>
+                      <TableHead className="font-semibold text-primary">Your Monthly Payment</TableHead>
+                      <TableHead className="font-semibold text-primary">Your Monthly Savings</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredRates.map((rate, index) => (
+                      <TableRow
+                        key={rate.id}
+                        className={`
+                          transition-colors
+                          hover:bg-primary/5 
+                          cursor-pointer
+                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        `}
+                      >
+                        <TableCell className="font-medium">{rate.Terms}</TableCell>
+                        <TableCell>{formatPercentage(rate.BankRate)}</TableCell>
+                        <TableCell>{formatPercentage(rate.OurRate)}</TableCell>
+                        <TableCell>{formatMoney(rate.BankMonthly)}</TableCell>
+                        <TableCell>{formatMoney(rate.OurMonthly)}</TableCell>
+                        <TableCell className="text-green-600 font-medium">
+                          {formatMoney(rate.Savings)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
           </CardContent>
