@@ -5,6 +5,7 @@ import ProvinceAveragesChart from './ProvinceAveragesChart';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { WeatherData } from '@/types/weather';
 import { Thermometer, Droplets } from 'lucide-react';
+import { format } from 'date-fns';
 
 const fetchWeatherData = async (): Promise<WeatherData[]> => {
   const promises = CANADIAN_CITIES.map(async (city) => {
@@ -56,6 +57,7 @@ const CanadianCitiesWeather = () => {
   if (!weatherData) return null;
 
   const { coldest, warmest } = getTemperatureExtremes(weatherData);
+  const currentTime = format(new Date(), "MMMM d, yyyy 'at' h:mm aa");
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -92,7 +94,7 @@ const CanadianCitiesWeather = () => {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Real-time Canadian Cities Weather Data</h2>
+        <h2 className="text-2xl font-semibold">Real-time Canadian Cities Weather Data as of {currentTime}</h2>
         <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm">
           <WeatherTable weatherData={weatherData} />
         </div>
