@@ -26,6 +26,19 @@ interface RatesResponse {
   Rates: Rate[];
 }
 
+const formatPercentage = (value: string) => {
+  const num = parseFloat(value);
+  return num.toFixed(2) + '%';
+};
+
+const formatMoney = (value: string) => {
+  const num = parseFloat(value.replace(/[^0-9.-]+/g, ''));
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(num);
+};
+
 const ApiIntegrationDemo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
@@ -80,27 +93,34 @@ const ApiIntegrationDemo = () => {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Terms</TableHead>
-                      <TableHead>Bank Rate</TableHead>
-                      <TableHead>Our Rate</TableHead>
-                      <TableHead>Bank Monthly</TableHead>
-                      <TableHead>Our Monthly</TableHead>
-                      <TableHead>Savings</TableHead>
+                    <TableRow className="bg-primary/10">
+                      <TableHead className="font-semibold text-primary">Terms</TableHead>
+                      <TableHead className="font-semibold text-primary">Bank Rate</TableHead>
+                      <TableHead className="font-semibold text-primary">Our Rate</TableHead>
+                      <TableHead className="font-semibold text-primary">Bank Monthly</TableHead>
+                      <TableHead className="font-semibold text-primary">Our Monthly</TableHead>
+                      <TableHead className="font-semibold text-primary">Savings</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredRates.map((rate) => (
+                    {filteredRates.map((rate, index) => (
                       <TableRow
                         key={rate.id}
-                        className="hover:bg-primary/5 cursor-pointer"
+                        className={`
+                          transition-colors
+                          hover:bg-primary/5 
+                          cursor-pointer
+                          ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                        `}
                       >
-                        <TableCell>{rate.Terms}</TableCell>
-                        <TableCell>{rate.BankRate}</TableCell>
-                        <TableCell>{rate.OurRate}</TableCell>
-                        <TableCell>{rate.BankMonthly}</TableCell>
-                        <TableCell>{rate.OurMonthly}</TableCell>
-                        <TableCell>{rate.Savings}</TableCell>
+                        <TableCell className="font-medium">{rate.Terms}</TableCell>
+                        <TableCell>{formatPercentage(rate.BankRate)}</TableCell>
+                        <TableCell>{formatPercentage(rate.OurRate)}</TableCell>
+                        <TableCell>{formatMoney(rate.BankMonthly)}</TableCell>
+                        <TableCell>{formatMoney(rate.OurMonthly)}</TableCell>
+                        <TableCell className="text-green-600 font-medium">
+                          {formatMoney(rate.Savings)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
