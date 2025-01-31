@@ -32,7 +32,7 @@ export const Hero = () => {
               className="border-[#86C232] text-[#86C232] hover:bg-[#86C232] hover:text-white animate-fadeIn"
               style={{ animationDelay: "0.5s" }}
             >
-              View Demo
+              Interact with Demos
             </Button>
           </Link>
         </div>
