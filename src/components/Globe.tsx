@@ -44,14 +44,16 @@ const Globe = () => {
 
     // Scene setup
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    
     const camera = new THREE.PerspectiveCamera(
       75,
       containerRef.current.clientWidth / containerRef.current.clientHeight,
       0.1,
       1000
     );
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
     
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
     containerRef.current.appendChild(renderer.domElement);
 
@@ -62,13 +64,25 @@ const Globe = () => {
     controls.minDistance = 3;
     controls.maxDistance = 10;
 
-    // Create globe with textures
+    // Create globe with texture
     const globeGeometry = new THREE.SphereGeometry(2, 64, 64);
     const textureLoader = new THREE.TextureLoader();
     
+    // Add loading manager to handle errors
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.onError = (url) => {
+      console.error('Error loading texture:', url);
+    };
+
+    textureLoader.setPath('/');
     const globeMaterial = new THREE.MeshPhongMaterial({
-      map: textureLoader.load('/earth-texture.jpg'),
-      bumpScale: 0.1,
+      map: textureLoader.load('earth-texture.jpg', 
+        undefined,
+        undefined,
+        (error) => {
+          console.error('Error loading earth texture:', error);
+        }
+      ),
       specular: new THREE.Color('grey'),
       shininess: 10,
     });
@@ -81,7 +95,7 @@ const Globe = () => {
     const colors = new Float32Array(CAPITAL_CITIES.length * 3);
 
     CAPITAL_CITIES.forEach((city, i) => {
-      const position = latLngToVector3(city.lat, city.lng, 2.1); // Slightly larger than globe radius
+      const position = latLngToVector3(city.lat, city.lng, 2.1);
       positions[i * 3] = position.x;
       positions[i * 3 + 1] = position.y;
       positions[i * 3 + 2] = position.z;
@@ -108,10 +122,11 @@ const Globe = () => {
     scene.add(points);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 1);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 3, 5);
+    const ambientLight = new THREE.AmbientLight(0x404040, 2); // Increased intensity
     scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Increased intensity
+    directionalLight.position.set(5, 3, 5);
     scene.add(directionalLight);
 
     camera.position.z = 5;
