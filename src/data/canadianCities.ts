@@ -21,6 +21,7 @@ export const CANADIAN_CITIES: City[] = [
   { name: "Surrey", province: "British Columbia", latitude: 49.1913, longitude: -122.8490 },
   { name: "Burnaby", province: "British Columbia", latitude: 49.2488, longitude: -122.9805 },
   { name: "Richmond", province: "British Columbia", latitude: 49.1666, longitude: -123.1336 },
+  { name: "Comox", province: "British Columbia", latitude: 49.6735, longitude: -124.9282 },
 
   // Alberta
   { name: "Calgary", province: "Alberta", latitude: 51.0447, longitude: -114.0719 },
