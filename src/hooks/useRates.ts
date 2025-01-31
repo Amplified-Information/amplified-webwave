@@ -23,21 +23,40 @@ export const useRates = () => {
   return useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
-      console.log("Starting rates fetch from Edge Function...");
+      console.log("Starting rates fetch...");
       
+      // Fetch API key from Supabase secrets
+      const { data: secrets, error: secretError } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'MORTGAGE_API_KEY')
+        .single();
+
+      if (secretError) {
+        console.error("Failed to fetch API key:", secretError);
+        throw new Error('Failed to fetch API key');
+      }
+
+      if (!secrets) {
+        console.error("No API key found");
+        throw new Error('API key not found');
+      }
+
+      console.log("Making API request to rates endpoint...");
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-mortgage-rates`,
+        "https://secure.dominionintranet.ca/rest/rates",
         {
           headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            'apikey': secrets.value,
+            'Content-Type': 'application/json'
           }
         }
       );
 
       if (!response.ok) {
-        const error = await response.json();
-        console.error("Edge Function error:", error);
-        throw new Error(error.error || 'Failed to fetch rates');
+        const errorText = await response.text();
+        console.error("API response error:", response.status, errorText);
+        throw new Error(`Failed to fetch rates: ${response.status} ${errorText}`);
       }
 
       const data: RatesResponse = await response.json();
