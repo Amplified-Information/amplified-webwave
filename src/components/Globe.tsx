@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 // Capital cities data with their coordinates
 const CAPITAL_CITIES = [
@@ -13,7 +13,9 @@ const CAPITAL_CITIES = [
   { name: 'Brasília', lat: -15.7975, lng: -47.8919 },
   { name: 'New Delhi', lat: 28.6139, lng: 77.2090 },
   { name: 'Canberra', lat: -35.2809, lng: 149.1300 },
-  { name: 'Cairo', lat: 30.0444, lng: 31.2357 }
+  { name: 'Cairo', lat: 30.0444, lng: 31.2357 },
+  { name: 'Ottawa', lat: 45.4215, lng: -75.6972 },
+  { name: 'Courtenay', lat: 49.6835, lng: -124.9957 }
 ];
 
 const Globe = () => {
