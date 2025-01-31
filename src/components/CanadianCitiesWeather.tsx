@@ -39,8 +39,10 @@ const CanadianCitiesWeather = () => {
 
   return weatherData ? (
     <div>
-      <WeatherTable weatherData={weatherData} />
       <ProvinceAveragesChart weatherData={weatherData} />
+      <div className="mt-8">
+        <WeatherTable weatherData={weatherData} />
+      </div>
     </div>
   ) : null;
 };

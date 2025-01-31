@@ -11,7 +11,6 @@ import {
 } from 'recharts';
 import { WeatherData } from '@/types/weather';
 
-// Order provinces from West to East
 const PROVINCE_ORDER = [
   "British Columbia",
   "Yukon",
@@ -53,7 +52,7 @@ const ProvinceAveragesChart = ({ weatherData }: ProvinceAveragesChartProps) => {
 
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-semibold mb-4">Provincial Weather Averages</h2>
+      <h2 className="text-2xl font-semibold mb-4">Real-time Aggregate Provincial Weather</h2>
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
