@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
+import Globe from "@/components/Globe";
 import { LineChart } from "lucide-react";
 
 const DataVisualizationDemo = () => {
@@ -11,28 +12,20 @@ const DataVisualizationDemo = () => {
           <LineChart className="w-12 h-12 mx-auto mb-4 text-primary" />
           <h1 className="text-4xl font-bold mb-4">Data Visualization</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Create interactive dashboards and reports
+            Interactive 3D globe visualization showing global data distribution
           </p>
         </div>
 
         <Card className="mb-8">
           <CardContent className="p-6">
-            <img
-              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71"
-              alt="Data Visualization Demo"
-              className="w-full h-64 object-cover rounded-lg mb-6"
-            />
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Features Coming Soon</h2>
+            <Globe />
+            <div className="mt-6 space-y-4">
+              <h2 className="text-2xl font-semibold">Interactive Globe Visualization</h2>
               <p className="text-gray-600">
-                Our data visualization platform will demonstrate:
+                This visualization demonstrates global data distribution using Three.js. 
+                The globe automatically rotates and displays data points across different locations.
+                The green points represent sample data locations that could be customized based on real data.
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-600">
-                <li>Interactive charts and graphs</li>
-                <li>Custom dashboard creation</li>
-                <li>Real-time data updates</li>
-                <li>Export and sharing capabilities</li>
-              </ul>
             </div>
           </CardContent>
         </Card>
