@@ -7,6 +7,7 @@ import { WeatherData } from '@/types/weather';
 import { Thermometer } from 'lucide-react';
 import { format } from 'date-fns';
 import { PROVINCIAL_FLAGS } from '@/data/provincialFlags';
+import { Table, TableBody, TableCell, TableRow } from './ui/table';
 
 const fetchWeatherData = async (): Promise<WeatherData[]> => {
   const promises = CANADIAN_CITIES.map(async (city) => {
@@ -60,75 +61,73 @@ const CanadianCitiesWeather = () => {
   const { coldest, warmest } = getTemperatureExtremes(weatherData);
   const currentTime = format(new Date(), "MMMM d, yyyy 'at' h:mm aa");
 
-  // Debug logging
-  console.log('Coldest city province:', coldest.province);
-  console.log('Coldest city flag path:', PROVINCIAL_FLAGS[coldest.province]);
-  console.log('Warmest city province:', warmest.province);
-  console.log('Warmest city flag path:', PROVINCIAL_FLAGS[warmest.province]);
-
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="grid gap-6 md:grid-cols-2">
         <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             <Thermometer className="h-6 w-6 text-blue-600" />
             <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Coldest City in Canada Right Now</h3>
           </div>
-          <div className="flex items-center gap-4">
-            <div>
-              <div className="text-3xl font-bold text-blue-600">
-                {coldest.cityName}
-              </div>
-              <div className="text-xl text-blue-500">
-                {coldest.temperature}°C
-              </div>
-              <div className="text-sm text-blue-400">
-                {coldest.province}
-              </div>
-            </div>
-            {PROVINCIAL_FLAGS[coldest.province] && (
-              <img 
-                src={PROVINCIAL_FLAGS[coldest.province]} 
-                alt={`${coldest.province} flag`}
-                className="h-12 w-16 object-cover rounded shadow-sm"
-                onError={(e) => {
-                  console.error('Error loading flag:', e.currentTarget.src);
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            )}
-          </div>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell className="border-0">
+                  <div>
+                    <div className="text-3xl font-bold text-blue-600">{coldest.cityName}</div>
+                    <div className="text-xl text-blue-500">{coldest.temperature}°C</div>
+                    <div className="text-sm text-blue-400">{coldest.province}</div>
+                  </div>
+                </TableCell>
+                <TableCell className="border-0 text-right">
+                  {PROVINCIAL_FLAGS[coldest.province] && (
+                    <img 
+                      src={PROVINCIAL_FLAGS[coldest.province]} 
+                      alt={`${coldest.province} flag`}
+                      className="h-16 w-24 object-cover rounded shadow-sm ml-auto"
+                      onError={(e) => {
+                        console.error('Error loading flag:', e.currentTarget.src);
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
 
         <div className="p-6 rounded-lg bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             <Thermometer className="h-6 w-6 text-red-600" />
             <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">Warmest City in Canada Right Now</h3>
           </div>
-          <div className="flex items-center gap-4">
-            <div>
-              <div className="text-3xl font-bold text-red-600">
-                {warmest.cityName}
-              </div>
-              <div className="text-xl text-red-500">
-                {warmest.temperature}°C
-              </div>
-              <div className="text-sm text-red-400">
-                {warmest.province}
-              </div>
-            </div>
-            {PROVINCIAL_FLAGS[warmest.province] && (
-              <img 
-                src={PROVINCIAL_FLAGS[warmest.province]} 
-                alt={`${warmest.province} flag`}
-                className="h-12 w-16 object-cover rounded shadow-sm"
-                onError={(e) => {
-                  console.error('Error loading flag:', e.currentTarget.src);
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            )}
-          </div>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell className="border-0">
+                  <div>
+                    <div className="text-3xl font-bold text-red-600">{warmest.cityName}</div>
+                    <div className="text-xl text-red-500">{warmest.temperature}°C</div>
+                    <div className="text-sm text-red-400">{warmest.province}</div>
+                  </div>
+                </TableCell>
+                <TableCell className="border-0 text-right">
+                  {PROVINCIAL_FLAGS[warmest.province] && (
+                    <img 
+                      src={PROVINCIAL_FLAGS[warmest.province]} 
+                      alt={`${warmest.province} flag`}
+                      className="h-16 w-24 object-cover rounded shadow-sm ml-auto"
+                      onError={(e) => {
+                        console.error('Error loading flag:', e.currentTarget.src);
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
