@@ -65,7 +65,7 @@ const CanadianCitiesWeather = () => {
         <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
           <div className="flex items-center gap-3 mb-2">
             <Thermometer className="h-6 w-6 text-blue-600" />
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Coldest City</h3>
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">Coldest City Right Now</h3>
           </div>
           <div className="text-3xl font-bold text-blue-600">
             {coldest.cityName}
@@ -78,7 +78,7 @@ const CanadianCitiesWeather = () => {
         <div className="p-6 rounded-lg bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
           <div className="flex items-center gap-3 mb-2">
             <Thermometer className="h-6 w-6 text-red-600" />
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">Warmest City</h3>
+            <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">Warmest City Right Now</h3>
           </div>
           <div className="text-3xl font-bold text-red-600">
             {warmest.cityName}
