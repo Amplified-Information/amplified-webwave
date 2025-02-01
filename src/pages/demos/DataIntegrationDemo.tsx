@@ -110,10 +110,20 @@ const DataIntegrationDemo = () => {
       <div className="container mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Smart Garden Planning</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Search for plants to discover their growing requirements and companion planting
-            recommendations. Select up to 20 plants to analyze their compatibility.
-          </p>
+          <div className="text-lg text-gray-600 max-w-3xl mx-auto space-y-4">
+            <p>
+              This demo showcases data integration from multiple sources:
+            </p>
+            <ul className="list-disc list-inside space-y-2">
+              <li><span className="font-semibold">OpenFarm API:</span> Provides detailed plant information including growing requirements and characteristics</li>
+              <li><span className="font-semibold">Companion Planting Database:</span> Local database of plant relationships and compatibility</li>
+            </ul>
+            <p>
+              The integration combines real-time plant data from OpenFarm with companion planting relationships 
+              to help you plan an optimal garden layout. Search for plants to discover their growing requirements 
+              and analyze compatibility between different species.
+            </p>
+          </div>
         </div>
 
         <Card className="mb-8">
