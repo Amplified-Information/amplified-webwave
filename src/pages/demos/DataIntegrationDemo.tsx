@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { findCompanionData } from "@/data/companionPlanting";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Plant {
   _id: string;
@@ -30,6 +31,7 @@ interface Plant {
 
 const DataIntegrationDemo = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPlants, setSelectedPlants] = useState<string[]>([]);
   const { toast } = useToast();
 
   const { data: plants, isLoading } = useQuery({
@@ -78,6 +80,30 @@ const DataIntegrationDemo = () => {
     }
   };
 
+  const handlePlantSelection = (plantName: string) => {
+    if (selectedPlants.includes(plantName)) {
+      setSelectedPlants(selectedPlants.filter(p => p !== plantName));
+    } else if (selectedPlants.length < 20) {
+      setSelectedPlants([...selectedPlants, plantName]);
+    } else {
+      toast({
+        title: "Selection limit reached",
+        description: "You can only select up to 20 plants",
+      });
+    }
+  };
+
+  const getCompanionStatus = (plant1: string, plant2: string) => {
+    const data1 = findCompanionData(plant1);
+    const data2 = findCompanionData(plant2);
+    
+    if (!data1 || !data2) return "unknown";
+    
+    if (data1.companions.includes(plant2)) return "companion";
+    if (data1.avoids.includes(plant2)) return "avoid";
+    return "neutral";
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -86,8 +112,7 @@ const DataIntegrationDemo = () => {
           <h1 className="text-4xl font-bold mb-4">Smart Garden Planning</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Search for plants to discover their growing requirements and companion planting
-            recommendations. This demo integrates data from OpenFarm API and our companion
-            planting database.
+            recommendations. Select up to 20 plants to analyze their compatibility.
           </p>
         </div>
 
@@ -115,6 +140,7 @@ const DataIntegrationDemo = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-[50px]"></TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Scientific Name</TableHead>
                         <TableHead>Sun Requirements</TableHead>
@@ -125,6 +151,12 @@ const DataIntegrationDemo = () => {
                     <TableBody>
                       {plants.map((plant: Plant) => (
                         <TableRow key={plant._id}>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedPlants.includes(plant.name)}
+                              onCheckedChange={() => handlePlantSelection(plant.name)}
+                            />
+                          </TableCell>
                           <TableCell className="font-medium">{plant.name}</TableCell>
                           <TableCell>{plant.binomial_name || "N/A"}</TableCell>
                           <TableCell>{plant.sun_requirements || "N/A"}</TableCell>
@@ -136,46 +168,68 @@ const DataIntegrationDemo = () => {
                   </Table>
                 </div>
 
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold">Companion Planting Guide</h2>
-                  {plants.map((plant: Plant) => {
-                    const companionData = findCompanionData(plant.name);
-                    if (!companionData) return null;
-
-                    return (
-                      <Card key={`companion-${plant._id}`} className="p-4">
-                        <h3 className="text-xl font-medium mb-2">{plant.name}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="font-semibold text-green-600 mb-2">
-                              Good Companions
-                            </h4>
-                            <ul className="list-disc list-inside">
-                              {companionData.companions.map((companion) => (
-                                <li key={companion} className="text-gray-600">
-                                  {companion}
-                                </li>
+                {selectedPlants.length > 0 && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold">Companion Planting Analysis</h2>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead></TableHead>
+                            {selectedPlants.map((plant) => (
+                              <TableHead key={plant} className="min-w-[100px]">
+                                {plant}
+                              </TableHead>
+                            ))}
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedPlants.map((plant1) => (
+                            <TableRow key={plant1}>
+                              <TableCell className="font-medium">{plant1}</TableCell>
+                              {selectedPlants.map((plant2) => (
+                                <TableCell 
+                                  key={`${plant1}-${plant2}`}
+                                  className={
+                                    plant1 === plant2 
+                                      ? "bg-gray-100" 
+                                      : getCompanionStatus(plant1, plant2) === "companion"
+                                      ? "bg-green-100"
+                                      : getCompanionStatus(plant1, plant2) === "avoid"
+                                      ? "bg-red-100"
+                                      : ""
+                                  }
+                                >
+                                  {plant1 === plant2 
+                                    ? "-" 
+                                    : getCompanionStatus(plant1, plant2) === "companion"
+                                    ? "✓"
+                                    : getCompanionStatus(plant1, plant2) === "avoid"
+                                    ? "✗"
+                                    : "?"}
+                                </TableCell>
                               ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-red-600 mb-2">
-                              Plants to Avoid
-                            </h4>
-                            <ul className="list-disc list-inside">
-                              {companionData.avoids.map((avoid) => (
-                                <li key={avoid} className="text-gray-600">
-                                  {avoid}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                        <p className="mt-4 text-gray-700">{companionData.benefits}</p>
-                      </Card>
-                    );
-                  })}
-                </div>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <div className="flex gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-green-100"></div>
+                        <span>Companion plants</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-red-100"></div>
+                        <span>Avoid planting together</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-gray-100"></div>
+                        <span>Same plant</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : searchTerm.length > 2 ? (
               <div className="text-center py-8">No plants found</div>

@@ -7,18 +7,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WeatherData } from '@/types/weather';
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface WeatherTableProps {
   weatherData: WeatherData[];
+  selectedItems?: string[];
+  onSelectionChange?: (items: string[]) => void;
+  showCheckboxes?: boolean;
 }
 
 type SortField = 'cityName' | 'province' | 'temperature' | 'humidity';
 type SortDirection = 'asc' | 'desc';
 
-const WeatherTable = ({ weatherData }: WeatherTableProps) => {
+const WeatherTable = ({ 
+  weatherData, 
+  selectedItems = [], 
+  onSelectionChange,
+  showCheckboxes = false 
+}: WeatherTableProps) => {
   const [sortField, setSortField] = useState<SortField>('cityName');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -29,6 +38,16 @@ const WeatherTable = ({ weatherData }: WeatherTableProps) => {
       setSortField(field);
       setSortDirection('asc');
     }
+  };
+
+  const handleCheckboxChange = (cityName: string) => {
+    if (!onSelectionChange) return;
+    
+    const newSelection = selectedItems.includes(cityName)
+      ? selectedItems.filter(item => item !== cityName)
+      : [...selectedItems, cityName];
+    
+    onSelectionChange(newSelection);
   };
 
   const sortedData = [...weatherData].sort((a, b) => {
@@ -46,6 +65,7 @@ const WeatherTable = ({ weatherData }: WeatherTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
+            {showCheckboxes && <TableHead className="w-[50px]" />}
             <TableHead>
               <Button
                 variant="ghost"
@@ -91,6 +111,14 @@ const WeatherTable = ({ weatherData }: WeatherTableProps) => {
         <TableBody>
           {sortedData.map((city) => (
             <TableRow key={city.cityName}>
+              {showCheckboxes && (
+                <TableCell className="w-[50px]">
+                  <Checkbox
+                    checked={selectedItems.includes(city.cityName)}
+                    onCheckedChange={() => handleCheckboxChange(city.cityName)}
+                  />
+                </TableCell>
+              )}
               <TableCell className="font-medium">{city.cityName}</TableCell>
               <TableCell>{city.province}</TableCell>
               <TableCell>{city.temperature}°C</TableCell>
