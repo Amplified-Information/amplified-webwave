@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { findCompanionData } from "@/data/companionPlanting";
 
 interface Plant {
   _id: string;
@@ -84,8 +85,9 @@ const DataIntegrationDemo = () => {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Smart Garden Planning</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Search for plants and discover their growing requirements. This demo showcases
-            real-time data integration with the OpenFarm API.
+            Search for plants to discover their growing requirements and companion planting
+            recommendations. This demo integrates data from OpenFarm API and our companion
+            planting database.
           </p>
         </div>
 
@@ -108,29 +110,72 @@ const DataIntegrationDemo = () => {
             {isLoading ? (
               <div className="text-center py-8">Loading plants...</div>
             ) : plants && plants.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Scientific Name</TableHead>
-                      <TableHead>Sun Requirements</TableHead>
-                      <TableHead>Sowing Method</TableHead>
-                      <TableHead>Height (cm)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {plants.map((plant: Plant) => (
-                      <TableRow key={plant._id}>
-                        <TableCell className="font-medium">{plant.name}</TableCell>
-                        <TableCell>{plant.binomial_name || "N/A"}</TableCell>
-                        <TableCell>{plant.sun_requirements || "N/A"}</TableCell>
-                        <TableCell>{plant.sowing_method || "N/A"}</TableCell>
-                        <TableCell>{plant.height || "N/A"}</TableCell>
+              <div className="space-y-8">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Scientific Name</TableHead>
+                        <TableHead>Sun Requirements</TableHead>
+                        <TableHead>Sowing Method</TableHead>
+                        <TableHead>Height (cm)</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {plants.map((plant: Plant) => (
+                        <TableRow key={plant._id}>
+                          <TableCell className="font-medium">{plant.name}</TableCell>
+                          <TableCell>{plant.binomial_name || "N/A"}</TableCell>
+                          <TableCell>{plant.sun_requirements || "N/A"}</TableCell>
+                          <TableCell>{plant.sowing_method || "N/A"}</TableCell>
+                          <TableCell>{plant.height || "N/A"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold">Companion Planting Guide</h2>
+                  {plants.map((plant: Plant) => {
+                    const companionData = findCompanionData(plant.name);
+                    if (!companionData) return null;
+
+                    return (
+                      <Card key={`companion-${plant._id}`} className="p-4">
+                        <h3 className="text-xl font-medium mb-2">{plant.name}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <h4 className="font-semibold text-green-600 mb-2">
+                              Good Companions
+                            </h4>
+                            <ul className="list-disc list-inside">
+                              {companionData.companions.map((companion) => (
+                                <li key={companion} className="text-gray-600">
+                                  {companion}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-red-600 mb-2">
+                              Plants to Avoid
+                            </h4>
+                            <ul className="list-disc list-inside">
+                              {companionData.avoids.map((avoid) => (
+                                <li key={avoid} className="text-gray-600">
+                                  {avoid}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                        <p className="mt-4 text-gray-700">{companionData.benefits}</p>
+                      </Card>
+                    );
+                  })}
+                </div>
               </div>
             ) : searchTerm.length > 2 ? (
               <div className="text-center py-8">No plants found</div>
