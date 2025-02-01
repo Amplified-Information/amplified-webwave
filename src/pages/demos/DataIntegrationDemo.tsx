@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { findCompanionData } from "@/data/companionPlanting";
+import { findCompanionData, companionPlantingData } from "@/data/companionPlanting";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface Plant {
@@ -34,6 +34,9 @@ const DataIntegrationDemo = () => {
   const [selectedPlants, setSelectedPlants] = useState<string[]>([]);
   const { toast } = useToast();
 
+  // Get the list of plants we have companion data for
+  const availablePlants = Object.keys(companionPlantingData);
+
   const { data: plants, isLoading } = useQuery({
     queryKey: ["plants", searchTerm],
     queryFn: async () => {
@@ -45,17 +48,23 @@ const DataIntegrationDemo = () => {
         throw new Error("Failed to fetch plants");
       }
       const data = await response.json();
-      return data.data.map((item: any) => ({
-        _id: item.id,
-        name: item.attributes.name,
-        binomial_name: item.attributes.binomial_name,
-        description: item.attributes.description,
-        sun_requirements: item.attributes.sun_requirements,
-        sowing_method: item.attributes.sowing_method,
-        spread: item.attributes.spread,
-        row_spacing: item.attributes.row_spacing,
-        height: item.attributes.height,
-      }));
+      // Filter to only include plants we have companion data for
+      return data.data
+        .map((item: any) => ({
+          _id: item.id,
+          name: item.attributes.name.toLowerCase(),
+          binomial_name: item.attributes.binomial_name,
+          description: item.attributes.description,
+          sun_requirements: item.attributes.sun_requirements,
+          sowing_method: item.attributes.sowing_method,
+          spread: item.attributes.spread,
+          row_spacing: item.attributes.row_spacing,
+          height: item.attributes.height,
+        }))
+        .filter((plant: Plant) => 
+          availablePlants.includes(plant.name) || 
+          availablePlants.some(p => plant.name.includes(p))
+        );
     },
     enabled: searchTerm.length > 2,
     meta: {
@@ -122,6 +131,9 @@ const DataIntegrationDemo = () => {
               The integration combines real-time plant data from OpenFarm with companion planting relationships 
               to help you plan an optimal garden layout. Search for plants to discover their growing requirements 
               and analyze compatibility between different species.
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Note: Currently showing data for: {availablePlants.join(", ")}
             </p>
           </div>
         </div>
