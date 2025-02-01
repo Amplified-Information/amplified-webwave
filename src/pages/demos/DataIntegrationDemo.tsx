@@ -55,12 +55,14 @@ const DataIntegrationDemo = () => {
       }));
     },
     enabled: searchTerm.length > 2,
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to fetch plant data. Please try again.",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to fetch plant data. Please try again.",
+          variant: "destructive",
+        });
+      },
     },
   });
 
