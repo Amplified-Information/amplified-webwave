@@ -62,6 +62,26 @@ const DataIntegrationDemo = () => {
               Select vegetables from the list below to analyze their compatibility
               and create an optimal garden layout.
             </p>
+            <div className="bg-blue-50 p-6 rounded-lg text-left">
+              <h2 className="text-xl font-semibold mb-2">How This Tool Works:</h2>
+              <p className="mb-2">
+                This garden planning tool uses a comprehensive static database to help you make informed decisions about your garden layout:
+              </p>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>
+                  <strong>Vegetable Database:</strong> Contains detailed information about common garden vegetables, including scientific names, growing requirements, and planting dates.
+                </li>
+                <li>
+                  <strong>Companion Planting Matrix:</strong> Uses pre-defined relationships between plants to show which vegetables grow well together and which should be kept apart.
+                </li>
+                <li>
+                  <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on your selected USDA hardiness zone to optimize planting times.
+                </li>
+                <li>
+                  <strong>Selection System:</strong> Allows you to choose up to 20 vegetables at once to analyze their compatibility and generate a personalized planting guide.
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
