@@ -16,9 +16,10 @@ const DemoOverview = () => {
       isActive: true
     },
     {
-      title: "Security Features",
-      description: "Explore our comprehensive security implementations",
-      path: "/demo/security-features"
+      title: "Trade Data Analysis",
+      description: "Explore international trade flows and patterns",
+      path: "/demo/trade-data",
+      isActive: true
     },
     {
       title: "Cloud Infrastructure",
