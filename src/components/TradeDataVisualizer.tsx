@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { ChartContainer } from "@/components/ui/chart";
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 
 interface TradeData {
   commodity_name: string;
@@ -67,10 +67,6 @@ export const TradeDataVisualizer = () => {
     );
   }
 
-  const getBarFill = (entry: TradeData) => {
-    return entry.trade_balance >= 0 ? "var(--primary)" : "#ef4444";
-  };
-
   return (
     <div className="space-y-8">
       <Card>
@@ -125,10 +121,11 @@ export const TradeDataVisualizer = () => {
                     );
                   }}
                 />
-                <Bar
-                  dataKey="trade_balance"
-                  fill={getBarFill}
-                />
+                <Bar dataKey="trade_balance" fill="var(--primary)">
+                  {tradeData?.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.trade_balance >= 0 ? "var(--primary)" : "#ef4444"} />
+                  ))}
+                </Bar>
               </RechartsBarChart>
             </ChartContainer>
           </div>
