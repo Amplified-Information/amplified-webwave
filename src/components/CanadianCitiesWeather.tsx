@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import WeatherTable from './WeatherTable';
 import ProvinceAveragesChart from './ProvinceAveragesChart';
-import CanadianWeatherMap from './CanadianWeatherMap';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { WeatherData } from '@/types/weather';
 import { Thermometer } from 'lucide-react';
@@ -65,7 +64,9 @@ const CanadianCitiesWeather = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm">
-        <CanadianWeatherMap weatherData={weatherData} />
+        <div className="text-center p-8 bg-gray-50 rounded-lg">
+          <p className="text-gray-600">Map visualization temporarily disabled for maintenance.</p>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
