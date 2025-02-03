@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { WeatherData } from '@/types/weather';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertDescription } from './ui/alert';
 
 interface CanadianWeatherMapProps {
   weatherData: WeatherData[];
@@ -18,21 +19,38 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const initializeMap = async () => {
-    if (!mapContainer.current || !weatherData.length) return;
+    if (!mapContainer.current || !weatherData.length) {
+      console.log('Container or weather data not ready:', {
+        container: !!mapContainer.current,
+        weatherDataLength: weatherData.length
+      });
+      return;
+    }
 
     try {
+      console.log('Fetching Mapbox token...');
       const { data: secretData, error: secretError } = await supabase
         .from('secrets')
         .select('value')
         .eq('name', 'MAPBOX_PUBLIC_TOKEN')
         .single();
 
-      if (secretError) throw new Error('Failed to fetch Mapbox token');
-      if (!secretData?.value) throw new Error('Mapbox token not found');
+      if (secretError) {
+        console.error('Supabase error:', secretError);
+        throw new Error(`Failed to fetch Mapbox token: ${secretError.message}`);
+      }
+      
+      if (!secretData?.value) {
+        console.error('No token found in secrets');
+        throw new Error('Mapbox token not found in secrets');
+      }
+
+      console.log('Token retrieved successfully');
 
       // Initialize map
       mapboxgl.accessToken = secretData.value;
       
+      console.log('Initializing Mapbox map...');
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
@@ -52,6 +70,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
       // Add terrain control
       map.current.on('load', () => {
+        console.log('Map loaded, adding terrain...');
         map.current?.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
         map.current?.addSource('mapbox-dem', {
           'type': 'raster-dem',
@@ -64,8 +83,14 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+      map.current.on('error', (e) => {
+        console.error('Mapbox error:', e);
+        setError(`Map error: ${e.error.message}`);
+      });
+
       setIsLoading(false);
       addMarkersToMap();
+      console.log('Map initialization complete');
     } catch (err) {
       console.error('Error initializing map:', err);
       setError(err instanceof Error ? err.message : 'Failed to initialize map');
@@ -120,8 +145,10 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   };
 
   useEffect(() => {
+    console.log('Component mounted, initializing map...');
     initializeMap();
     return () => {
+      console.log('Component unmounting, cleaning up...');
       markers.current.forEach(marker => marker.remove());
       popups.current.forEach(popup => popup.remove());
       map.current?.remove();
@@ -136,9 +163,11 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-600 dark:text-red-400">
-        <p>Error: {error}</p>
-      </div>
+      <Alert variant="destructive" className="mb-4">
+        <AlertDescription>
+          {error}
+        </AlertDescription>
+      </Alert>
     );
   }
 
