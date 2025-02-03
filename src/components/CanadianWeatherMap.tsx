@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { WeatherData } from '@/types/weather';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
 
 interface CanadianWeatherMapProps {
   weatherData: WeatherData[];
@@ -13,43 +15,64 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const popups = useRef<mapboxgl.Popup[]>([]);
+  const [token, setToken] = useState('');
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
-  useEffect(() => {
-    if (!mapContainer.current || !weatherData.length) return;
+  const initializeMap = () => {
+    if (!mapContainer.current || !weatherData.length || !token) return;
 
     // Initialize map
-    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHM0Z2V2NWowMGRqMmtvNWR4NHB0aXF5In0.qY4WMqXfGgxkUNyRzBFJPg';
+    mapboxgl.accessToken = token;
     
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/outdoors-v12', // Changed to outdoors style for better geographical features
-      center: [-96, 62],
-      zoom: 3.5,
-      minZoom: 2,
-      maxZoom: 9,
-      bounds: [
-        [-141, 41.7], // Southwest coordinates
-        [-52, 83.3]  // Northeast coordinates
-      ],
-      maxBounds: [
-        [-180, 30], // Southwest coordinates
-        [-30, 90]  // Northeast coordinates
-      ]
-    });
-
-    // Add terrain control
-    map.current.on('load', () => {
-      map.current?.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
-      map.current?.addSource('mapbox-dem', {
-        'type': 'raster-dem',
-        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        'tileSize': 512,
-        'maxzoom': 14
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        center: [-96, 62],
+        zoom: 3.5,
+        minZoom: 2,
+        maxZoom: 9,
+        bounds: [
+          [-141, 41.7], // Southwest coordinates
+          [-52, 83.3]  // Northeast coordinates
+        ],
+        maxBounds: [
+          [-180, 30], // Southwest coordinates
+          [-30, 90]  // Northeast coordinates
+        ]
       });
-    });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      // Add terrain control
+      map.current.on('load', () => {
+        map.current?.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+        map.current?.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+      });
+
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+      setIsMapInitialized(true);
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Cleanup function
+    return () => {
+      markers.current.forEach(marker => marker.remove());
+      popups.current.forEach(popup => popup.remove());
+      map.current?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMapInitialized || !map.current || !weatherData.length) return;
 
     // Clean up existing markers and popups
     markers.current.forEach(marker => marker.remove());
@@ -92,18 +115,27 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         popups.current.push(popup);
       }
     });
-
-    // Cleanup
-    return () => {
-      markers.current.forEach(marker => marker.remove());
-      popups.current.forEach(popup => popup.remove());
-      map.current?.remove();
-    };
-  }, [weatherData]);
+  }, [weatherData, isMapInitialized]);
 
   return (
-    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-      <div ref={mapContainer} className="absolute inset-0" />
+    <div className="space-y-4">
+      {!isMapInitialized && (
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="Enter your Mapbox public token"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            className="flex-1"
+          />
+          <Button onClick={initializeMap} disabled={!token}>
+            Initialize Map
+          </Button>
+        </div>
+      )}
+      <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+        <div ref={mapContainer} className="absolute inset-0" />
+      </div>
     </div>
   );
 };
