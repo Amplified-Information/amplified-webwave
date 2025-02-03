@@ -36,29 +36,45 @@ serve(async (req) => {
     const data = await response.json()
     console.log('Fetched trade data:', data)
 
-    // Process and transform the data
-    const transformedData = data.data.map((item: any) => {
-      const isCanada = item.reporterCode === '124';
-      return {
-        reporter_country: isCanada ? 'Canada' : 'United States',
-        partner_country: isCanada ? 'United States' : 'Canada',
-        commodity_code: item.cmdCode,
-        commodity_name: item.cmdDesc,
-        trade_value: item.primaryValue || 0,
-        trade_year: parseInt(item.refYear),
-        trade_flow: item.rgDesc,
-      };
-    });
+    // Process and transform the data to match our new schema
+    const transformedData = data.data.map((item: any) => ({
+      reporter_code: item.reporterCode,
+      reporter_desc: item.reporterDesc,
+      partner_code: item.partnerCode,
+      partner_desc: item.partnerDesc,
+      ref_year: parseInt(item.refYear),
+      trade_flow_code: item.rgCode,
+      trade_flow_desc: item.rgDesc,
+      commodity_code: item.cmdCode,
+      commodity_desc: item.cmdDesc,
+      qty: item.qty || null,
+      qty_unit: item.qtyUnit || null,
+      trade_value: item.primaryValue || 0
+    }));
+
+    // Clear existing data before inserting new data
+    const { error: deleteError } = await supabaseClient
+      .from('trade_data')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all rows
+
+    if (deleteError) {
+      throw deleteError;
+    }
 
     // Insert the transformed data into Supabase
-    const { error } = await supabaseClient
+    const { error: insertError } = await supabaseClient
       .from('trade_data')
-      .insert(transformedData)
+      .insert(transformedData);
 
-    if (error) throw error
+    if (insertError) throw insertError;
 
     return new Response(
-      JSON.stringify({ message: 'Trade data updated successfully', count: transformedData.length }),
+      JSON.stringify({ 
+        message: 'Trade data updated successfully', 
+        count: transformedData.length,
+        sample: transformedData[0] 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
