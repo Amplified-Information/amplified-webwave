@@ -12,35 +12,35 @@ import { ChartContainer } from "@/components/ui/chart";
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 
 interface TradeData {
-  commodity_name: string;
+  commodity_desc: string;
   trade_balance: number;
 }
 
 const fetchTradeData = async () => {
   const { data, error } = await supabase
     .from('trade_data')
-    .select('commodity_name, trade_value, trade_flow, reporter_country')
-    .in('reporter_country', ['Canada', 'United States'])
-    .in('partner_country', ['Canada', 'United States']);
+    .select('commodity_desc, trade_value, trade_flow_desc, reporter_desc')
+    .in('reporter_desc', ['Canada', 'United States'])
+    .in('partner_desc', ['Canada', 'United States']);
 
   if (error) throw error;
 
   // Process data to calculate trade balance by commodity
   const balanceByProduct = data.reduce((acc: { [key: string]: number }, curr) => {
     const value = curr.trade_value;
-    const isCanadaExport = curr.reporter_country === 'Canada' && curr.trade_flow === 'Export';
-    const isUSAImport = curr.reporter_country === 'United States' && curr.trade_flow === 'Import';
+    const isCanadaExport = curr.reporter_desc === 'Canada' && curr.trade_flow_desc === 'Export';
+    const isUSAImport = curr.reporter_desc === 'United States' && curr.trade_flow_desc === 'Import';
     
     // Positive values represent Canadian surplus
     const tradeValue = (isCanadaExport || isUSAImport) ? value : -value;
     
-    acc[curr.commodity_name] = (acc[curr.commodity_name] || 0) + tradeValue;
+    acc[curr.commodity_desc] = (acc[curr.commodity_desc] || 0) + tradeValue;
     return acc;
   }, {});
 
   // Convert to array format for chart
-  return Object.entries(balanceByProduct).map(([commodity_name, trade_balance]) => ({
-    commodity_name,
+  return Object.entries(balanceByProduct).map(([commodity_desc, trade_balance]) => ({
+    commodity_desc,
     trade_balance
   }));
 };
@@ -99,7 +99,7 @@ export const TradeDataVisualizer = () => {
                 />
                 <YAxis 
                   type="category" 
-                  dataKey="commodity_name" 
+                  dataKey="commodity_desc" 
                   width={140}
                 />
                 <Tooltip
@@ -110,7 +110,7 @@ export const TradeDataVisualizer = () => {
                       <div className="rounded-lg border bg-background p-2 shadow-sm">
                         <div className="grid grid-cols-2 gap-2">
                           <div className="font-medium">Sector:</div>
-                          <div>{payload[0].payload.commodity_name}</div>
+                          <div>{payload[0].payload.commodity_desc}</div>
                           <div className="font-medium">Balance:</div>
                           <div className={value >= 0 ? "text-green-600" : "text-red-600"}>
                             ${Math.abs(value).toLocaleString()}

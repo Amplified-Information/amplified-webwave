@@ -36,38 +36,53 @@ export type Database = {
       trade_data: {
         Row: {
           commodity_code: string
-          commodity_name: string
+          commodity_desc: string
           created_at: string
           id: string
-          partner_country: string
-          reporter_country: string
-          trade_flow: string
+          partner_code: string
+          partner_desc: string
+          qty: number | null
+          qty_unit: string | null
+          ref_year: number
+          reporter_code: string
+          reporter_desc: string
+          trade_flow_code: number
+          trade_flow_desc: string
           trade_value: number
-          trade_year: number
           updated_at: string
         }
         Insert: {
           commodity_code: string
-          commodity_name: string
+          commodity_desc: string
           created_at?: string
           id?: string
-          partner_country: string
-          reporter_country: string
-          trade_flow: string
+          partner_code: string
+          partner_desc: string
+          qty?: number | null
+          qty_unit?: string | null
+          ref_year: number
+          reporter_code: string
+          reporter_desc: string
+          trade_flow_code: number
+          trade_flow_desc: string
           trade_value: number
-          trade_year: number
           updated_at?: string
         }
         Update: {
           commodity_code?: string
-          commodity_name?: string
+          commodity_desc?: string
           created_at?: string
           id?: string
-          partner_country?: string
-          reporter_country?: string
-          trade_flow?: string
+          partner_code?: string
+          partner_desc?: string
+          qty?: number | null
+          qty_unit?: string | null
+          ref_year?: number
+          reporter_code?: string
+          reporter_desc?: string
+          trade_flow_code?: number
+          trade_flow_desc?: string
           trade_value?: number
-          trade_year?: number
           updated_at?: string
         }
         Relationships: []
