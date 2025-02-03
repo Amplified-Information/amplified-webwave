@@ -19,9 +19,9 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Fetch data from Comtrade API (using their sample API for demonstration)
+    // Fetch data from Comtrade API (public API endpoint)
     const response = await fetch(
-      'https://comtradeapi.un.org/public/v1/preview/C/A/HS?freq=M&px=HS&ps=2022&r=124&p=842&rg=all&cc=TOTAL',
+      'https://comtradeapi.un.org/public/v1/preview/C/A/HS?freq=A&px=HS&ps=2022&r=124,842&p=124,842&rg=all&cc=AG,EN,MF',
       {
         headers: {
           'Content-Type': 'application/json',
@@ -37,15 +37,18 @@ serve(async (req) => {
     console.log('Fetched trade data:', data)
 
     // Process and transform the data
-    const transformedData = data.data.map((item: any) => ({
-      reporter_country: 'Canada',
-      partner_country: 'United States',
-      commodity_code: item.cmdCode || 'TOTAL',
-      commodity_name: item.cmdDesc || 'Total Trade',
-      trade_value: item.primaryValue || 0,
-      trade_year: parseInt(item.period.substring(0, 4)),
-      trade_flow: item.rgDesc,
-    }))
+    const transformedData = data.data.map((item: any) => {
+      const isCanada = item.reporterCode === '124';
+      return {
+        reporter_country: isCanada ? 'Canada' : 'United States',
+        partner_country: isCanada ? 'United States' : 'Canada',
+        commodity_code: item.cmdCode,
+        commodity_name: item.cmdDesc,
+        trade_value: item.primaryValue || 0,
+        trade_year: parseInt(item.refYear),
+        trade_flow: item.rgDesc,
+      };
+    });
 
     // Insert the transformed data into Supabase
     const { error } = await supabaseClient
@@ -55,7 +58,7 @@ serve(async (req) => {
     if (error) throw error
 
     return new Response(
-      JSON.stringify({ message: 'Trade data updated successfully' }),
+      JSON.stringify({ message: 'Trade data updated successfully', count: transformedData.length }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

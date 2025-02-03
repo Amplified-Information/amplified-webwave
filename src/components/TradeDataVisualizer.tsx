@@ -19,10 +19,9 @@ interface TradeData {
 const fetchTradeData = async () => {
   const { data, error } = await supabase
     .from('trade_data')
-    .select('commodity_name, trade_value, trade_flow')
-    .or('reporter_country.eq.Canada,reporter_country.eq.United States')
-    .and('partner_country.in.(Canada,United States)')
-    .neq('reporter_country', 'partner_country');
+    .select('commodity_name, trade_value, trade_flow, reporter_country')
+    .in('reporter_country', ['Canada', 'United States'])
+    .in('partner_country', ['Canada', 'United States']);
 
   if (error) throw error;
 
@@ -106,15 +105,16 @@ export const TradeDataVisualizer = () => {
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload?.length) return null;
+                    const value = payload[0].value as number;
                     return (
                       <div className="rounded-lg border bg-background p-2 shadow-sm">
                         <div className="grid grid-cols-2 gap-2">
                           <div className="font-medium">Sector:</div>
                           <div>{payload[0].payload.commodity_name}</div>
                           <div className="font-medium">Balance:</div>
-                          <div className={payload[0].value >= 0 ? "text-green-600" : "text-red-600"}>
-                            ${Math.abs(payload[0].value).toLocaleString()}
-                            {payload[0].value >= 0 ? " surplus" : " deficit"}
+                          <div className={value >= 0 ? "text-green-600" : "text-red-600"}>
+                            ${Math.abs(value).toLocaleString()}
+                            {value >= 0 ? " surplus" : " deficit"}
                           </div>
                         </div>
                       </div>
