@@ -35,15 +35,16 @@ export const DemoPages = () => {
       path: "/demo/data-visualization"
     },
     {
+      title: "Trade Data Analysis",
+      description: "Explore international trade flows and patterns",
+      path: "/demo/trade-data",
+      isActive: true
+    },
+    {
       title: "API Integration",
       description: "Connect with external services through our API platform",
       path: "/demo/api-integration",
       isActive: true
-    },
-    {
-      title: "Automated Workflows",
-      description: "Build and manage automated data processing pipelines",
-      path: "/demo/automated-workflows"
     }
   ];
 

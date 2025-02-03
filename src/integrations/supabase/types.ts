@@ -33,6 +33,45 @@ export type Database = {
         }
         Relationships: []
       }
+      trade_data: {
+        Row: {
+          commodity_code: string
+          commodity_name: string
+          created_at: string
+          id: string
+          partner_country: string
+          reporter_country: string
+          trade_flow: string
+          trade_value: number
+          trade_year: number
+          updated_at: string
+        }
+        Insert: {
+          commodity_code: string
+          commodity_name: string
+          created_at?: string
+          id?: string
+          partner_country: string
+          reporter_country: string
+          trade_flow: string
+          trade_value: number
+          trade_year: number
+          updated_at?: string
+        }
+        Update: {
+          commodity_code?: string
+          commodity_name?: string
+          created_at?: string
+          id?: string
+          partner_country?: string
+          reporter_country?: string
+          trade_flow?: string
+          trade_value?: number
+          trade_year?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

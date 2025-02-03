@@ -23,6 +23,7 @@ import MachineLearningDemo from "./pages/demos/MachineLearningDemo";
 import DataVisualizationDemo from "./pages/demos/DataVisualizationDemo";
 import ApiIntegrationDemo from "./pages/demos/ApiIntegrationDemo";
 import AutomatedWorkflowsDemo from "./pages/demos/AutomatedWorkflowsDemo";
+import TradeDataDemo from "./pages/demos/TradeDataDemo";
 import Methodologies from "./pages/Methodologies";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/demo/data-visualization" element={<DataVisualizationDemo />} />
           <Route path="/demo/api-integration" element={<ApiIntegrationDemo />} />
           <Route path="/demo/automated-workflows" element={<AutomatedWorkflowsDemo />} />
+          <Route path="/demo/trade-data" element={<TradeDataDemo />} />
           <Route path="/methodologies" element={<Methodologies />} />
         </Routes>
       </BrowserRouter>
