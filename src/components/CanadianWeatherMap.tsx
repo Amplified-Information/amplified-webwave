@@ -17,12 +17,12 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const popups = useRef<mapboxgl.Popup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
 
-  // First, fetch the Mapbox token
+  // Initialize map when component mounts
   useEffect(() => {
-    const fetchMapboxToken = async () => {
+    const initializeMap = async () => {
       try {
+        // Fetch Mapbox token from Supabase
         const { data: secretData, error: secretError } = await supabase
           .from('secrets')
           .select('value')
@@ -30,114 +30,108 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           .single();
 
         if (secretError) {
-          console.error('Error fetching Mapbox token:', secretError);
           throw new Error(`Failed to fetch Mapbox token: ${secretError.message}`);
         }
 
         if (!secretData?.value) {
-          throw new Error('Mapbox token not found in secrets');
+          throw new Error('Mapbox token not found');
         }
 
-        setMapboxToken(secretData.value);
+        // Set Mapbox token
+        mapboxgl.accessToken = secretData.value;
+
+        // Create map instance
+        if (!mapContainer.current) {
+          throw new Error('Map container not found');
+        }
+
+        // Initialize map
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/outdoors-v12',
+          center: [-96, 62],
+          zoom: 3.5,
+          minZoom: 2,
+          maxZoom: 9,
+          bounds: [
+            [-141, 41.7], // Southwest coordinates
+            [-52, 83.3]   // Northeast coordinates
+          ],
+          maxBounds: [
+            [-180, 30],   // Southwest coordinates
+            [-30, 90]     // Northeast coordinates
+          ]
+        });
+
+        // Add navigation controls
+        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        // Wait for map to load before adding markers
+        map.current.on('load', () => {
+          console.log('Map loaded successfully');
+          setIsLoading(false);
+          
+          map.current?.setTerrain({ 
+            source: 'mapbox-dem', 
+            exaggeration: 1.5 
+          });
+          
+          map.current?.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 14
+          });
+
+          if (weatherData.length > 0) {
+            addMarkersToMap();
+          }
+        });
+
       } catch (err) {
-        console.error('Error in fetchMapboxToken:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch Mapbox token');
+        console.error('Error initializing map:', err);
+        setError(err instanceof Error ? err.message : 'Failed to initialize map');
         setIsLoading(false);
       }
     };
 
-    fetchMapboxToken();
-  }, []);
-
-  // Then, initialize the map once we have the token
-  useEffect(() => {
-    if (!mapboxToken || !mapContainer.current || map.current) return;
-
-    try {
-      console.log('Initializing map with token...');
-      mapboxgl.accessToken = mapboxToken;
-
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/outdoors-v12',
-        center: [-96, 62],
-        zoom: 3.5,
-        minZoom: 2,
-        maxZoom: 9,
-        bounds: [
-          [-141, 41.7], // Southwest coordinates
-          [-52, 83.3]   // Northeast coordinates
-        ],
-        maxBounds: [
-          [-180, 30],   // Southwest coordinates
-          [-30, 90]     // Northeast coordinates
-        ]
-      });
-
-      map.current.on('load', () => {
-        console.log('Map loaded successfully');
-        setIsLoading(false);
-        
-        map.current?.setTerrain({ 
-          source: 'mapbox-dem', 
-          exaggeration: 1.5 
-        });
-        
-        map.current?.addSource('mapbox-dem', {
-          'type': 'raster-dem',
-          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-          'tileSize': 512,
-          'maxzoom': 14
-        });
-
-        if (weatherData.length > 0) {
-          addMarkersToMap();
-        }
-      });
-
-      map.current.on('error', (e) => {
-        console.error('Mapbox error:', e);
-        setError(`Map error: ${e.error.message}`);
-        setIsLoading(false);
-      });
-
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    } catch (err) {
-      console.error('Error in map initialization:', err);
-      setError(err instanceof Error ? err.message : 'Failed to initialize map');
-      setIsLoading(false);
+    // Initialize map if it hasn't been created yet
+    if (!map.current) {
+      initializeMap();
     }
 
+    // Cleanup function
     return () => {
+      markers.current.forEach(marker => marker.remove());
+      popups.current.forEach(popup => popup.remove());
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
     };
-  }, [mapboxToken]);
+  }, []); // Empty dependency array since we only want to initialize once
+
+  // Add markers when weather data changes
+  useEffect(() => {
+    if (map.current && !isLoading && weatherData.length > 0) {
+      addMarkersToMap();
+    }
+  }, [weatherData]);
 
   const addMarkersToMap = () => {
-    if (!map.current || !weatherData.length) {
-      console.log('Cannot add markers: map or weather data not ready');
-      return;
-    }
+    if (!map.current) return;
 
-    console.log('Adding markers to map...');
-    
-    // Clean up existing markers and popups
+    // Clear existing markers and popups
     markers.current.forEach(marker => marker.remove());
     popups.current.forEach(popup => popup.remove());
     markers.current = [];
     popups.current = [];
 
-    // Add markers for each city
+    // Add new markers
     weatherData.forEach((cityWeather) => {
       const cityData = CANADIAN_CITIES.find(c => c.name === cityWeather.cityName);
       
       if (cityData) {
-        // Create popup
         const popup = new mapboxgl.Popup({
           closeButton: false,
           closeOnClick: false,
@@ -150,15 +144,13 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           </div>`
         );
 
-        // Create marker
         const marker = new mapboxgl.Marker({
           color: cityWeather.temperature > 0 ? '#ef4444' : '#3b82f6'
         })
           .setLngLat([cityData.longitude, cityData.latitude])
           .setPopup(popup)
-          .addTo(map.current!);
+          .addTo(map.current);
 
-        // Show popup on hover
         const markerElement = marker.getElement();
         markerElement.addEventListener('mouseenter', () => popup.addTo(map.current!));
         markerElement.addEventListener('mouseleave', () => popup.remove());
@@ -167,22 +159,12 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         popups.current.push(popup);
       }
     });
-    console.log('Markers added successfully');
   };
-
-  // Update markers when weather data changes
-  useEffect(() => {
-    if (!isLoading && !error && map.current) {
-      addMarkersToMap();
-    }
-  }, [weatherData]);
 
   if (error) {
     return (
       <Alert variant="destructive" className="mb-4">
-        <AlertDescription>
-          {error}
-        </AlertDescription>
+        <AlertDescription>{error}</AlertDescription>
       </Alert>
     );
   }
