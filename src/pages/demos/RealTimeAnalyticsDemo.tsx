@@ -26,7 +26,9 @@ const RealTimeAnalyticsDemo = () => {
 
         <Card className="mb-8">
           <CardContent className="p-6">
-            <CanadianCitiesWeather />
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-600">Map visualization temporarily disabled for maintenance.</p>
+            </div>
           </CardContent>
         </Card>
       </div>
