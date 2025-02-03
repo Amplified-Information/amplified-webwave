@@ -26,5 +26,5 @@ enabled = true
 enabled = true
 
 [[functions]]
-name = "fetch-trade-data"
+[functions.fetch-trade-data]
 verify_jwt = false

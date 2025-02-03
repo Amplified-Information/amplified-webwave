@@ -67,6 +67,10 @@ export const TradeDataVisualizer = () => {
     );
   }
 
+  const getBarFill = (entry: TradeData) => {
+    return entry.trade_balance >= 0 ? "var(--primary)" : "#ef4444";
+  };
+
   return (
     <div className="space-y-8">
       <Card>
@@ -123,7 +127,7 @@ export const TradeDataVisualizer = () => {
                 />
                 <Bar
                   dataKey="trade_balance"
-                  fill={(data) => data.trade_balance >= 0 ? "var(--primary)" : "#ef4444"}
+                  fill={getBarFill}
                 />
               </RechartsBarChart>
             </ChartContainer>
