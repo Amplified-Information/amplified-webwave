@@ -65,20 +65,20 @@ const DataIntegrationDemo = () => {
             <div className="bg-blue-50 p-6 rounded-lg text-left">
               <h2 className="text-xl font-semibold mb-2">How This Tool Works:</h2>
               <p className="mb-2">
-                This garden planning tool uses a comprehensive static database to help you make informed decisions about your garden layout:
+                This garden planning tool uses a comprehensive static database to help you make informed decisions about your garden layout. The data is sourced from established gardening resources and agricultural research:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  <strong>Vegetable Database:</strong> Contains detailed information about common garden vegetables, including scientific names, growing requirements, and planting dates.
+                  <strong>Vegetable Database:</strong> Contains detailed information about common garden vegetables, including scientific names, growing requirements, and planting dates. This data is maintained in a static TypeScript file (gardenVegetables.ts) and is based on USDA guidelines and agricultural extension services recommendations.
                 </li>
                 <li>
-                  <strong>Companion Planting Matrix:</strong> Uses pre-defined relationships between plants to show which vegetables grow well together and which should be kept apart.
+                  <strong>Companion Planting Matrix:</strong> Uses pre-defined relationships between plants to show which vegetables grow well together and which should be kept apart. These relationships are documented in our companionPlanting.ts file and are derived from traditional gardening wisdom and modern agricultural research.
                 </li>
                 <li>
-                  <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on your selected USDA hardiness zone to optimize planting times.
+                  <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on your selected USDA hardiness zone to optimize planting times. The dates are aligned with USDA recommendations for each hardiness zone.
                 </li>
                 <li>
-                  <strong>Selection System:</strong> Allows you to choose up to 20 vegetables at once to analyze their compatibility and generate a personalized planting guide.
+                  <strong>Selection System:</strong> Allows you to choose up to 20 vegetables at once to analyze their compatibility and generate a personalized planting guide. The analysis is performed in real-time using our integrated companion planting database.
                 </li>
               </ul>
             </div>
