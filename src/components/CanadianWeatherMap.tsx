@@ -18,7 +18,6 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize map when component mounts
   useEffect(() => {
     const initializeMap = async () => {
       try {
@@ -30,64 +29,69 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           .single();
 
         if (secretError) {
+          console.error('Error fetching Mapbox token:', secretError);
           throw new Error(`Failed to fetch Mapbox token: ${secretError.message}`);
         }
 
         if (!secretData?.value) {
-          throw new Error('Mapbox token not found');
+          console.error('No Mapbox token found in secrets');
+          throw new Error('Mapbox token not found in secrets');
         }
 
         // Set Mapbox token
         mapboxgl.accessToken = secretData.value;
 
-        // Create map instance
+        // Ensure map container exists
         if (!mapContainer.current) {
+          console.error('Map container ref is null');
           throw new Error('Map container not found');
         }
 
-        // Initialize map
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/outdoors-v12',
-          center: [-96, 62],
-          zoom: 3.5,
-          minZoom: 2,
-          maxZoom: 9,
-          bounds: [
-            [-141, 41.7], // Southwest coordinates
-            [-52, 83.3]   // Northeast coordinates
-          ],
-          maxBounds: [
-            [-180, 30],   // Southwest coordinates
-            [-30, 90]     // Northeast coordinates
-          ]
-        });
-
-        // Add navigation controls
-        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-        // Wait for map to load before adding markers
-        map.current.on('load', () => {
-          console.log('Map loaded successfully');
-          setIsLoading(false);
-          
-          map.current?.setTerrain({ 
-            source: 'mapbox-dem', 
-            exaggeration: 1.5 
-          });
-          
-          map.current?.addSource('mapbox-dem', {
-            'type': 'raster-dem',
-            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-            'tileSize': 512,
-            'maxzoom': 14
+        // Initialize map only if it hasn't been created yet
+        if (!map.current) {
+          console.log('Creating new map instance');
+          map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: 'mapbox://styles/mapbox/outdoors-v12',
+            center: [-96, 62],
+            zoom: 3.5,
+            minZoom: 2,
+            maxZoom: 9,
+            bounds: [
+              [-141, 41.7], // Southwest coordinates
+              [-52, 83.3]   // Northeast coordinates
+            ],
+            maxBounds: [
+              [-180, 30],   // Southwest coordinates
+              [-30, 90]     // Northeast coordinates
+            ]
           });
 
-          if (weatherData.length > 0) {
-            addMarkersToMap();
-          }
-        });
+          // Add navigation controls
+          map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+          // Wait for map to load before adding markers
+          map.current.on('load', () => {
+            console.log('Map loaded successfully');
+            setIsLoading(false);
+            
+            map.current?.setTerrain({ 
+              source: 'mapbox-dem', 
+              exaggeration: 1.5 
+            });
+            
+            map.current?.addSource('mapbox-dem', {
+              'type': 'raster-dem',
+              'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+              'tileSize': 512,
+              'maxzoom': 14
+            });
+
+            if (weatherData.length > 0) {
+              addMarkersToMap();
+            }
+          });
+        }
       } catch (err) {
         console.error('Error initializing map:', err);
         setError(err instanceof Error ? err.message : 'Failed to initialize map');
@@ -95,13 +99,11 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       }
     };
 
-    // Initialize map if it hasn't been created yet
-    if (!map.current) {
-      initializeMap();
-    }
+    initializeMap();
 
     // Cleanup function
     return () => {
+      console.log('Cleaning up map instance');
       markers.current.forEach(marker => marker.remove());
       popups.current.forEach(popup => popup.remove());
       if (map.current) {
@@ -119,7 +121,10 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   }, [weatherData]);
 
   const addMarkersToMap = () => {
-    if (!map.current) return;
+    if (!map.current) {
+      console.error('Cannot add markers: map instance is null');
+      return;
+    }
 
     // Clear existing markers and popups
     markers.current.forEach(marker => marker.remove());
