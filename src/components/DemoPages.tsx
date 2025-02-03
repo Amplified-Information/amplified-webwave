@@ -45,6 +45,11 @@ export const DemoPages = () => {
       description: "Connect with external services through our API platform",
       path: "/demo/api-integration",
       isActive: true
+    },
+    {
+      title: "Automated Workflows",
+      description: "Build and manage automated data processing pipelines",
+      path: "/demo/automated-workflows"
     }
   ];
 
