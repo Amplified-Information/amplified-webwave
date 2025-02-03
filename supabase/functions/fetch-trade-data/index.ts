@@ -17,20 +17,25 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Use proper headers and follow redirects
+    // Use a more reliable endpoint with no authentication required
     const response = await fetch(
-      'https://comtradeapi.un.org/public/v1/preview/C/A/HS?freq=A&px=HS&ps=2022&r=124,842&p=124,842&rg=all&cc=AG,EN,MF',
+      'https://comtradeapi.un.org/data/v1/get/C/A/HS?freq=A&px=HS&ps=2022&r=124%2C842&p=124%2C842&rg=all&cc=TOTAL&fmt=json&head=M',
       {
+        method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        redirect: 'follow', // Explicitly follow redirects
+        }
       }
     )
 
     if (!response.ok) {
-      throw new Error(`API request failed with status: ${response.status}, ${await response.text()}`)
+      const text = await response.text()
+      console.error('API Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: text
+      })
+      throw new Error(`API request failed with status: ${response.status}`)
     }
 
     const data = await response.json()
