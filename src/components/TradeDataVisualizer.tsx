@@ -7,9 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { ChartContainer } from "@/components/ui/chart";
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TradeData {
   commodity_desc: string;
@@ -46,10 +48,33 @@ const fetchTradeData = async () => {
 };
 
 export const TradeDataVisualizer = () => {
-  const { data: tradeData, isLoading, error } = useQuery({
+  const { toast } = useToast();
+  const { data: tradeData, isLoading, error, refetch } = useQuery({
     queryKey: ['canada-usa-trade'],
     queryFn: fetchTradeData,
   });
+
+  const loadTradeData = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-trade-data');
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: `Loaded ${data.count} trade records successfully`,
+      });
+      
+      // Refetch the data to update the chart
+      refetch();
+    } catch (error) {
+      console.error('Error loading trade data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load trade data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -69,6 +94,11 @@ export const TradeDataVisualizer = () => {
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-end">
+        <Button onClick={loadTradeData}>
+          Refresh Trade Data
+        </Button>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Canada-USA Trade Balance by Sector</CardTitle>
