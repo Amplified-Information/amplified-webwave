@@ -8,32 +8,47 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 interface TradeData {
-  reporter_country: string;
-  partner_country: string;
   commodity_name: string;
-  trade_value: number;
-  trade_year: number;
-  trade_flow: string;
+  trade_balance: number;
 }
 
 const fetchTradeData = async () => {
   const { data, error } = await supabase
     .from('trade_data')
-    .select('*')
-    .order('trade_year', { ascending: true })
-    .limit(100);
+    .select('commodity_name, trade_value, trade_flow')
+    .or('reporter_country.eq.Canada,reporter_country.eq.United States')
+    .and('partner_country.in.(Canada,United States)')
+    .neq('reporter_country', 'partner_country');
 
   if (error) throw error;
-  return data as TradeData[];
+
+  // Process data to calculate trade balance by commodity
+  const balanceByProduct = data.reduce((acc: { [key: string]: number }, curr) => {
+    const value = curr.trade_value;
+    const isCanadaExport = curr.reporter_country === 'Canada' && curr.trade_flow === 'Export';
+    const isUSAImport = curr.reporter_country === 'United States' && curr.trade_flow === 'Import';
+    
+    // Positive values represent Canadian surplus
+    const tradeValue = (isCanadaExport || isUSAImport) ? value : -value;
+    
+    acc[curr.commodity_name] = (acc[curr.commodity_name] || 0) + tradeValue;
+    return acc;
+  }, {});
+
+  // Convert to array format for chart
+  return Object.entries(balanceByProduct).map(([commodity_name, trade_balance]) => ({
+    commodity_name,
+    trade_balance
+  }));
 };
 
 export const TradeDataVisualizer = () => {
   const { data: tradeData, isLoading, error } = useQuery({
-    queryKey: ['trade-data'],
+    queryKey: ['canada-usa-trade'],
     queryFn: fetchTradeData,
   });
 
@@ -57,13 +72,13 @@ export const TradeDataVisualizer = () => {
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle>Trade Flow Analysis</CardTitle>
+          <CardTitle>Canada-USA Trade Balance by Sector</CardTitle>
           <CardDescription>
-            Visualization of international trade patterns and trends
+            Trade surplus/deficit analysis between Canada and USA by commodity sector
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px]">
+          <div className="h-[600px]">
             <ChartContainer
               className="h-full"
               config={{
@@ -75,26 +90,40 @@ export const TradeDataVisualizer = () => {
                 },
               }}
             >
-              <RechartsBarChart data={tradeData}>
-                <XAxis dataKey="trade_year" />
-                <YAxis />
-                <Tooltip content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  return (
-                    <div className="rounded-lg border bg-background p-2 shadow-sm">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="font-medium">Year:</div>
-                        <div>{payload[0].payload.trade_year}</div>
-                        <div className="font-medium">Value:</div>
-                        <div>${payload[0].value?.toLocaleString()}</div>
+              <RechartsBarChart
+                data={tradeData}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 150, bottom: 5 }}
+              >
+                <XAxis type="number" 
+                  label={{ value: 'Trade Balance (USD)', position: 'bottom' }}
+                />
+                <YAxis 
+                  type="category" 
+                  dataKey="commodity_name" 
+                  width={140}
+                />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null;
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="font-medium">Sector:</div>
+                          <div>{payload[0].payload.commodity_name}</div>
+                          <div className="font-medium">Balance:</div>
+                          <div className={payload[0].value >= 0 ? "text-green-600" : "text-red-600"}>
+                            ${Math.abs(payload[0].value).toLocaleString()}
+                            {payload[0].value >= 0 ? " surplus" : " deficit"}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                }} />
+                    );
+                  }}
+                />
                 <Bar
-                  dataKey="trade_value"
-                  fill="var(--primary)"
-                  radius={[4, 4, 0, 0]}
+                  dataKey="trade_balance"
+                  fill={(data) => data.trade_balance >= 0 ? "var(--primary)" : "#ef4444"}
                 />
               </RechartsBarChart>
             </ChartContainer>
