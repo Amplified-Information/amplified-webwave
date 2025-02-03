@@ -17,35 +17,45 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const popups = useRef<mapboxgl.Popup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
 
-  const initializeMap = async () => {
+  // First, fetch the Mapbox token
+  useEffect(() => {
+    const fetchMapboxToken = async () => {
+      try {
+        const { data: secretData, error: secretError } = await supabase
+          .from('secrets')
+          .select('value')
+          .eq('name', 'MAPBOX_PUBLIC_TOKEN')
+          .single();
+
+        if (secretError) {
+          console.error('Error fetching Mapbox token:', secretError);
+          throw new Error(`Failed to fetch Mapbox token: ${secretError.message}`);
+        }
+
+        if (!secretData?.value) {
+          throw new Error('Mapbox token not found in secrets');
+        }
+
+        setMapboxToken(secretData.value);
+      } catch (err) {
+        console.error('Error in fetchMapboxToken:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch Mapbox token');
+        setIsLoading(false);
+      }
+    };
+
+    fetchMapboxToken();
+  }, []);
+
+  // Then, initialize the map once we have the token
+  useEffect(() => {
+    if (!mapboxToken || !mapContainer.current || map.current) return;
+
     try {
-      console.log('Starting map initialization...');
-      
-      if (!mapContainer.current) {
-        console.error('Map container not found');
-        throw new Error('Map container not found');
-      }
-
-      console.log('Fetching Mapbox token from Supabase...');
-      const { data: secretData, error: secretError } = await supabase
-        .from('secrets')
-        .select('value')
-        .eq('name', 'MAPBOX_PUBLIC_TOKEN')
-        .single();
-
-      if (secretError) {
-        console.error('Supabase error:', secretError);
-        throw new Error(`Failed to fetch Mapbox token: ${secretError.message}`);
-      }
-
-      if (!secretData?.value) {
-        console.error('No Mapbox token found in secrets');
-        throw new Error('Mapbox token not found in secrets');
-      }
-
-      console.log('Token retrieved successfully, initializing Mapbox...');
-      mapboxgl.accessToken = secretData.value;
+      console.log('Initializing map with token...');
+      mapboxgl.accessToken = mapboxToken;
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -79,6 +89,10 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           'tileSize': 512,
           'maxzoom': 14
         });
+
+        if (weatherData.length > 0) {
+          addMarkersToMap();
+        }
       });
 
       map.current.on('error', (e) => {
@@ -90,16 +104,19 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      if (weatherData.length > 0) {
-        addMarkersToMap();
-      }
-
     } catch (err) {
       console.error('Error in map initialization:', err);
       setError(err instanceof Error ? err.message : 'Failed to initialize map');
       setIsLoading(false);
     }
-  };
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, [mapboxToken]);
 
   const addMarkersToMap = () => {
     if (!map.current || !weatherData.length) {
@@ -153,23 +170,12 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     console.log('Markers added successfully');
   };
 
-  useEffect(() => {
-    console.log('Component mounted, initializing map...');
-    initializeMap();
-
-    return () => {
-      console.log('Component unmounting, cleaning up...');
-      markers.current.forEach(marker => marker.remove());
-      popups.current.forEach(popup => popup.remove());
-      map.current?.remove();
-    };
-  }, []);
-
+  // Update markers when weather data changes
   useEffect(() => {
     if (!isLoading && !error && map.current) {
       addMarkersToMap();
     }
-  }, [weatherData, isLoading]);
+  }, [weatherData]);
 
   if (error) {
     return (
