@@ -17,11 +17,15 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const popups = useRef<mapboxgl.Popup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+
     const initializeMap = async () => {
+      if (!mapContainer.current || mapInitialized) return;
+
       try {
-        // Fetch Mapbox token from Supabase
         const { data: secretData, error: secretError } = await supabase
           .from('secrets')
           .select('value')
@@ -38,71 +42,70 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           throw new Error('Mapbox token not found in secrets');
         }
 
-        // Set Mapbox token
         mapboxgl.accessToken = secretData.value;
 
-        // Ensure map container exists
-        if (!mapContainer.current) {
-          console.error('Map container ref is null');
-          throw new Error('Map container not found');
-        }
+        if (!mounted) return;
 
-        // Initialize map only if it hasn't been created yet
-        if (!map.current) {
-          console.log('Creating new map instance');
-          map.current = new mapboxgl.Map({
-            container: mapContainer.current,
-            style: 'mapbox://styles/mapbox/outdoors-v12',
-            center: [-96, 62],
-            zoom: 3.5,
-            minZoom: 2,
-            maxZoom: 9,
-            bounds: [
-              [-141, 41.7], // Southwest coordinates
-              [-52, 83.3]   // Northeast coordinates
-            ],
-            maxBounds: [
-              [-180, 30],   // Southwest coordinates
-              [-30, 90]     // Northeast coordinates
-            ]
+        console.log('Creating new map instance');
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/outdoors-v12',
+          center: [-96, 62],
+          zoom: 3.5,
+          minZoom: 2,
+          maxZoom: 9,
+          bounds: [
+            [-141, 41.7],
+            [-52, 83.3]
+          ],
+          maxBounds: [
+            [-180, 30],
+            [-30, 90]
+          ]
+        });
+
+        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        map.current.on('load', () => {
+          if (!mounted) return;
+          
+          console.log('Map loaded successfully');
+          setIsLoading(false);
+          setMapInitialized(true);
+          
+          map.current?.setTerrain({ 
+            source: 'mapbox-dem', 
+            exaggeration: 1.5 
+          });
+          
+          map.current?.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 14
           });
 
-          // Add navigation controls
-          map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+          if (weatherData.length > 0) {
+            addMarkersToMap();
+          }
+        });
 
-          // Wait for map to load before adding markers
-          map.current.on('load', () => {
-            console.log('Map loaded successfully');
-            setIsLoading(false);
-            
-            map.current?.setTerrain({ 
-              source: 'mapbox-dem', 
-              exaggeration: 1.5 
-            });
-            
-            map.current?.addSource('mapbox-dem', {
-              'type': 'raster-dem',
-              'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-              'tileSize': 512,
-              'maxzoom': 14
-            });
-
-            if (weatherData.length > 0) {
-              addMarkersToMap();
-            }
-          });
-        }
       } catch (err) {
         console.error('Error initializing map:', err);
-        setError(err instanceof Error ? err.message : 'Failed to initialize map');
-        setIsLoading(false);
+        if (mounted) {
+          setError(err instanceof Error ? err.message : 'Failed to initialize map');
+          setIsLoading(false);
+        }
       }
     };
 
-    initializeMap();
+    // Small delay to ensure container is mounted
+    setTimeout(() => {
+      initializeMap();
+    }, 100);
 
-    // Cleanup function
     return () => {
+      mounted = false;
       console.log('Cleaning up map instance');
       markers.current.forEach(marker => marker.remove());
       popups.current.forEach(popup => popup.remove());
@@ -111,14 +114,13 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         map.current = null;
       }
     };
-  }, []); // Empty dependency array since we only want to initialize once
+  }, []);
 
-  // Add markers when weather data changes
   useEffect(() => {
-    if (map.current && !isLoading && weatherData.length > 0) {
+    if (map.current && mapInitialized && weatherData.length > 0) {
       addMarkersToMap();
     }
-  }, [weatherData]);
+  }, [weatherData, mapInitialized]);
 
   const addMarkersToMap = () => {
     if (!map.current) {
@@ -126,13 +128,11 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       return;
     }
 
-    // Clear existing markers and popups
     markers.current.forEach(marker => marker.remove());
     popups.current.forEach(popup => popup.remove());
     markers.current = [];
     popups.current = [];
 
-    // Add new markers
     weatherData.forEach((cityWeather) => {
       const cityData = CANADIAN_CITIES.find(c => c.name === cityWeather.cityName);
       
