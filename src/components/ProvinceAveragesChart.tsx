@@ -78,12 +78,14 @@ const ProvinceAveragesChart = ({ weatherData }: ProvinceAveragesChartProps) => {
               orientation="left"
               padding={{ top: 10, bottom: 10 }}
               label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }}
+              width={80}
             />
             <YAxis 
               yAxisId="right" 
               orientation="right"
               padding={{ top: 10, bottom: 10 }}
               label={{ value: 'Humidity (%)', angle: 90, position: 'insideRight' }}
+              width={80}
             />
             <Tooltip />
             <Legend />
