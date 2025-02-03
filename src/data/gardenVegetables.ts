@@ -6,6 +6,9 @@ export interface GardenVegetable {
   sunRequirements: string;
   sowingMethod: string;
   height?: number;
+  sowingDates: {
+    [key: string]: string;
+  };
 }
 
 export const gardenVegetables: GardenVegetable[] = [
@@ -16,7 +19,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "A warm-season crop and popular garden vegetable",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed or transplant",
-    height: 150
+    height: 150,
+    sowingDates: {
+      "3": "Late May to early June",
+      "4": "Mid-May to early June",
+      "5": "Early to mid-May",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "2",
@@ -25,7 +37,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Root vegetable, perfect for most gardens",
     sunRequirements: "Full sun to partial shade",
     sowingMethod: "Direct seed",
-    height: 30
+    height: 30,
+    sowingDates: {
+      "3": "April to May",
+      "4": "March to April",
+      "5": "February to March",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "3",
@@ -34,7 +55,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Cool-season crop, easy to grow",
     sunRequirements: "Partial shade to full sun",
     sowingMethod: "Direct seed",
-    height: 25
+    height: 25,
+    sowingDates: {
+      "3": "March to April",
+      "4": "February to March",
+      "5": "N/A",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "4",
@@ -43,7 +73,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Climbing vine producing crisp vegetables",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed or transplant",
-    height: 200
+    height: 200,
+    sowingDates: {
+      "3": "Late May to early June",
+      "4": "Mid-May to early June",
+      "5": "Early to mid-May",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "5",
@@ -52,7 +91,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Warm-season vegetable with various varieties",
     sunRequirements: "Full sun",
     sowingMethod: "Transplant",
-    height: 100
+    height: 100,
+    sowingDates: {
+      "3": "N/A",
+      "4": "Late May to early June",
+      "5": "Mid-May to early June",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "6",
@@ -61,7 +109,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Nitrogen-fixing legume, available in bush or pole varieties",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed",
-    height: 180
+    height: 180,
+    sowingDates: {
+      "3": "Late May to early June",
+      "4": "Mid-May to early June",
+      "5": "Early to mid-May",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "7",
@@ -70,7 +127,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Essential root vegetable with strong flavor",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed or transplant",
-    height: 45
+    height: 45,
+    sowingDates: {
+      "3": "March to April",
+      "4": "February to March",
+      "5": "N/A",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "8",
@@ -79,7 +145,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Nutritious cole crop with edible flowers",
     sunRequirements: "Full sun",
     sowingMethod: "Transplant",
-    height: 60
+    height: 60,
+    sowingDates: {
+      "3": "April to May",
+      "4": "March to April",
+      "5": "February to March",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "9",
@@ -88,7 +163,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Hardy cole crop with compact heads",
     sunRequirements: "Full sun",
     sowingMethod: "Transplant",
-    height: 40
+    height: 40,
+    sowingDates: {
+      "3": "April to May",
+      "4": "March to April",
+      "5": "February to March",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "10",
@@ -97,7 +181,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Cool-season legume, great for early planting",
     sunRequirements: "Full sun to partial shade",
     sowingMethod: "Direct seed",
-    height: 180
+    height: 180,
+    sowingDates: {
+      "3": "March to April",
+      "4": "February to March",
+      "5": "N/A",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "11",
@@ -106,7 +199,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Starchy tuber, staple food crop",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed",
-    height: 60
+    height: 60,
+    sowingDates: {
+      "3": "April to May",
+      "4": "March to April",
+      "5": "February to March",
+      "6": "N/A",
+      "7": "N/A",
+      "8": "N/A",
+      "9": "N/A"
+    }
   },
   {
     id: "12",
@@ -115,7 +217,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Sprawling vine with variety of fruit types",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed",
-    height: 90
+    height: 90,
+    sowingDates: {
+      "3": "Late May to early June",
+      "4": "Mid-May to early June",
+      "5": "Early to mid-May",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "13",
@@ -124,7 +235,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Aromatic herb, great companion plant",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed or transplant",
-    height: 60
+    height: 60,
+    sowingDates: {
+      "3": "N/A",
+      "4": "Late May to early June",
+      "5": "Mid-May to early June",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "14",
@@ -133,7 +253,16 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Tall grain crop, heavy feeder",
     sunRequirements: "Full sun",
     sowingMethod: "Direct seed",
-    height: 240
+    height: 240,
+    sowingDates: {
+      "3": "N/A",
+      "4": "Late May to early June",
+      "5": "Mid-May to early June",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   },
   {
     id: "15",
@@ -142,6 +271,25 @@ export const gardenVegetables: GardenVegetable[] = [
     description: "Warm-season crop from nightshade family",
     sunRequirements: "Full sun",
     sowingMethod: "Transplant",
-    height: 90
+    height: 90,
+    sowingDates: {
+      "3": "N/A",
+      "4": "Late May to early June",
+      "5": "Mid-May to early June",
+      "6": "April to early May",
+      "7": "March to April",
+      "8": "February to March",
+      "9": "January to February"
+    }
   }
+];
+
+export const hardinessZones = [
+  { value: "3", label: "Zone 3 (-40°F to -30°F)" },
+  { value: "4", label: "Zone 4 (-30°F to -20°F)" },
+  { value: "5", label: "Zone 5 (-20°F to -10°F)" },
+  { value: "6", label: "Zone 6 (-10°F to 0°F)" },
+  { value: "7", label: "Zone 7 (0°F to 10°F)" },
+  { value: "8", label: "Zone 8 (10°F to 20°F)" },
+  { value: "9", label: "Zone 9 (20°F to 30°F)" }
 ];

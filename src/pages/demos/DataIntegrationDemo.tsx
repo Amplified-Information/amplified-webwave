@@ -11,12 +11,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState } from "react";
 import { findCompanionData } from "@/data/companionPlanting";
-import { gardenVegetables } from "@/data/gardenVegetables";
+import { gardenVegetables, hardinessZones } from "@/data/gardenVegetables";
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
+  const [selectedZone, setSelectedZone] = useState<string>("5");
   const { toast } = useToast();
 
   const handleVegetableSelection = (vegetableName: string) => {
@@ -57,6 +65,24 @@ const DataIntegrationDemo = () => {
           </div>
         </div>
 
+        <div className="mb-8">
+          <label htmlFor="zone-select" className="block text-sm font-medium text-gray-700 mb-2">
+            Select Your Hardiness Zone
+          </label>
+          <Select value={selectedZone} onValueChange={setSelectedZone}>
+            <SelectTrigger className="w-full md:w-[300px]">
+              <SelectValue placeholder="Select your zone" />
+            </SelectTrigger>
+            <SelectContent>
+              {hardinessZones.map((zone) => (
+                <SelectItem key={zone.value} value={zone.value}>
+                  {zone.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="space-y-8">
@@ -69,6 +95,7 @@ const DataIntegrationDemo = () => {
                       <TableHead>Scientific Name</TableHead>
                       <TableHead>Sun Requirements</TableHead>
                       <TableHead>Sowing Method</TableHead>
+                      <TableHead>Sowing Dates</TableHead>
                       <TableHead>Height (cm)</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -85,6 +112,7 @@ const DataIntegrationDemo = () => {
                         <TableCell>{vegetable.binomialName}</TableCell>
                         <TableCell>{vegetable.sunRequirements}</TableCell>
                         <TableCell>{vegetable.sowingMethod}</TableCell>
+                        <TableCell>{vegetable.sowingDates[selectedZone] || "Not recommended for this zone"}</TableCell>
                         <TableCell>{vegetable.height || "N/A"}</TableCell>
                       </TableRow>
                     ))}
