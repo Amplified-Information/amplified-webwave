@@ -285,11 +285,11 @@ export const gardenVegetables: GardenVegetable[] = [
 ];
 
 export const hardinessZones = [
-  { value: "3", label: "Zone 3 (-40°F to -30°F)" },
-  { value: "4", label: "Zone 4 (-30°F to -20°F)" },
-  { value: "5", label: "Zone 5 (-20°F to -10°F)" },
-  { value: "6", label: "Zone 6 (-10°F to 0°F)" },
-  { value: "7", label: "Zone 7 (0°F to 10°F)" },
-  { value: "8", label: "Zone 8 (10°F to 20°F)" },
-  { value: "9", label: "Zone 9 (20°F to 30°F)" }
+  { value: "3", label: "Zone 3 (-40°C to -34°C)" },
+  { value: "4", label: "Zone 4 (-34°C to -29°C)" },
+  { value: "5", label: "Zone 5 (-29°C to -23°C)" },
+  { value: "6", label: "Zone 6 (-23°C to -18°C)" },
+  { value: "7", label: "Zone 7 (-18°C to -12°C)" },
+  { value: "8", label: "Zone 8 (-12°C to -7°C)" },
+  { value: "9", label: "Zone 9 (-7°C to -1°C)" }
 ];
