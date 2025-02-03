@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { WeatherData } from '@/types/weather';
+import { CANADIAN_CITIES } from '@/data/canadianCities';
 
 interface CanadianWeatherMapProps {
   weatherData: WeatherData[];
