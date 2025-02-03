@@ -3,8 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { WeatherData } from '@/types/weather';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CanadianWeatherMapProps {
   weatherData: WeatherData[];
@@ -15,16 +14,25 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const popups = useRef<mapboxgl.Popup[]>([]);
-  const [token, setToken] = useState('');
-  const [isMapInitialized, setIsMapInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const initializeMap = () => {
-    if (!mapContainer.current || !weatherData.length || !token) return;
+  const initializeMap = async () => {
+    if (!mapContainer.current || !weatherData.length) return;
 
-    // Initialize map
-    mapboxgl.accessToken = token;
-    
     try {
+      const { data: secretData, error: secretError } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'MAPBOX_PUBLIC_TOKEN')
+        .single();
+
+      if (secretError) throw new Error('Failed to fetch Mapbox token');
+      if (!secretData?.value) throw new Error('Mapbox token not found');
+
+      // Initialize map
+      mapboxgl.accessToken = secretData.value;
+      
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
@@ -56,23 +64,17 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      setIsMapInitialized(true);
-    } catch (error) {
-      console.error('Error initializing map:', error);
+      setIsLoading(false);
+      addMarkersToMap();
+    } catch (err) {
+      console.error('Error initializing map:', err);
+      setError(err instanceof Error ? err.message : 'Failed to initialize map');
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    // Cleanup function
-    return () => {
-      markers.current.forEach(marker => marker.remove());
-      popups.current.forEach(popup => popup.remove());
-      map.current?.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isMapInitialized || !map.current || !weatherData.length) return;
+  const addMarkersToMap = () => {
+    if (!map.current || !weatherData.length) return;
 
     // Clean up existing markers and popups
     markers.current.forEach(marker => marker.remove());
@@ -115,27 +117,42 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         popups.current.push(popup);
       }
     });
-  }, [weatherData, isMapInitialized]);
+  };
+
+  useEffect(() => {
+    initializeMap();
+    return () => {
+      markers.current.forEach(marker => marker.remove());
+      popups.current.forEach(popup => popup.remove());
+      map.current?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !error) {
+      addMarkersToMap();
+    }
+  }, [weatherData, isLoading]);
+
+  if (error) {
+    return (
+      <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 text-red-600 dark:text-red-400">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[400px] bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {!isMapInitialized && (
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Enter your Mapbox public token"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={initializeMap} disabled={!token}>
-            Initialize Map
-          </Button>
-        </div>
-      )}
-      <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-        <div ref={mapContainer} className="absolute inset-0" />
-      </div>
+    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+      <div ref={mapContainer} className="absolute inset-0" />
     </div>
   );
 };
