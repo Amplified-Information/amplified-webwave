@@ -22,8 +22,8 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [-96, 62], // Center of Canada
+      style: 'mapbox://styles/mapbox/outdoors-v12', // Changed to outdoors style for better geographical features
+      center: [-96, 62],
       zoom: 3.5,
       minZoom: 2,
       maxZoom: 9,
@@ -35,6 +35,17 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         [-180, 30], // Southwest coordinates
         [-30, 90]  // Northeast coordinates
       ]
+    });
+
+    // Add terrain control
+    map.current.on('load', () => {
+      map.current?.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+      map.current?.addSource('mapbox-dem', {
+        'type': 'raster-dem',
+        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        'tileSize': 512,
+        'maxzoom': 14
+      });
     });
 
     // Add navigation controls
