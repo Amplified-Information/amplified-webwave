@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
 import { Bot, Car, DollarSign } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CANADIAN_CITIES } from "@/data/canadianCities";
 
 const AutomatedWorkflowsDemo = () => {
   const [budget, setBudget] = useState([25000]);
@@ -19,15 +21,19 @@ const AutomatedWorkflowsDemo = () => {
     setTimeout(() => setIsSearching(false), 2000);
   };
 
+  const majorCities = CANADIAN_CITIES.filter(city => 
+    ["Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa", "Edmonton", "Quebec City", "Winnipeg"].includes(city.name)
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <div className="container mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <Car className="w-12 h-12 mx-auto mb-4 text-primary" />
-          <h1 className="text-4xl font-bold mb-4">Used Car Finder AI Crew</h1>
+          <h1 className="text-4xl font-bold mb-4">Canadian Used Car Finder AI Crew</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Our AI crew will help you find the perfect used car based on your preferences
+            Our AI crew will help you find the perfect used car in the Canadian market based on your preferences
           </p>
         </div>
 
@@ -41,7 +47,7 @@ const AutomatedWorkflowsDemo = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="budget">Budget Range (USD)</Label>
+                <Label htmlFor="budget">Budget Range (CAD)</Label>
                 <div className="flex items-center gap-4">
                   <DollarSign className="w-4 h-4 text-gray-500" />
                   <Slider
@@ -58,20 +64,26 @@ const AutomatedWorkflowsDemo = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  placeholder="Enter your city or ZIP code"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
+                <Label htmlFor="location">City</Label>
+                <Select value={location} onValueChange={setLocation}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a city" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {majorCities.map((city) => (
+                      <SelectItem key={city.name} value={city.name}>
+                        {city.name}, {city.province}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="preferences">Additional Preferences</Label>
                 <Input
                   id="preferences"
-                  placeholder="e.g., SUV, low mileage, specific brands"
+                  placeholder="e.g., SUV for winter, fuel efficiency, specific brands"
                   value={preferences}
                   onChange={(e) => setPreferences(e.target.value)}
                 />
@@ -94,17 +106,17 @@ const AutomatedWorkflowsDemo = () => {
             <CardContent>
               <div className="space-y-4">
                 <p className="text-gray-600">
-                  The AI crew will consist of:
+                  Your specialized Canadian market AI crew includes:
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Market Research Specialist</li>
-                  <li>Vehicle Inspector</li>
-                  <li>Price Negotiator</li>
-                  <li>Safety Analyst</li>
+                  <li>Canadian Market Specialist (Local pricing and availability)</li>
+                  <li>Winter Performance Expert (Canadian climate considerations)</li>
+                  <li>Vehicle Inspector (Canadian safety standards)</li>
+                  <li>Price Negotiator (Canadian market values)</li>
                 </ul>
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    Status: {isSearching ? "Crew is working..." : "Ready to start search"}
+                    Status: {isSearching ? "Crew is searching Canadian listings..." : "Ready to start search"}
                   </p>
                 </div>
               </div>
