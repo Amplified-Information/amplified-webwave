@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
-export const DemoPages = () => {
+interface DemoPagesProps {
+  showHeader?: boolean;
+  className?: string;
+}
+
+export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps) => {
   const demos = [
     {
       title: "Smart Garden Planning",
@@ -51,14 +56,16 @@ export const DemoPages = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className={`py-16 bg-gray-50 ${className}`}>
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Interactive Demos</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Explore our platform's capabilities through these interactive demonstrations
-          </p>
-        </div>
+        {showHeader && (
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Interactive Demos</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Explore our platform's capabilities through these interactive demonstrations
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {demos.map((demo) => (
