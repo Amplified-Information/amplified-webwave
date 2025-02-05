@@ -22,7 +22,7 @@ const CanadianMap = () => {
           .from('secrets')
           .select('value')
           .eq('name', 'MAPBOX_PUBLIC_TOKEN')
-          .single();
+          .maybeSingle();
 
         if (secretError) {
           console.error('Error fetching Mapbox token:', secretError);
@@ -65,16 +65,16 @@ const CanadianMap = () => {
           setIsLoading(false);
           setMapInitialized(true);
           
-          map.current?.setTerrain({ 
-            source: 'mapbox-dem', 
-            exaggeration: 1.5 
-          });
-          
           map.current?.addSource('mapbox-dem', {
             'type': 'raster-dem',
             'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
             'tileSize': 512,
             'maxzoom': 14
+          });
+
+          map.current?.setTerrain({ 
+            source: 'mapbox-dem', 
+            exaggeration: 1.5 
           });
         });
 
@@ -87,10 +87,7 @@ const CanadianMap = () => {
       }
     };
 
-    // Small delay to ensure container is mounted
-    setTimeout(() => {
-      initializeMap();
-    }, 100);
+    initializeMap();
 
     return () => {
       mounted = false;
@@ -100,7 +97,7 @@ const CanadianMap = () => {
         map.current = null;
       }
     };
-  }, []);
+  }, [mapInitialized]);
 
   if (error) {
     return (
