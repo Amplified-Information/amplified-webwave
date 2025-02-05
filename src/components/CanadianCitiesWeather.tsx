@@ -63,12 +63,6 @@ const CanadianCitiesWeather = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      <div className="rounded-lg bg-white/50 dark:bg-gray-800/50 p-6 shadow-lg backdrop-blur-sm">
-        <div className="text-center p-8 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">Map visualization temporarily disabled for maintenance.</p>
-        </div>
-      </div>
-
       <div className="grid gap-6 md:grid-cols-2">
         <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-lg animate-fadeIn transition-all hover:scale-[1.02]">
           <div className="flex items-center gap-3 mb-4">
