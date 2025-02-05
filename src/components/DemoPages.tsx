@@ -4,9 +4,10 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 export const DemoPages = () => {
   const demos = [
     {
-      title: "Data Integration",
-      description: "Connect and synchronize data from multiple sources seamlessly",
-      path: "/demo/data-integration"
+      title: "Smart Garden Planning",
+      description: "Plan and optimize your garden with AI-powered companion planting",
+      path: "/demo/data-integration",
+      status: "in development"
     },
     {
       title: "Real-time Analytics",
@@ -66,17 +67,24 @@ export const DemoPages = () => {
               className="group relative"
             >
               <Card className={`h-full transition-all duration-300 ${
-                demo.isActive 
-                  ? 'hover:shadow-lg hover:bg-[#F2FCE2]' 
-                  : 'hover:shadow-lg hover:bg-primary/10'
+                demo.status === "in development" 
+                  ? 'hover:shadow-lg hover:bg-orange-50' 
+                  : demo.isActive 
+                    ? 'hover:shadow-lg hover:bg-[#F2FCE2]' 
+                    : 'hover:shadow-lg hover:bg-primary/10'
               }`}>
                 <CardHeader>
                   <CardTitle>{demo.title}</CardTitle>
                   <CardDescription>{demo.description}</CardDescription>
                 </CardHeader>
-                {!demo.isActive && (
+                {!demo.isActive && !demo.status && (
                   <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-gray-500">
                     Coming Soon
+                  </div>
+                )}
+                {demo.status === "in development" && (
+                  <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-orange-600">
+                    In Development
                   </div>
                 )}
               </Card>
