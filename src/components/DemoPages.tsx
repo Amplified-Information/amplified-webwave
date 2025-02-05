@@ -43,9 +43,10 @@ export const DemoPages = () => {
       isActive: true
     },
     {
-      title: "Automated Workflows",
-      description: "Build and manage automated data processing pipelines",
-      path: "/demo/automated-workflows"
+      title: "Find a Used Car with AI",
+      description: "Let our AI crew help you find the perfect used car in Canada",
+      path: "/demo/automated-workflows",
+      isActive: true
     }
   ];
 
