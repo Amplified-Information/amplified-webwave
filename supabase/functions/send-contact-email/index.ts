@@ -21,12 +21,17 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    const apiKey = Deno.env.get("RESEND_API_KEY");
+    console.log("API Key length:", apiKey?.length || 0);
+    console.log("API Key first 5 chars:", apiKey?.substring(0, 5));
+    
+    const resend = new Resend(apiKey);
     const { name, email, message }: ContactFormData = await req.json();
 
     console.log("Sending emails for contact form submission:", { name, email });
 
     // Send notification email to site owner
+    console.log("Attempting to send owner notification email...");
     const ownerEmailResponse = await resend.emails.send({
       from: "Contact Form <contact@amplified.info>",
       to: ["mark@amplified.info"],
@@ -43,6 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Owner notification email response:", ownerEmailResponse);
 
     // Send confirmation email to the sender
+    console.log("Attempting to send confirmation email to sender...");
     const senderEmailResponse = await resend.emails.send({
       from: "Amplified Information <contact@amplified.info>",
       to: [email],
@@ -75,6 +81,13 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error) {
     console.error("Error sending emails:", error);
+    if (error instanceof Error) {
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
     return new Response(
       JSON.stringify({ error: error.message }),
       {
