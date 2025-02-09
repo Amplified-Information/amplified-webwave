@@ -24,18 +24,18 @@ const handler = async (req: Request): Promise<Response> => {
     const { name, email, message }: ContactFormData = await req.json();
 
     console.log("Creating SMTP client with following details:", {
-      hostname: "amplified.info",
-      port: 587,
-      username: "mark@amplified.info"
+      hostname: "mail.amplified.info",
+      port: 465,
+      username: "contact@amplified.info"
     });
     
     const client = new SMTPClient({
       connection: {
-        hostname: "amplified.info",
-        port: 587,
+        hostname: "mail.amplified.info",
+        port: 465,
         tls: true,
         auth: {
-          username: "mark@amplified.info",
+          username: "contact@amplified.info",
           password: Deno.env.get("SMTP_PASSWORD")
         }
       }
@@ -45,8 +45,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     try {
       const emailResult = await client.send({
-        from: "mark@amplified.info",
-        to: "mark@amplified.info",
+        from: "contact@amplified.info",
+        to: "contact@amplified.info",
         subject: "New Contact Form Submission",
         content: "text/html",
         html: `
