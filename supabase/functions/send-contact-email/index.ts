@@ -47,11 +47,13 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       errorMessage: error.message,
       errorStack: error.stack,
     });
-    throw error;
+    throw error;  // Re-throw to be handled by the main handler
   }
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("Contact form endpoint hit with method:", req.method);
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });

@@ -36,8 +36,13 @@ export const Contact = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
+      toast({
+        title: "Sending message...",
+        description: "Please wait while we process your request.",
+      });
+
       const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: data
+        body: data,
       });
 
       if (error) throw error;
