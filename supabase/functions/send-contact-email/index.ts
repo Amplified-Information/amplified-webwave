@@ -1,5 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,8 +23,34 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, message }: ContactFormData = await req.json();
 
-    // Log the form submission data
-    console.log("Contact form submission received:", {
+    const client = new SMTPClient({
+      connection: {
+        hostname: "amplified.info",
+        port: 587,
+        tls: true,
+        auth: {
+          username: "mark@amplified.info",
+          password: "your-password-here" // We'll need to set this up securely
+        }
+      }
+    });
+
+    // Send email
+    await client.send({
+      from: "mark@amplified.info",
+      to: "mark@amplified.info",
+      subject: "New Contact Form Submission",
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message}</p>
+      `,
+    });
+
+    // Log the form submission
+    console.log("Contact form submission received and email sent:", {
       name,
       email,
       message,
