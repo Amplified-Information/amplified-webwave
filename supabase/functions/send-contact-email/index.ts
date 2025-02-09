@@ -20,9 +20,9 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   try {
     console.log("Attempting to connect to SMTP server...");
     await client.connect({
-      hostname: "smtp.gmail.com",
+      hostname: "mail.amplified.info",
       port: 465,
-      username: "connect@amplified.info",
+      username: "contact@amplified.info",
       password: Deno.env.get("SMTP_PASSWORD")!,
       tls: true,
     });
@@ -30,7 +30,7 @@ const sendEmail = async (to: string, subject: string, html: string) => {
 
     console.log(`Sending email to ${to}...`);
     await client.send({
-      from: "connect@amplified.info",
+      from: "contact@amplified.info",
       to,
       subject,
       content: "This message is in HTML format",
