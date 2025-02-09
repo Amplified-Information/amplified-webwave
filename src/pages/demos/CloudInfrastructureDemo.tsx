@@ -34,7 +34,7 @@ const CloudInfrastructureDemo = () => {
                   <span className="text-sm">AWS</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#4285F4' }}></div>
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF0000' }}></div>
                   <span className="text-sm">Google Cloud</span>
                 </div>
                 <div className="flex items-center gap-2">
