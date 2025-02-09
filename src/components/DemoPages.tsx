@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Leaf, Globe, Database, ChartBar, Square, ChartLine, House, Car } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -13,46 +14,54 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Smart Garden Planning",
       description: "Plan and optimize your garden with AI-powered companion planting",
       path: "/demo/data-integration",
-      isActive: true
+      isActive: true,
+      icon: Leaf
     },
     {
       title: "Live Canadian Weather Analytics",
       description: "Monitor and analyze data streams in real-time",
       path: "/demo/real-time-analytics",
-      isActive: true
+      isActive: true,
+      icon: Globe
     },
     {
       title: "Trade Data Analysis",
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
-      status: "in development"
+      status: "in development",
+      icon: Database
     },
     {
       title: "Cloud Infrastructure",
       description: "Scale your infrastructure with cloud-native solutions",
-      path: "/demo/cloud-infrastructure"
+      path: "/demo/cloud-infrastructure",
+      icon: Square
     },
     {
       title: "Machine Learning",
       description: "Implement AI/ML models for predictive analytics",
-      path: "/demo/machine-learning"
+      path: "/demo/machine-learning",
+      icon: ChartLine
     },
     {
       title: "Data Visualization Sandbox",
       description: "Create interactive dashboards and reports",
-      path: "/demo/data-visualization"
+      path: "/demo/data-visualization",
+      icon: ChartBar
     },
     {
       title: "Find a Mortgage that Saves you Money",
       description: "Compare current mortgage rates and calculate your potential savings",
       path: "/demo/api-integration",
-      isActive: true
+      isActive: true,
+      icon: House
     },
     {
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
-      status: "in development"
+      status: "in development",
+      icon: Car
     }
   ];
 
@@ -83,7 +92,10 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                     : 'hover:shadow-lg hover:bg-primary/10'
               }`}>
                 <CardHeader>
-                  <CardTitle>{demo.title}</CardTitle>
+                  <div className="flex items-center gap-3 mb-2">
+                    {demo.icon && <demo.icon className="w-5 h-5" />}
+                    <CardTitle>{demo.title}</CardTitle>
+                  </div>
                   <CardDescription>{demo.description}</CardDescription>
                 </CardHeader>
                 {!demo.isActive && !demo.status && (
