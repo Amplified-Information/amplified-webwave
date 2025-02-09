@@ -22,18 +22,13 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const apiKey = Deno.env.get("RESEND_API_KEY");
-    console.log("API Key exists:", !!apiKey);
-    console.log("API Key length:", apiKey?.length || 0);
-    if (apiKey) {
-      console.log("API Key first 5 chars:", apiKey.substring(0, 5));
-      console.log("API Key last 5 chars:", apiKey.substring(apiKey.length - 5));
-      // Log if there's any whitespace
-      console.log("Has leading/trailing whitespace:", apiKey !== apiKey.trim());
-      console.log("Contains newlines:", apiKey.includes("\n"));
-      console.log("Contains carriage returns:", apiKey.includes("\r"));
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY environment variable is not set");
     }
-    
-    const resend = new Resend(apiKey?.trim()); // Trim any potential whitespace
+
+    // Create Resend instance with proper Bearer token format
+    const resend = new Resend(apiKey);
+
     const { name, email, message }: ContactFormData = await req.json();
 
     console.log("Preparing to send emails for:", { name, email });
