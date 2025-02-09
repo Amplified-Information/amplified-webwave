@@ -33,31 +33,79 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Received contact form submission:", { name, email, message });
 
     try {
-      // Send email to site owner
+      // Send email to site owner with enhanced formatting
       console.log("Sending email to site owner...");
       await resend.emails.send({
         from: "Amplified Information <contact@amplified.info>",
         to: ["mark@amplified.info"],
         subject: `New Contact Form Submission from ${name}`,
         html: `
-          <h1>New Contact Form Submission</h1>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Message:</strong></p>
-          <p>${message}</p>
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #1a56db; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+                .content { background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 0 0 8px 8px; }
+                .field { margin-bottom: 15px; }
+                .label { font-weight: bold; color: #4a5568; }
+                .message { white-space: pre-wrap; background-color: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1 style="margin: 0;">New Contact Form Submission</h1>
+              </div>
+              <div class="content">
+                <div class="field">
+                  <p class="label">Name:</p>
+                  <p>${name}</p>
+                </div>
+                <div class="field">
+                  <p class="label">Email:</p>
+                  <p>${email}</p>
+                </div>
+                <div class="field">
+                  <p class="label">Message:</p>
+                  <div class="message">${message}</div>
+                </div>
+              </div>
+            </body>
+          </html>
         `,
       });
 
-      // Send confirmation email to user
+      // Send confirmation email to user with enhanced formatting
       console.log("Sending confirmation email to user...");
       await resend.emails.send({
         from: "Amplified Information <contact@amplified.info>",
         to: [email],
-        subject: "We've received your message!",
+        subject: "Thank you for contacting Amplified Information",
         html: `
-          <h1>Thank you for contacting us, ${name}!</h1>
-          <p>We have received your message and will get back to you as soon as possible.</p>
-          <p>Best regards,<br>The Amplified Information Team</p>
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #1a56db; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+                .content { background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 0 0 8px 8px; }
+                .signature { margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <h1 style="margin: 0;">Thank You for Your Message</h1>
+              </div>
+              <div class="content">
+                <p>Dear ${name},</p>
+                <p>Thank you for reaching out to Amplified Information. We have received your message and appreciate you taking the time to contact us.</p>
+                <p>Our team will review your message and get back to you as soon as possible.</p>
+                <div class="signature">
+                  <p>Best regards,<br>The Amplified Information Team</p>
+                </div>
+              </div>
+            </body>
+          </html>
         `,
       });
 
