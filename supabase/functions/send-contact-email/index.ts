@@ -22,6 +22,7 @@ const sendEmail = async (to: string, subject: string, html: string) => {
     port: 465,
     username: "contact@amplified.info",
     password: Deno.env.get("SMTP_PASSWORD")!,
+    tls: true,
   };
   
   console.log("SMTP Configuration:", {
@@ -39,7 +40,8 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       from: "contact@amplified.info",
       to,
       subject,
-      html,
+      content: html,
+      html: true,
     });
     console.log("Email sent successfully");
 
