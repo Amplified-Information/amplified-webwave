@@ -1,6 +1,9 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Cloud } from "lucide-react";
+import CloudGlobe from "@/components/CloudGlobe";
+import { cloudLocations } from "@/data/cloudProviderLocations";
 
 const CloudInfrastructureDemo = () => {
   return (
@@ -17,21 +20,41 @@ const CloudInfrastructureDemo = () => {
 
         <Card className="mb-8">
           <CardContent className="p-6">
-            <img
-              src="https://images.unsplash.com/photo-1451187580459-43490279c0fa"
-              alt="Cloud Infrastructure Demo"
-              className="w-full h-64 object-cover rounded-lg mb-6"
-            />
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Features Coming Soon</h2>
+            <CloudGlobe />
+            <div className="mt-6 space-y-4">
+              <h2 className="text-2xl font-semibold">Global Cloud Provider Locations</h2>
               <p className="text-gray-600">
-                Our cloud infrastructure demonstration will showcase:
+                Interactive 3D visualization of major cloud provider data centers and CDN edge locations.
+                Includes AWS, Google Cloud, and Azure infrastructure points across the globe.
               </p>
+              
+              <div className="flex gap-4 justify-center mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF9900' }}></div>
+                  <span className="text-sm">AWS</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#4285F4' }}></div>
+                  <span className="text-sm">Google Cloud</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#00A4EF' }}></div>
+                  <span className="text-sm">Azure</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold">Features</h2>
               <ul className="list-disc pl-6 space-y-2 text-gray-600">
-                <li>Auto-scaling capabilities</li>
-                <li>Load balancing and high availability</li>
-                <li>Containerization and orchestration</li>
-                <li>Cloud resource management</li>
+                <li>Interactive 3D globe visualization</li>
+                <li>Real-time cloud provider location mapping</li>
+                <li>CDN edge location performance metrics</li>
+                <li>Region and availability zone overview</li>
               </ul>
             </div>
           </CardContent>
