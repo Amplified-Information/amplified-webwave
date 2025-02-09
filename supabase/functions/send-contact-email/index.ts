@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
+import { SmtpClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,16 +32,15 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   
   try {
     console.log("Attempting to connect to SMTP server...");
-    await client.connectTLS(smtpConfig);
+    await client.connect(smtpConfig);
     console.log("Successfully connected to SMTP server");
 
     console.log(`Sending email to ${to}...`);
     await client.send({
       from: "contact@amplified.info",
-      to,
+      to: [to],
       subject,
-      content: html,
-      html: true,
+      html,
     });
     console.log("Email sent successfully");
 
