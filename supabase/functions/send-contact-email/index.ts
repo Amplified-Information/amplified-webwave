@@ -39,12 +39,10 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       from: "contact@amplified.info",
       to,
       subject,
-      content: "This message is in HTML format",
       html,
     });
     console.log("Email sent successfully");
 
-    console.log("Closing SMTP connection...");
     await client.close();
     console.log("SMTP connection closed");
   } catch (error) {
