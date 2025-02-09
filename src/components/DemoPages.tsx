@@ -38,7 +38,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       path: "/demo/machine-learning"
     },
     {
-      title: "Data Visualization",
+      title: "Data Visualization Sandbox",
       description: "Create interactive dashboards and reports",
       path: "/demo/data-visualization"
     },
