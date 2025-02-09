@@ -17,14 +17,21 @@ interface ContactEmailRequest {
 const sendEmail = async (to: string, subject: string, html: string) => {
   const client = new SmtpClient();
   
+  const smtpConfig = {
+    hostname: "mail.amplified.info",
+    port: 465,
+    username: "contact@amplified.info",
+    password: Deno.env.get("SMTP_PASSWORD")!,
+  };
+  
+  console.log("SMTP Configuration:", {
+    ...smtpConfig,
+    password: "[REDACTED]" // Don't log the actual password
+  });
+  
   try {
     console.log("Attempting to connect to SMTP server...");
-    await client.connectTLS({
-      hostname: "mail.amplified.info",
-      port: 465,
-      username: "contact@amplified.info",
-      password: Deno.env.get("SMTP_PASSWORD")!,
-    });
+    await client.connectTLS(smtpConfig);
     console.log("Successfully connected to SMTP server");
 
     console.log(`Sending email to ${to}...`);
@@ -45,8 +52,12 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       error,
       errorMessage: error.message,
       errorStack: error.stack,
+      smtpConfig: {
+        ...smtpConfig,
+        password: "[REDACTED]"
+      }
     });
-    throw new Error(`Failed to send email: ${error.message}`);
+    throw error;
   }
 };
 
@@ -59,11 +70,13 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("Parsing request body...");
     const { name, email, message }: ContactEmailRequest = await req.json();
     console.log("Received contact form submission:", { name, email, message });
 
     try {
       // Send email to site owner
+      console.log("Sending email to site owner...");
       await sendEmail(
         "mark@amplified.info",
         `New Contact Form Submission from ${name}`,
@@ -77,6 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
 
       // Send confirmation email to user
+      console.log("Sending confirmation email to user...");
       await sendEmail(
         email,
         "We've received your message!",
@@ -100,10 +114,14 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     } catch (emailError) {
-      console.error("Email sending failed:", emailError);
+      console.error("Email sending failed:", {
+        error: emailError,
+        message: emailError.message,
+        stack: emailError.stack
+      });
       return new Response(
         JSON.stringify({ 
-          error: "Failed to send email. Please try again later or contact us directly.",
+          error: "Failed to send email",
           details: emailError.message 
         }),
         {
@@ -113,7 +131,11 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
   } catch (error) {
-    console.error("Error processing request:", error);
+    console.error("Error processing request:", {
+      error,
+      message: error.message,
+      stack: error.stack
+    });
     return new Response(
       JSON.stringify({ 
         error: "Invalid request format",

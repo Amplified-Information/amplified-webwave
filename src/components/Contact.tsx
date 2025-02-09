@@ -36,31 +36,35 @@ export const Contact = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      form.reset();
       toast({
         title: "Sending message...",
         description: "Please wait while we process your request.",
       });
 
+      console.log("Attempting to send message via Edge Function...");
       const { data: response, error } = await supabase.functions.invoke('send-contact-email', {
         body: data,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge Function error:', error);
+        throw new Error(error.message || 'Failed to reach our servers. Please try again.');
+      }
+
+      console.log('Edge Function response:', response);
       
+      form.reset();
       toast({
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
       });
     } catch (error: any) {
-      console.error('Error sending message:', error);
+      console.error('Detailed error:', error);
       toast({
-        title: "Error",
+        title: "Error sending message",
         description: error.message || "There was a problem sending your message. Please try again.",
         variant: "destructive",
       });
-      // Restore the form data if sending failed
-      form.reset(data);
     }
   };
 
