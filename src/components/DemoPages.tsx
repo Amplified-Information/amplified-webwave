@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -12,7 +13,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Smart Garden Planning",
       description: "Plan and optimize your garden with AI-powered companion planting",
       path: "/demo/data-integration",
-      status: "in development"
+      isActive: true
     },
     {
       title: "Real-time Analytics",
@@ -51,7 +52,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
-      isActive: true
+      status: "in development"
     }
   ];
 
