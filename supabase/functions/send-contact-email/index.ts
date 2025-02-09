@@ -20,12 +20,12 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   await client.connectTLS({
     hostname: "smtp.gmail.com",
     port: 465,
-    username: "mark@amplified.info",
+    username: "connect@amplified.info",
     password: Deno.env.get("SMTP_PASSWORD")!,
   });
 
   await client.send({
-    from: "mark@amplified.info",
+    from: "connect@amplified.info",
     to,
     subject,
     content: "This message is in HTML format",
