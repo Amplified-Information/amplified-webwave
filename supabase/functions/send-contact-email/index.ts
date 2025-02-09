@@ -27,9 +27,13 @@ const handler = async (req: Request): Promise<Response> => {
     if (apiKey) {
       console.log("API Key first 5 chars:", apiKey.substring(0, 5));
       console.log("API Key last 5 chars:", apiKey.substring(apiKey.length - 5));
+      // Log if there's any whitespace
+      console.log("Has leading/trailing whitespace:", apiKey !== apiKey.trim());
+      console.log("Contains newlines:", apiKey.includes("\n"));
+      console.log("Contains carriage returns:", apiKey.includes("\r"));
     }
     
-    const resend = new Resend(apiKey);
+    const resend = new Resend(apiKey?.trim()); // Trim any potential whitespace
     const { name, email, message }: ContactFormData = await req.json();
 
     console.log("Preparing to send emails for:", { name, email });
