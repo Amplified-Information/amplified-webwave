@@ -25,7 +25,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Trade Data Analysis",
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
-      isActive: true
+      status: "in development"
     },
     {
       title: "Cloud Infrastructure",
