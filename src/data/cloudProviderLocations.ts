@@ -11,6 +11,20 @@ export interface CloudLocation {
     east: number;
     west: number;
   };
+  services?: string[];
+  yearEstablished?: number;
+  capacity?: {
+    servers: number;
+    storage: string;
+  };
+  sustainability?: {
+    renewable: number;
+    carbonNeutral: boolean;
+  };
+  availability?: {
+    zones: number;
+    sla: number;
+  };
 }
 
 export const cloudLocations: CloudLocation[] = [
@@ -21,6 +35,20 @@ export const cloudLocations: CloudLocation[] = [
     lat: 38.9519, 
     lng: -77.4480, 
     type: 'Region',
+    services: ['EC2', 'S3', 'RDS', 'Lambda', 'DynamoDB'],
+    yearEstablished: 2006,
+    capacity: {
+      servers: 150000,
+      storage: '100+ PB'
+    },
+    sustainability: {
+      renewable: 65,
+      carbonNeutral: true
+    },
+    availability: {
+      zones: 6,
+      sla: 99.99
+    },
     regionBounds: {
       north: 39.5,
       south: 38.5,
@@ -34,6 +62,20 @@ export const cloudLocations: CloudLocation[] = [
     lat: 40.4173, 
     lng: -82.9071, 
     type: 'Region',
+    services: ['EC2', 'S3', 'RDS', 'CloudFront', 'Route53'],
+    yearEstablished: 2016,
+    capacity: {
+      servers: 100000,
+      storage: '75+ PB'
+    },
+    sustainability: {
+      renewable: 75,
+      carbonNeutral: true
+    },
+    availability: {
+      zones: 3,
+      sla: 99.99
+    },
     regionBounds: {
       north: 41.0,
       south: 40.0,

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -187,10 +186,36 @@ const CloudGlobe: React.FC = () => {
           ? `<br>Performance: ${location.performance}ms` 
           : '';
           
+        let servicesInfo = location.services 
+          ? `<br>Services: ${location.services.join(', ')}` 
+          : '';
+          
+        let capacityInfo = location.capacity 
+          ? `<br>Capacity: ${location.capacity.servers.toLocaleString()} servers, ${location.capacity.storage} storage` 
+          : '';
+          
+        let sustainabilityInfo = location.sustainability 
+          ? `<br>Renewable Energy: ${location.sustainability.renewable}%` 
+          : '';
+          
+        let availabilityInfo = location.availability 
+          ? `<br>Availability Zones: ${location.availability.zones}<br>SLA: ${location.availability.sla}%` 
+          : '';
+          
+        let yearInfo = location.yearEstablished 
+          ? `<br>Established: ${location.yearEstablished}` 
+          : '';
+        
         labelRef.current.innerHTML = `
-          ${location.provider}<br>
+          <div class="font-bold">${location.provider}</div>
           ${location.name}<br>
-          Type: ${location.type}${performanceInfo}
+          Type: ${location.type}
+          ${performanceInfo}
+          ${yearInfo}
+          ${servicesInfo}
+          ${capacityInfo}
+          ${sustainabilityInfo}
+          ${availabilityInfo}
         `;
 
         // Show region bounds if available
