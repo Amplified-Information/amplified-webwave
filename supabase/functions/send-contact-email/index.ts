@@ -89,9 +89,10 @@ const handler = async (req: Request): Promise<Response> => {
                 body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
                 .logo { width: 200px; height: auto; }
                 .content { max-width: 600px; margin: 20px 0; }
-                .footer { margin-top: 30px; color: #666; font-size: 14px; }
-                .footer p { margin: 3px 0; }
-                .name { color: #1a56db; font-weight: bold; }
+                .footer { margin-top: 30px; color: #666; }
+                .footer p { margin: 3px 0; font-size: 8pt; }
+                .name { color: #1a56db; font-weight: bold; font-size: 12pt !important; }
+                a { color: #666; text-decoration: none; }
               </style>
             </head>
             <body>
@@ -160,3 +161,4 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 serve(handler);
+
