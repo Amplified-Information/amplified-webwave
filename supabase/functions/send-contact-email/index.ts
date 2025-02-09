@@ -23,7 +23,11 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, message }: ContactFormData = await req.json();
 
-    console.log("Creating SMTP client...");
+    console.log("Creating SMTP client with following details:", {
+      hostname: "amplified.info",
+      port: 587,
+      username: "mark@amplified.info"
+    });
     
     const client = new SMTPClient({
       connection: {
@@ -33,19 +37,18 @@ const handler = async (req: Request): Promise<Response> => {
         auth: {
           username: "mark@amplified.info",
           password: Deno.env.get("SMTP_PASSWORD")
-        },
-        pool: true,
-        poolTimeout: 3000, // 3 second timeout
+        }
       }
     });
 
-    console.log("SMTP client created, attempting to connect and send...");
+    console.log("SMTP client created, attempting to send email...");
 
     try {
       const emailResult = await client.send({
         from: "mark@amplified.info",
         to: "mark@amplified.info",
         subject: "New Contact Form Submission",
+        content: "text/html",
         html: `
           <h2>New Contact Form Submission</h2>
           <p><strong>Name:</strong> ${name}</p>
@@ -56,8 +59,6 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       console.log("Email sent successfully:", emailResult);
-
-      await client.close(); // Properly close the connection
       
       return new Response(
         JSON.stringify({
@@ -73,16 +74,21 @@ const handler = async (req: Request): Promise<Response> => {
         }
       );
     } catch (emailError) {
-      console.error("Error sending email:", emailError);
-      if (emailError instanceof Error) {
-        console.error("Email error details:", {
-          name: emailError.name,
-          message: emailError.message,
-          stack: emailError.stack
-        });
-      }
-      await client.close(); // Make sure to close even on error
+      console.error("Error sending email. Details:", {
+        error: emailError,
+        errorName: emailError instanceof Error ? emailError.name : 'Unknown',
+        errorMessage: emailError instanceof Error ? emailError.message : String(emailError),
+        errorStack: emailError instanceof Error ? emailError.stack : 'No stack trace'
+      });
+      
       throw emailError;
+    } finally {
+      try {
+        await client.close();
+        console.log("SMTP connection closed successfully");
+      } catch (closeError) {
+        console.error("Error closing SMTP connection:", closeError);
+      }
     }
   } catch (error) {
     console.error("Error processing form submission:", error);
