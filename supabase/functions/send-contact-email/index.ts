@@ -1,8 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +14,33 @@ interface ContactEmailRequest {
   message: string;
 }
 
+const sendEmail = async (to: string, subject: string, html: string) => {
+  const client = new SmtpClient();
+  
+  try {
+    await client.connect({
+      hostname: "smtp.gmail.com",
+      port: 465,
+      username: "connect@amplified.info",
+      password: Deno.env.get("SMTP_PASSWORD")!,
+      tls: true,
+    });
+
+    await client.send({
+      from: "connect@amplified.info",
+      to,
+      subject,
+      content: "This message is in HTML format",
+      html,
+    });
+
+    await client.close();
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -27,34 +52,30 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Received contact form submission:", { name, email, message });
 
     // Send email to site owner
-    const notificationEmail = await resend.emails.send({
-      from: "connect@amplified.info",
-      to: "mark@amplified.info",
-      subject: `New Contact Form Submission from ${name}`,
-      html: `
+    await sendEmail(
+      "mark@amplified.info",
+      `New Contact Form Submission from ${name}`,
+      `
         <h1>New Contact Form Submission</h1>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
-      `,
-    });
-
-    console.log("Notification email sent:", notificationEmail);
+      `
+    );
 
     // Send confirmation email to user
-    const confirmationEmail = await resend.emails.send({
-      from: "connect@amplified.info",
-      to: email,
-      subject: "We've received your message!",
-      html: `
+    await sendEmail(
+      email,
+      "We've received your message!",
+      `
         <h1>Thank you for contacting us, ${name}!</h1>
         <p>We have received your message and will get back to you as soon as possible.</p>
         <p>Best regards,<br>The Amplified Information Team</p>
-      `,
-    });
+      `
+    );
 
-    console.log("Confirmation email sent:", confirmationEmail);
+    console.log("Emails sent successfully");
 
     return new Response(
       JSON.stringify({ message: "Emails sent successfully" }),
