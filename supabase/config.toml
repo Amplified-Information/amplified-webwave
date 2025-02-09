@@ -1,3 +1,4 @@
+
 project_id = "vwmwxeemfbxgofzisglf"
 
 [api]
@@ -27,4 +28,8 @@ enabled = true
 
 [[functions]]
 [functions.fetch-trade-data]
+verify_jwt = false
+
+[[functions]]
+[functions.send-contact-email]
 verify_jwt = false
