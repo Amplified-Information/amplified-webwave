@@ -24,10 +24,12 @@ const handler = async (req: Request): Promise<Response> => {
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const { name, email, message }: ContactFormData = await req.json();
 
+    console.log("Sending emails for contact form submission:", { name, email });
+
     // Send notification email to site owner
     const ownerEmailResponse = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>",
-      to: "mark@amplified.info",
+      from: "Amplified Information <onboarding@resend.dev>",
+      to: ["mark@amplified.info"],
       subject: `New Contact Form Message from ${name}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -38,10 +40,12 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
+    console.log("Owner notification email response:", ownerEmailResponse);
+
     // Send confirmation email to the sender
     const senderEmailResponse = await resend.emails.send({
       from: "Amplified Information <onboarding@resend.dev>",
-      to: email,
+      to: [email],
       subject: "We've received your message",
       html: `
         <h2>Thank you for contacting us, ${name}!</h2>
@@ -53,13 +57,14 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Emails sent successfully:", {
-      ownerEmail: ownerEmailResponse,
-      senderEmail: senderEmailResponse,
-    });
+    console.log("Sender confirmation email response:", senderEmailResponse);
 
     return new Response(
-      JSON.stringify({ message: "Emails sent successfully" }),
+      JSON.stringify({ 
+        message: "Emails sent successfully",
+        ownerEmail: ownerEmailResponse,
+        senderEmail: senderEmailResponse
+      }),
       {
         status: 200,
         headers: {
