@@ -26,17 +26,16 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("RESEND_API_KEY environment variable is not set");
     }
 
-    // Create Resend instance with the API key directly
+    // Initialize Resend with API key
     const resend = new Resend(apiKey);
-
     const { name, email, message }: ContactFormData = await req.json();
 
     console.log("Preparing to send emails for:", { name, email });
 
     // Send notification email to site owner
     console.log("Attempting to send owner notification email...");
-    const ownerEmailResponse = await resend.emails.send({
-      from: "Contact Form <contact@amplified.info>",
+    const { data: ownerEmailData, error: ownerEmailError } = await resend.emails.send({
+      from: "onboarding@resend.dev", // Using Resend's default domain for testing
       to: ["mark@amplified.info"],
       subject: `New Contact Form Message from ${name}`,
       html: `
@@ -48,12 +47,23 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Owner notification email response:", ownerEmailResponse);
+    if (ownerEmailError) {
+      console.error("Owner notification email error:", ownerEmailError);
+      return new Response(
+        JSON.stringify({ error: ownerEmailError }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log("Owner notification email sent successfully:", ownerEmailData);
 
     // Send confirmation email to the sender
     console.log("Attempting to send confirmation email to sender...");
-    const senderEmailResponse = await resend.emails.send({
-      from: "Amplified Information <contact@amplified.info>",
+    const { data: senderEmailData, error: senderEmailError } = await resend.emails.send({
+      from: "onboarding@resend.dev", // Using Resend's default domain for testing
       to: [email],
       subject: "We've received your message",
       html: `
@@ -62,17 +72,28 @@ const handler = async (req: Request): Promise<Response> => {
         <p>For reference, here's what you sent us:</p>
         <p>${message}</p>
         <br>
-        <p>Best regards,<br>Amplified Information Team</p>
+        <p>Best regards,<br>The Team</p>
       `,
     });
 
-    console.log("Sender confirmation email response:", senderEmailResponse);
+    if (senderEmailError) {
+      console.error("Sender confirmation email error:", senderEmailError);
+      return new Response(
+        JSON.stringify({ error: senderEmailError }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log("Sender confirmation email sent successfully:", senderEmailData);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         message: "Emails sent successfully",
-        ownerEmail: ownerEmailResponse,
-        senderEmail: senderEmailResponse
+        ownerEmail: ownerEmailData,
+        senderEmail: senderEmailData
       }),
       {
         status: 200,
