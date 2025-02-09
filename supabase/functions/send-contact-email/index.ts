@@ -1,6 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { SmtpClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,51 +15,7 @@ interface ContactEmailRequest {
   message: string;
 }
 
-const sendEmail = async (to: string, subject: string, html: string) => {
-  const client = new SmtpClient();
-  
-  const smtpConfig = {
-    hostname: "mail.amplified.info",
-    port: 465,
-    username: "contact@amplified.info",
-    password: Deno.env.get("SMTP_PASSWORD")!,
-    tls: true,
-  };
-  
-  console.log("SMTP Configuration:", {
-    ...smtpConfig,
-    password: "[REDACTED]" // Don't log the actual password
-  });
-  
-  try {
-    console.log("Attempting to connect to SMTP server...");
-    await client.connect(smtpConfig);
-    console.log("Successfully connected to SMTP server");
-
-    console.log(`Sending email to ${to}...`);
-    await client.send({
-      from: "contact@amplified.info",
-      to: [to],
-      subject,
-      html,
-    });
-    console.log("Email sent successfully");
-
-    await client.close();
-    console.log("SMTP connection closed");
-  } catch (error) {
-    console.error("Detailed error in sendEmail:", {
-      error,
-      errorMessage: error.message,
-      errorStack: error.stack,
-      smtpConfig: {
-        ...smtpConfig,
-        password: "[REDACTED]"
-      }
-    });
-    throw error;
-  }
-};
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("Contact form endpoint hit with method:", req.method);
@@ -67,10 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { 
-      headers: {
-        ...corsHeaders,
-        "Content-Length": "0",
-      }
+      headers: corsHeaders
     });
   }
 
@@ -82,29 +35,31 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       // Send email to site owner
       console.log("Sending email to site owner...");
-      await sendEmail(
-        "mark@amplified.info",
-        `New Contact Form Submission from ${name}`,
-        `
+      await resend.emails.send({
+        from: "Amplified Information <contact@amplified.info>",
+        to: ["mark@amplified.info"],
+        subject: `New Contact Form Submission from ${name}`,
+        html: `
           <h1>New Contact Form Submission</h1>
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Message:</strong></p>
           <p>${message}</p>
-        `
-      );
+        `,
+      });
 
       // Send confirmation email to user
       console.log("Sending confirmation email to user...");
-      await sendEmail(
-        email,
-        "We've received your message!",
-        `
+      await resend.emails.send({
+        from: "Amplified Information <contact@amplified.info>",
+        to: [email],
+        subject: "We've received your message!",
+        html: `
           <h1>Thank you for contacting us, ${name}!</h1>
           <p>We have received your message and will get back to you as soon as possible.</p>
           <p>Best regards,<br>The Amplified Information Team</p>
-        `
-      );
+        `,
+      });
 
       console.log("Both emails sent successfully");
 
