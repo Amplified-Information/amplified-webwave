@@ -7,6 +7,7 @@ import { cloudLocations } from '@/data/cloudProviderLocations';
 const CloudGlobe: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
+  const regionBoundsRef = useRef<THREE.LineSegments | null>(null);
   const sceneRef = useRef<{
     scene: THREE.Scene;
     camera: THREE.PerspectiveCamera;
@@ -65,6 +66,66 @@ const CloudGlobe: React.FC = () => {
     // Store markers for raycasting
     const markers: THREE.Mesh[] = [];
 
+    // Function to create region bounds
+    const createRegionBounds = (bounds: { north: number; south: number; east: number; west: number }) => {
+      if (regionBoundsRef.current) {
+        scene.remove(regionBoundsRef.current);
+      }
+
+      const points: THREE.Vector3[] = [];
+      const radius = 2.1; // Slightly larger than Earth radius
+
+      // Create a box of lines around the region
+      const corners = [
+        { lat: bounds.north, lng: bounds.west },
+        { lat: bounds.north, lng: bounds.east },
+        { lat: bounds.south, lng: bounds.east },
+        { lat: bounds.south, lng: bounds.west },
+      ];
+
+      corners.forEach((corner, i) => {
+        const phi = (90 - corner.lat) * (Math.PI / 180);
+        const theta = (corner.lng + 180) * (Math.PI / 180);
+        
+        const x = -(radius * Math.sin(phi) * Math.cos(theta));
+        const y = radius * Math.cos(phi);
+        const z = radius * Math.sin(phi) * Math.sin(theta);
+        
+        points.push(new THREE.Vector3(x, y, z));
+        // Connect to next corner
+        if (i < corners.length - 1) {
+          points.push(new THREE.Vector3(x, y, z));
+          const nextCorner = corners[i + 1];
+          const nextPhi = (90 - nextCorner.lat) * (Math.PI / 180);
+          const nextTheta = (nextCorner.lng + 180) * (Math.PI / 180);
+          points.push(new THREE.Vector3(
+            -(radius * Math.sin(nextPhi) * Math.cos(nextTheta)),
+            radius * Math.cos(nextPhi),
+            radius * Math.sin(nextPhi) * Math.sin(nextTheta)
+          ));
+        }
+      });
+
+      // Connect last corner to first corner
+      const firstCorner = corners[0];
+      const lastCorner = corners[corners.length - 1];
+      points.push(new THREE.Vector3(
+        -(radius * Math.sin((90 - lastCorner.lat) * (Math.PI / 180)) * Math.cos((lastCorner.lng + 180) * (Math.PI / 180))),
+        radius * Math.cos((90 - lastCorner.lat) * (Math.PI / 180)),
+        radius * Math.sin((90 - lastCorner.lat) * (Math.PI / 180)) * Math.sin((lastCorner.lng + 180) * (Math.PI / 180))
+      ));
+      points.push(new THREE.Vector3(
+        -(radius * Math.sin((90 - firstCorner.lat) * (Math.PI / 180)) * Math.cos((firstCorner.lng + 180) * (Math.PI / 180))),
+        radius * Math.cos((90 - firstCorner.lat) * (Math.PI / 180)),
+        radius * Math.sin((90 - firstCorner.lat) * (Math.PI / 180)) * Math.sin((firstCorner.lng + 180) * (Math.PI / 180))
+      ));
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 });
+      regionBoundsRef.current = new THREE.LineSegments(geometry, material);
+      scene.add(regionBoundsRef.current);
+    };
+
     // Add location markers
     cloudLocations.forEach((location) => {
       const markerGeometry = new THREE.SphereGeometry(0.03, 16, 16);
@@ -77,9 +138,8 @@ const CloudGlobe: React.FC = () => {
       });
       
       const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-      marker.userData = location; // Store location data in the marker
+      marker.userData = location;
       
-      // Convert lat/lng to 3D position
       const phi = (90 - location.lat) * (Math.PI / 180);
       const theta = (location.lng + 180) * (Math.PI / 180);
       
@@ -132,8 +192,20 @@ const CloudGlobe: React.FC = () => {
           ${location.name}<br>
           Type: ${location.type}${performanceInfo}
         `;
+
+        // Show region bounds if available
+        if (location.regionBounds) {
+          createRegionBounds(location.regionBounds);
+        } else if (regionBoundsRef.current) {
+          scene.remove(regionBoundsRef.current);
+          regionBoundsRef.current = null;
+        }
       } else {
         labelRef.current.style.display = 'none';
+        if (regionBoundsRef.current) {
+          scene.remove(regionBoundsRef.current);
+          regionBoundsRef.current = null;
+        }
       }
     };
 
