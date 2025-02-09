@@ -1,7 +1,5 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Leaf, Globe, Database, ChartBar, Square, ChartLine, House, Car } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -14,54 +12,46 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Smart Garden Planning",
       description: "Plan and optimize your garden with AI-powered companion planting",
       path: "/demo/data-integration",
-      isActive: true,
-      icon: Leaf
+      status: "in development"
     },
     {
-      title: "Live Canadian Weather Analytics",
+      title: "Real-time Analytics",
       description: "Monitor and analyze data streams in real-time",
       path: "/demo/real-time-analytics",
-      isActive: true,
-      icon: Globe
+      isActive: true
     },
     {
       title: "Trade Data Analysis",
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
-      status: "in development",
-      icon: Database
+      isActive: true
     },
     {
       title: "Cloud Infrastructure",
       description: "Scale your infrastructure with cloud-native solutions",
-      path: "/demo/cloud-infrastructure",
-      icon: Square
+      path: "/demo/cloud-infrastructure"
     },
     {
       title: "Machine Learning",
       description: "Implement AI/ML models for predictive analytics",
-      path: "/demo/machine-learning",
-      icon: ChartLine
+      path: "/demo/machine-learning"
     },
     {
-      title: "Data Visualization Sandbox",
+      title: "Data Visualization",
       description: "Create interactive dashboards and reports",
-      path: "/demo/data-visualization",
-      icon: ChartBar
+      path: "/demo/data-visualization"
     },
     {
-      title: "Find a Mortgage that Saves you Money",
-      description: "Compare current mortgage rates and calculate your potential savings",
+      title: "API Integration",
+      description: "Connect with external services through our API platform",
       path: "/demo/api-integration",
-      isActive: true,
-      icon: House
+      isActive: true
     },
     {
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
-      status: "in development",
-      icon: Car
+      isActive: true
     }
   ];
 
@@ -92,10 +82,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                     : 'hover:shadow-lg hover:bg-primary/10'
               }`}>
                 <CardHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    {demo.icon && <demo.icon className="w-5 h-5" />}
-                    <CardTitle>{demo.title}</CardTitle>
-                  </div>
+                  <CardTitle>{demo.title}</CardTitle>
                   <CardDescription>{demo.description}</CardDescription>
                 </CardHeader>
                 {!demo.isActive && !demo.status && (
