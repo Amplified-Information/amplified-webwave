@@ -46,7 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       const emailResult = await client.send({
         from: "contact@amplified.info",
-        to: "contact@amplified.info",
+        to: "mark@amplified.info",
         subject: "New Contact Form Submission",
         content: "text/html",
         html: `
