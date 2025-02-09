@@ -16,7 +16,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       isActive: true
     },
     {
-      title: "Real-time Analytics",
+      title: "Live Canadian Weather Analytics",
       description: "Monitor and analyze data streams in real-time",
       path: "/demo/real-time-analytics",
       isActive: true
