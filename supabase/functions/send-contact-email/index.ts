@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
         tls: true,
         auth: {
           username: "mark@amplified.info",
-          password: "your-password-here" // We'll need to set this up securely
+          password: Deno.env.get("SMTP_PASSWORD")
         }
       }
     });
