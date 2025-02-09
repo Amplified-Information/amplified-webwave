@@ -164,7 +164,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error processing request:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: error.message || 'Internal server error' }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
@@ -172,3 +172,4 @@ serve(async (req) => {
     )
   }
 })
+

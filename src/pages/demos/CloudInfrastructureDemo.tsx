@@ -8,6 +8,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
+interface CloudMetrics {
+  id: string;
+  provider: string;
+  location_name: string;
+  lat: number;
+  lng: number;
+  type: string;
+  services: string;
+  capacity: string;
+  sustainability: string;
+  availability: string;
+  performance: number | null;
+  last_updated: string | null;
+}
+
 const CloudInfrastructureDemo = () => {
   const { toast } = useToast();
 
@@ -17,10 +32,18 @@ const CloudInfrastructureDemo = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('cloud_provider_metrics')
-        .select('*')
+        .select('*');
       
-      if (error) throw error
-      return data
+      if (error) throw error;
+
+      // Transform JSON fields to strings
+      return data?.map(metric => ({
+        ...metric,
+        services: JSON.stringify(metric.services),
+        capacity: JSON.stringify(metric.capacity),
+        sustainability: JSON.stringify(metric.sustainability),
+        availability: JSON.stringify(metric.availability)
+      }));
     }
   });
 
@@ -35,38 +58,43 @@ const CloudInfrastructureDemo = () => {
           schema: 'public',
           table: 'cloud_provider_metrics'
         },
-        (payload) => {
+        (payload: any) => {
           toast({
             title: "Infrastructure Update",
             description: `${payload.new.provider} ${payload.new.location_name} metrics updated`,
-          })
+          });
         }
       )
-      .subscribe()
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel)
-    }
+      supabase.removeChannel(channel);
+    };
   }, [toast]);
 
   // Trigger metrics update every 5 minutes
   useEffect(() => {
     const updateMetrics = async () => {
       try {
-        await supabase.functions.invoke('fetch-cloud-metrics')
+        await supabase.functions.invoke('fetch-cloud-metrics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
       } catch (error) {
-        console.error('Error updating metrics:', error)
+        console.error('Error updating metrics:', error);
       }
-    }
+    };
 
     // Initial fetch
-    updateMetrics()
+    updateMetrics();
 
     // Set up interval
-    const interval = setInterval(updateMetrics, 5 * 60 * 1000)
+    const interval = setInterval(updateMetrics, 5 * 60 * 1000);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -127,3 +155,4 @@ const CloudInfrastructureDemo = () => {
 };
 
 export default CloudInfrastructureDemo;
+
