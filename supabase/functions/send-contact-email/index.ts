@@ -17,22 +17,27 @@ interface ContactEmailRequest {
 const client = new SmtpClient();
 
 const sendEmail = async (to: string, subject: string, html: string) => {
-  await client.connectTLS({
-    hostname: "smtp.gmail.com",
-    port: 465,
-    username: "connect@amplified.info",
-    password: Deno.env.get("SMTP_PASSWORD")!,
-  });
+  try {
+    await client.connectTLS({
+      hostname: "smtp.gmail.com",
+      port: 465,
+      username: "connect@amplified.info",
+      password: Deno.env.get("SMTP_PASSWORD")!,
+    });
 
-  await client.send({
-    from: "connect@amplified.info",
-    to,
-    subject,
-    content: "This message is in HTML format",
-    html,
-  });
+    await client.send({
+      from: "connect@amplified.info",
+      to,
+      subject,
+      content: "This message is in HTML format",
+      html,
+    });
 
-  await client.close();
+    await client.close();
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
 };
 
 const handler = async (req: Request): Promise<Response> => {
@@ -43,6 +48,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { name, email, message }: ContactEmailRequest = await req.json();
+    console.log("Received contact form submission:", { name, email, message });
 
     // Send email to site owner
     await sendEmail(
@@ -93,3 +99,4 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 serve(handler);
+
