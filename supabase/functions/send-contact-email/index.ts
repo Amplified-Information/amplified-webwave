@@ -23,23 +23,24 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, message }: ContactFormData = await req.json();
 
-    console.log("Attempting to create SMTP client with credentials");
+    console.log("Creating SMTP client...");
     
     const client = new SMTPClient({
       connection: {
         hostname: "amplified.info",
         port: 587,
-        tls: false, // Start with plain connection
+        tls: true,
         auth: {
           username: "mark@amplified.info",
           password: Deno.env.get("SMTP_PASSWORD")
-        }
+        },
+        pool: true,
+        poolTimeout: 3000, // 3 second timeout
       }
     });
 
-    console.log("SMTP client created, attempting to send email");
+    console.log("SMTP client created, attempting to connect and send...");
 
-    // Send email
     try {
       const emailResult = await client.send({
         from: "mark@amplified.info",
@@ -54,29 +55,38 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
-      console.log("Email send attempt completed:", emailResult);
+      console.log("Email sent successfully:", emailResult);
+
+      await client.close(); // Properly close the connection
+      
+      return new Response(
+        JSON.stringify({
+          message: "Form submission received successfully",
+          data: { name, email, message }
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
     } catch (emailError) {
       console.error("Error sending email:", emailError);
+      if (emailError instanceof Error) {
+        console.error("Email error details:", {
+          name: emailError.name,
+          message: emailError.message,
+          stack: emailError.stack
+        });
+      }
+      await client.close(); // Make sure to close even on error
       throw emailError;
     }
-
-    return new Response(
-      JSON.stringify({
-        message: "Form submission received successfully",
-        data: { name, email, message }
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
-      }
-    );
   } catch (error) {
     console.error("Error processing form submission:", error);
     
-    // Log more detailed error information
     if (error instanceof Error) {
       console.error("Error details:", {
         name: error.name,
