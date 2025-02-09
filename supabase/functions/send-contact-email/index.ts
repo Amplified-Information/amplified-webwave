@@ -100,7 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>We have received your message and will get back to you as soon as possible.</p>
                 <div class="footer">
                   <p class="name">Mark Gratton, CBIP</p>
-                  <img src="https://amplified.info/logo.png" alt="Amplified Information" class="logo">
+                  <img src="https://amplified.info/lovable-uploads/f50a8f6c-1a61-46ac-8e5f-bda51fdb2300.png" alt="Amplified Information" class="logo">
                   <p><a href="mailto:mark@amplified.info">mark@amplified.info</a></p>
                   <p>(613) 859-3905</p>
                   <p>3473 Dove Creek Road<br>Courtenay, BC V9J 1P3</p>
