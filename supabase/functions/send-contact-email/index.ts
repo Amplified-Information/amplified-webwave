@@ -26,8 +26,8 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("RESEND_API_KEY environment variable is not set");
     }
 
-    // Create Resend instance with Bearer token format
-    const resend = new Resend(`Bearer ${apiKey}`);
+    // Create Resend instance with the API key directly
+    const resend = new Resend(apiKey);
 
     const { name, email, message }: ContactFormData = await req.json();
 
