@@ -22,13 +22,17 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const apiKey = Deno.env.get("RESEND_API_KEY");
+    console.log("API Key exists:", !!apiKey);
     console.log("API Key length:", apiKey?.length || 0);
-    console.log("API Key first 5 chars:", apiKey?.substring(0, 5));
+    if (apiKey) {
+      console.log("API Key first 5 chars:", apiKey.substring(0, 5));
+      console.log("API Key last 5 chars:", apiKey.substring(apiKey.length - 5));
+    }
     
     const resend = new Resend(apiKey);
     const { name, email, message }: ContactFormData = await req.json();
 
-    console.log("Sending emails for contact form submission:", { name, email });
+    console.log("Preparing to send emails for:", { name, email });
 
     // Send notification email to site owner
     console.log("Attempting to send owner notification email...");
