@@ -1,9 +1,27 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { cloudLocations } from '@/data/cloudProviderLocations';
 
-const CloudGlobe: React.FC = () => {
+interface CloudMetric {
+  provider: string;
+  location_name: string;
+  lat: number;
+  lng: number;
+  type: string;
+  services: string;
+  capacity: string;
+  sustainability: string;
+  availability: string;
+  performance: number;
+}
+
+interface CloudGlobeProps {
+  cloudMetrics?: CloudMetric[];
+}
+
+const CloudGlobe: React.FC<CloudGlobeProps> = ({ cloudMetrics }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
   const regionBoundsRef = useRef<THREE.LineSegments | null>(null);
@@ -105,20 +123,6 @@ const CloudGlobe: React.FC = () => {
         }
       });
 
-      // Connect last corner to first corner
-      const firstCorner = corners[0];
-      const lastCorner = corners[corners.length - 1];
-      points.push(new THREE.Vector3(
-        -(radius * Math.sin((90 - lastCorner.lat) * (Math.PI / 180)) * Math.cos((lastCorner.lng + 180) * (Math.PI / 180))),
-        radius * Math.cos((90 - lastCorner.lat) * (Math.PI / 180)),
-        radius * Math.sin((90 - lastCorner.lat) * (Math.PI / 180)) * Math.sin((lastCorner.lng + 180) * (Math.PI / 180))
-      ));
-      points.push(new THREE.Vector3(
-        -(radius * Math.sin((90 - firstCorner.lat) * (Math.PI / 180)) * Math.cos((firstCorner.lng + 180) * (Math.PI / 180))),
-        radius * Math.cos((90 - firstCorner.lat) * (Math.PI / 180)),
-        radius * Math.sin((90 - firstCorner.lat) * (Math.PI / 180)) * Math.sin((firstCorner.lng + 180) * (Math.PI / 180))
-      ));
-
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
       const material = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 });
       regionBoundsRef.current = new THREE.LineSegments(geometry, material);
@@ -126,30 +130,47 @@ const CloudGlobe: React.FC = () => {
     };
 
     // Add location markers
-    cloudLocations.forEach((location) => {
-      const markerGeometry = new THREE.SphereGeometry(0.03, 16, 16);
-      const markerMaterial = new THREE.MeshBasicMaterial({
-        color: location.provider === 'AWS' 
-          ? 0xFF9900 
-          : location.provider === 'Google Cloud' 
-            ? 0xFF0000 
-            : 0x00A4EF
+    const updateMarkers = () => {
+      // Remove existing markers
+      markers.forEach(marker => scene.remove(marker));
+      markers.length = 0;
+
+      // Use cloud metrics if available, fall back to static data
+      const locations = cloudMetrics || cloudLocations;
+
+      locations.forEach((location) => {
+        const markerGeometry = new THREE.SphereGeometry(0.03, 16, 16);
+        const markerMaterial = new THREE.MeshBasicMaterial({
+          color: location.provider === 'AWS' 
+            ? 0xFF9900 
+            : location.provider === 'Google Cloud' 
+              ? 0xFF0000 
+              : 0x00A4EF
+        });
+        
+        const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+        marker.userData = location;
+        
+        const phi = (90 - location.lat) * (Math.PI / 180);
+        const theta = (location.lng + 180) * (Math.PI / 180);
+        
+        const x = -(2.1 * Math.sin(phi) * Math.cos(theta));
+        const y = 2.1 * Math.cos(phi);
+        const z = 2.1 * Math.sin(phi) * Math.sin(theta);
+        
+        marker.position.set(x, y, z);
+        scene.add(marker);
+        markers.push(marker);
       });
-      
-      const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-      marker.userData = location;
-      
-      const phi = (90 - location.lat) * (Math.PI / 180);
-      const theta = (location.lng + 180) * (Math.PI / 180);
-      
-      const x = -(2.1 * Math.sin(phi) * Math.cos(theta));
-      const y = 2.1 * Math.cos(phi);
-      const z = 2.1 * Math.sin(phi) * Math.sin(theta);
-      
-      marker.position.set(x, y, z);
-      scene.add(marker);
-      markers.push(marker);
-    });
+    };
+
+    // Initial marker setup
+    updateMarkers();
+
+    // Update markers when cloud metrics change
+    if (cloudMetrics) {
+      updateMarkers();
+    }
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0x404040, 2);
@@ -182,40 +203,51 @@ const CloudGlobe: React.FC = () => {
         labelRef.current.style.left = `${event.clientX}px`;
         labelRef.current.style.top = `${event.clientY}px`;
         
-        let performanceInfo = location.performance 
-          ? `<br>Performance: ${location.performance}ms` 
-          : '';
-          
-        let servicesInfo = location.services 
-          ? `<br>Services: ${location.services.join(', ')}` 
-          : '';
-          
-        let capacityInfo = location.capacity 
-          ? `<br>Capacity: ${location.capacity.servers.toLocaleString()} servers, ${location.capacity.storage} storage` 
-          : '';
-          
-        let sustainabilityInfo = location.sustainability 
-          ? `<br>Renewable Energy: ${location.sustainability.renewable}%` 
-          : '';
-          
-        let availabilityInfo = location.availability 
-          ? `<br>Availability Zones: ${location.availability.zones}<br>SLA: ${location.availability.sla}%` 
-          : '';
-          
-        let yearInfo = location.yearEstablished 
-          ? `<br>Established: ${location.yearEstablished}` 
-          : '';
+        let servicesInfo = '';
+        let capacityInfo = '';
+        let sustainabilityInfo = '';
+        let availabilityInfo = '';
+        
+        if (location.services) {
+          const services = typeof location.services === 'string' 
+            ? JSON.parse(location.services) 
+            : location.services;
+          servicesInfo = `<br>Services: ${Array.isArray(services) ? services.join(', ') : ''}`;
+        }
+        
+        if (location.capacity) {
+          const capacity = typeof location.capacity === 'string' 
+            ? JSON.parse(location.capacity) 
+            : location.capacity;
+          capacityInfo = `<br>Capacity: ${capacity.servers.toLocaleString()} servers
+                         <br>Utilization: ${capacity.utilization}%`;
+        }
+        
+        if (location.sustainability) {
+          const sustainability = typeof location.sustainability === 'string'
+            ? JSON.parse(location.sustainability)
+            : location.sustainability;
+          sustainabilityInfo = `<br>Renewable Energy: ${sustainability.renewable}%`;
+        }
+        
+        if (location.availability) {
+          const availability = typeof location.availability === 'string'
+            ? JSON.parse(location.availability)
+            : location.availability;
+          availabilityInfo = `<br>Availability Zones: ${availability.zones}
+                             <br>SLA: ${availability.sla}%
+                             <br>Status: ${availability.current_status}`;
+        }
         
         labelRef.current.innerHTML = `
           <div class="font-bold">${location.provider}</div>
-          ${location.name}<br>
+          ${location.location_name}<br>
           Type: ${location.type}
-          ${performanceInfo}
-          ${yearInfo}
           ${servicesInfo}
           ${capacityInfo}
           ${sustainabilityInfo}
           ${availabilityInfo}
+          ${location.performance ? `<br>Performance: ${location.performance}ms` : ''}
         `;
 
         // Show region bounds if available
@@ -273,7 +305,7 @@ const CloudGlobe: React.FC = () => {
       earthMaterial.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [cloudMetrics]);
 
   return (
     <div 
