@@ -14,15 +14,16 @@ interface ContactEmailRequest {
   message: string;
 }
 
-const client = new SmtpClient();
-
 const sendEmail = async (to: string, subject: string, html: string) => {
+  const client = new SmtpClient();
+  
   try {
-    await client.connectTLS({
+    await client.connect({
       hostname: "smtp.gmail.com",
       port: 465,
       username: "connect@amplified.info",
       password: Deno.env.get("SMTP_PASSWORD")!,
+      tls: true,
     });
 
     await client.send({
@@ -99,4 +100,3 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 serve(handler);
-
