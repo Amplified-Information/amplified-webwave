@@ -80,28 +80,30 @@ const handler = async (req: Request): Promise<Response> => {
       await resend.emails.send({
         from: "Amplified Information <contact@amplified.info>",
         to: [email],
-        subject: "Thank you for contacting Amplified Information",
+        subject: "Thank you for contacting us",
         html: `
           <!DOCTYPE html>
           <html>
             <head>
               <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background-color: #1a56db; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
-                .content { background-color: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 0 0 8px 8px; }
-                .signature { margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
+                .logo { width: 200px; height: auto; }
+                .content { max-width: 600px; margin: 20px 0; }
+                .footer { margin-top: 30px; color: #666; font-size: 14px; }
+                .footer p { margin: 3px 0; }
+                .name { color: #1a56db; font-weight: bold; }
               </style>
             </head>
             <body>
-              <div class="header">
-                <h1 style="margin: 0;">Thank You for Your Message</h1>
-              </div>
               <div class="content">
-                <p>Dear ${name},</p>
-                <p>Thank you for reaching out to Amplified Information. We have received your message and appreciate you taking the time to contact us.</p>
-                <p>Our team will review your message and get back to you as soon as possible.</p>
-                <div class="signature">
-                  <p>Best regards,<br>The Amplified Information Team</p>
+                <p>Hello ${name},</p>
+                <p>We have received your message and will get back to you as soon as possible.</p>
+                <div class="footer">
+                  <p class="name">Mark Gratton, CBIP</p>
+                  <img src="https://amplified.info/logo.png" alt="Amplified Information" class="logo">
+                  <p><a href="mailto:mark@amplified.info">mark@amplified.info</a></p>
+                  <p>(613) 859-3905</p>
+                  <p>3473 Dove Creek Road<br>Courtenay, BC V9J 1P3</p>
                 </div>
               </div>
             </body>
