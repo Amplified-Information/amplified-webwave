@@ -36,11 +36,18 @@ export const Contact = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
+      console.log('Submitting contact form with data:', data);
+      
+      const response = await supabase.functions.invoke('send-contact-email', {
         body: data
       });
+      
+      console.log('Edge function response:', response);
 
-      if (error) throw error;
+      if (response.error) {
+        console.error('Edge function error:', response.error);
+        throw response.error;
+      }
       
       toast({
         title: "Message sent!",
@@ -142,3 +149,4 @@ export const Contact = () => {
     </section>
   );
 };
+
