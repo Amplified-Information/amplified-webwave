@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cloud_provider_metrics: {
+        Row: {
+          availability: Json | null
+          capacity: Json | null
+          id: string
+          last_updated: string | null
+          lat: number
+          lng: number
+          location_name: string
+          performance: number | null
+          provider: string
+          services: Json | null
+          sustainability: Json | null
+          type: string
+        }
+        Insert: {
+          availability?: Json | null
+          capacity?: Json | null
+          id?: string
+          last_updated?: string | null
+          lat: number
+          lng: number
+          location_name: string
+          performance?: number | null
+          provider: string
+          services?: Json | null
+          sustainability?: Json | null
+          type: string
+        }
+        Update: {
+          availability?: Json | null
+          capacity?: Json | null
+          id?: string
+          last_updated?: string | null
+          lat?: number
+          lng?: number
+          location_name?: string
+          performance?: number | null
+          provider?: string
+          services?: Json | null
+          sustainability?: Json | null
+          type?: string
+        }
+        Relationships: []
+      }
       secrets: {
         Row: {
           created_at: string

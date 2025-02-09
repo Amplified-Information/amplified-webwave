@@ -1,3 +1,4 @@
+
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -34,11 +36,11 @@ export const Contact = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // Here you would typically send the data to your backend
-      console.log("Form data:", data);
-      
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: data
+      });
+
+      if (error) throw error;
       
       toast({
         title: "Message sent!",
@@ -47,6 +49,7 @@ export const Contact = () => {
       
       form.reset();
     } catch (error) {
+      console.error('Error sending message:', error);
       toast({
         title: "Error",
         description: "There was a problem sending your message. Please try again.",
