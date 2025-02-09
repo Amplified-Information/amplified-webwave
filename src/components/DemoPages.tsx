@@ -43,8 +43,8 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       path: "/demo/data-visualization"
     },
     {
-      title: "API Integration",
-      description: "Connect with external services through our API platform",
+      title: "Find a Mortgage that Saves you Money",
+      description: "Compare current mortgage rates and calculate your potential savings",
       path: "/demo/api-integration",
       isActive: true
     },
