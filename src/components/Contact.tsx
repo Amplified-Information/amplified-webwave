@@ -36,12 +36,13 @@ export const Contact = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
+      form.reset();
       toast({
         title: "Sending message...",
         description: "Please wait while we process your request.",
       });
 
-      const { error } = await supabase.functions.invoke('send-contact-email', {
+      const { data: response, error } = await supabase.functions.invoke('send-contact-email', {
         body: data,
       });
 
@@ -51,15 +52,15 @@ export const Contact = () => {
         title: "Message sent!",
         description: "We'll get back to you as soon as possible.",
       });
-      
-      form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
       toast({
         title: "Error",
-        description: "There was a problem sending your message. Please try again.",
+        description: error.message || "There was a problem sending your message. Please try again.",
         variant: "destructive",
       });
+      // Restore the form data if sending failed
+      form.reset(data);
     }
   };
 
