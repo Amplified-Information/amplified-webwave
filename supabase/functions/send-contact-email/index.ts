@@ -18,14 +18,16 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   const client = new SmtpClient();
   
   try {
-    await client.connect({
+    console.log("Attempting to connect to SMTP server...");
+    await client.connectTLS({
       hostname: "smtp.gmail.com",
       port: 465,
       username: "connect@amplified.info",
       password: Deno.env.get("SMTP_PASSWORD")!,
-      tls: true,
     });
+    console.log("Successfully connected to SMTP server");
 
+    console.log(`Sending email to ${to}...`);
     await client.send({
       from: "connect@amplified.info",
       to,
@@ -33,10 +35,17 @@ const sendEmail = async (to: string, subject: string, html: string) => {
       content: "This message is in HTML format",
       html,
     });
+    console.log("Email sent successfully");
 
+    console.log("Closing SMTP connection...");
     await client.close();
+    console.log("SMTP connection closed");
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Detailed error in sendEmail:", {
+      error,
+      errorMessage: error.message,
+      errorStack: error.stack,
+    });
     throw error;
   }
 };
@@ -75,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
       `
     );
 
-    console.log("Emails sent successfully");
+    console.log("Both emails sent successfully");
 
     return new Response(
       JSON.stringify({ message: "Emails sent successfully" }),
@@ -88,7 +97,11 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: any) {
-    console.error("Error in send-contact-email function:", error);
+    console.error("Error in send-contact-email function:", {
+      error,
+      errorMessage: error.message,
+      errorStack: error.stack,
+    });
     return new Response(
       JSON.stringify({ error: error.message }),
       {
