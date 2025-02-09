@@ -19,11 +19,12 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   
   try {
     console.log("Attempting to connect to SMTP server...");
-    await client.connectTLS({
+    await client.connect({
       hostname: "smtp.gmail.com",
       port: 465,
       username: "connect@amplified.info",
       password: Deno.env.get("SMTP_PASSWORD")!,
+      tls: true,
     });
     console.log("Successfully connected to SMTP server");
 
