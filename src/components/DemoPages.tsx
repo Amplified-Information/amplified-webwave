@@ -52,7 +52,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
-      isActive: true
+      status: "in development"
     },
     {
       title: "Supply Chain Optimization",
