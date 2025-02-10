@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   url: z.string().url().optional(),
@@ -34,12 +35,13 @@ interface ArticleData {
   content: string;
   url?: string;
   source?: string;
-  ttr?: number; // time to read in minutes
+  ttr?: number;
 }
 
 export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: AnalysisFormProps) => {
   const [isExtracting, setIsExtracting] = useState(false);
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
+  const { toast } = useToast();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -69,14 +71,29 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
             ? JSON.parse(extractionError.message)
             : extractionError;
           
+          toast({
+            variant: "destructive",
+            title: "Extraction Failed",
+            description: "We couldn't extract the article content. Please try pasting the article text directly in the box below."
+          });
+          
           form.setError('url', { 
             type: 'manual',
-            message: errorBody.error || 'Failed to extract article content'
+            message: 'Unable to extract article. Please paste the content manually.'
           });
+
+          // Focus the content textarea after error
+          setTimeout(() => {
+            const contentTextarea = document.querySelector('textarea[name="content"]');
+            if (contentTextarea) {
+              contentTextarea.focus();
+            }
+          }, 100);
+
         } catch (parseError) {
           form.setError('url', { 
             type: 'manual',
-            message: 'Failed to extract article content'
+            message: 'Unable to extract article. Please paste the content manually.'
           });
         }
         return;
@@ -87,16 +104,26 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
         form.setValue("content", extractionData.content);
         form.clearErrors('url');
       } else {
+        toast({
+          variant: "destructive",
+          title: "No Content Found",
+          description: "We couldn't find any content in this article. Please try pasting the text directly."
+        });
         form.setError('url', { 
           type: 'manual',
-          message: 'No content found in the article'
+          message: 'No content found. Please paste the article manually.'
         });
       }
     } catch (error: any) {
       console.error('Article extraction error:', error);
+      toast({
+        variant: "destructive",
+        title: "Extraction Error",
+        description: "Failed to extract article content. Please paste the text directly below."
+      });
       form.setError('url', { 
         type: 'manual',
-        message: error.message || 'Failed to extract article content'
+        message: 'Failed to extract content. Please paste the article manually.'
       });
     } finally {
       setIsExtracting(false);
