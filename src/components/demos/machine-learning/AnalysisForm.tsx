@@ -1,4 +1,3 @@
-
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -83,12 +82,10 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
           });
 
           // Focus the content textarea after error
-          setTimeout(() => {
-            const contentTextarea = document.querySelector('textarea[name="content"]');
-            if (contentTextarea) {
-              contentTextarea.focus();
-            }
-          }, 100);
+          const contentTextarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement;
+          if (contentTextarea) {
+            contentTextarea.focus();
+          }
 
         } catch (parseError) {
           form.setError('url', { 

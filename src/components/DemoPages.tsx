@@ -40,6 +40,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       status: "in development"
     },
     {
+      title: "Article Content Extractor",
+      description: "Extract and analyze content from any article URL",
+      path: "/demo/article-extractor",
+      isActive: true
+    },
+    {
       title: "Data Visualization",
       description: "Create interactive dashboards and reports",
       path: "/demo/data-visualization"
