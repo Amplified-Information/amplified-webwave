@@ -1,6 +1,3 @@
-// This code creates a reusable WeatherTable component that displays weather data in a sortable table format. 
-// It includes features like optional checkboxes for row selection, sortable columns, and dynamic rendering based on the provided props. 
-// The component uses various UI components from a custom UI library and handles sorting and selection logic internally.
 
 import React, { useState } from 'react';
 import {
@@ -16,7 +13,6 @@ import { WeatherData } from '@/types/weather';
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Define props interface for WeatherTable component
 interface WeatherTableProps {
   weatherData: WeatherData[];
   selectedItems?: string[];
@@ -24,8 +20,7 @@ interface WeatherTableProps {
   showCheckboxes?: boolean;
 }
 
-// Define types for sorting
-type SortField = 'cityName' | 'province' | 'temperature' | 'humidity';
+type SortField = 'cityname' | 'province' | 'temperature' | 'humidity';
 type SortDirection = 'asc' | 'desc';
 
 const WeatherTable = ({ 
@@ -34,34 +29,28 @@ const WeatherTable = ({
   onSelectionChange,
   showCheckboxes = false 
 }: WeatherTableProps) => {
-  // State for sorting
-  const [sortField, setSortField] = useState<SortField>('cityName');
+  const [sortField, setSortField] = useState<SortField>('cityname');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  // Handle sorting when a column header is clicked
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      // If the same field is clicked, toggle the sort direction
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      // If a new field is clicked, set it as the sort field and default to ascending
       setSortField(field);
       setSortDirection('asc');
     }
   };
 
-  // Handle checkbox selection
-  const handleCheckboxChange = (cityName: string) => {
+  const handleCheckboxChange = (cityname: string) => {
     if (!onSelectionChange) return;
     
-    const newSelection = selectedItems.includes(cityName)
-      ? selectedItems.filter(item => item !== cityName)
-      : [...selectedItems, cityName];
+    const newSelection = selectedItems.includes(cityname)
+      ? selectedItems.filter(item => item !== cityname)
+      : [...selectedItems, cityname];
     
     onSelectionChange(newSelection);
   };
 
-  // Sort the data based on the current sort field and direction
   const sortedData = [...weatherData].sort((a, b) => {
     const multiplier = sortDirection === 'asc' ? 1 : -1;
     
@@ -77,13 +66,11 @@ const WeatherTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            {/* Render checkbox column if showCheckboxes is true */}
             {showCheckboxes && <TableHead className="w-[50px]" />}
-            {/* Render sortable column headers */}
             <TableHead>
               <Button
                 variant="ghost"
-                onClick={() => handleSort('cityName')}
+                onClick={() => handleSort('cityname')}
                 className="h-8 w-full flex items-center justify-between"
               >
                 City
@@ -123,19 +110,17 @@ const WeatherTable = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* Render table rows with sorted data */}
           {sortedData.map((city) => (
-            <TableRow key={city.cityName}>
-              {/* Render checkbox if showCheckboxes is true */}
+            <TableRow key={city.cityname}>
               {showCheckboxes && (
                 <TableCell className="w-[50px]">
                   <Checkbox
-                    checked={selectedItems.includes(city.cityName)}
-                    onCheckedChange={() => handleCheckboxChange(city.cityName)}
+                    checked={selectedItems.includes(city.cityname)}
+                    onCheckedChange={() => handleCheckboxChange(city.cityname)}
                   />
                 </TableCell>
               )}
-              <TableCell className="font-medium">{city.cityName}</TableCell>
+              <TableCell className="font-medium">{city.cityname}</TableCell>
               <TableCell>{city.province}</TableCell>
               <TableCell>{city.temperature}°C</TableCell>
               <TableCell>{city.humidity}%</TableCell>
