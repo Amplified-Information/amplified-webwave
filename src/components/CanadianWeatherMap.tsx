@@ -7,6 +7,7 @@ import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from './ui/alert';
 import { useQuery } from '@tanstack/react-query';
+import { useToast } from './ui/use-toast';
 
 interface CanadianWeatherMapProps {
   weatherData: WeatherData[];
@@ -20,11 +21,13 @@ const fetchMapboxToken = async () => {
     .maybeSingle();
 
   if (error) {
+    console.error('Failed to fetch Mapbox token:', error);
     throw new Error(`Failed to fetch Mapbox token: ${error.message}`);
   }
 
   if (!data?.value) {
-    throw new Error('Mapbox token not found in Supabase secrets');
+    console.error('Mapbox token not found in Supabase secrets');
+    throw new Error('Mapbox token not found in database');
   }
 
   return data.value;
@@ -36,11 +39,19 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const markers = useRef<mapboxgl.Marker[]>([]);
   const popups = useRef<mapboxgl.Popup[]>([]);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const { toast } = useToast();
 
   const { data: mapboxToken, isLoading, error } = useQuery({
     queryKey: ['mapbox-token'],
     queryFn: fetchMapboxToken,
     retry: 1,
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error loading map",
+        description: error instanceof Error ? error.message : 'Failed to initialize map'
+      });
+    }
   });
 
   useEffect(() => {
@@ -99,6 +110,11 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
       } catch (err) {
         console.error('Error initializing map:', err);
+        toast({
+          variant: "destructive",
+          title: "Map Error",
+          description: err instanceof Error ? err.message : 'Failed to initialize map'
+        });
       }
     };
 
@@ -114,7 +130,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         map.current = null;
       }
     };
-  }, [mapboxToken, mapInitialized, weatherData]);
+  }, [mapboxToken, mapInitialized, weatherData, toast]);
 
   useEffect(() => {
     if (map.current && mapInitialized && weatherData.length > 0) {
