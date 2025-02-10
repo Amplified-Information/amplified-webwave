@@ -1,4 +1,3 @@
-
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
@@ -23,32 +22,26 @@ async function extractArticleContent(url: string): Promise<string> {
   try {
     console.log('Extracting article content from URL:', url);
     const article = await extract(url);
-    console.log('Article extraction result:', article ? 'Success' : 'Failed');
     
-    if (!article) {
-      throw new Error('Article extraction failed - no content returned');
+    if (!article || !article.content) {
+      console.log('No article content found:', article);
+      throw new Error('No content found at the provided URL');
     }
 
-    if (!article.content) {
-      console.log('Article metadata:', JSON.stringify(article, null, 2));
-      throw new Error('Article found but no content available');
-    }
-
-    // Clean the content more thoroughly
     const cleanContent = article.content
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/\s+/g, ' ')    // Normalize whitespace
-      .trim();                 // Remove leading/trailing whitespace
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
 
     if (!cleanContent) {
-      throw new Error('Article content was empty after cleaning');
+      throw new Error('Extracted content was empty after cleaning');
     }
 
-    console.log('Extracted content length:', cleanContent.length);
+    console.log('Successfully extracted content, length:', cleanContent.length);
     return cleanContent;
   } catch (error) {
-    console.error('Error extracting article:', error);
-    throw new Error(`Failed to extract article content: ${error.message}`);
+    console.error('Article extraction error:', error);
+    throw new Error('Unable to extract article content. Please paste the article text directly.');
   }
 }
 
@@ -140,30 +133,19 @@ Deno.serve(async (req) => {
   try {
     const { articleId, content, url } = await req.json() as AnalysisRequest;
     
-    // Extract article content if URL is provided
     let articleContent = content;
-    if (url) {
+    if (url && !content) {
       try {
-        const extractedContent = await extractArticleContent(url);
-        if (extractedContent) {
-          articleContent = extractedContent;
-          console.log('Successfully extracted article content from URL');
-        } else {
-          console.log('Using provided content as fallback');
-        }
+        articleContent = await extractArticleContent(url);
+        console.log('Successfully extracted content from URL');
       } catch (error) {
-        console.error('Failed to extract article:', error);
-        // If we have content, use it as fallback instead of failing
-        if (!content) {
-          throw new Error('Unable to extract article from URL. Please paste the article content directly in the text box instead.');
-        } else {
-          console.log('Using provided content as fallback after URL extraction failed');
-        }
+        console.error('URL extraction failed:', error);
+        throw new Error('Unable to extract article from URL. Please paste the article content directly.');
       }
     }
 
     if (!articleContent || articleContent.trim().length === 0) {
-      throw new Error('Please provide article content either through URL or by pasting it directly.');
+      throw new Error('No article content provided. Please provide content either through URL or direct input.');
     }
     
     const supabaseClient = createClient(
