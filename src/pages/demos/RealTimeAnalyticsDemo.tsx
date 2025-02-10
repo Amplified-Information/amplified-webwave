@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartBar } from "lucide-react";
@@ -13,7 +12,7 @@ const fetchWeatherData = async (): Promise<WeatherData[]> => {
   const { data, error } = await supabase
     .from('weather_data')
     .select('*')
-    .order('cityName', { ascending: true });
+    .order('cityname', { ascending: true });
 
   if (error) {
     throw new Error('Failed to fetch weather data');

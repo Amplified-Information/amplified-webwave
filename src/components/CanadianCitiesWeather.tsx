@@ -20,7 +20,7 @@ const fetchAndStoreWeatherData = async (): Promise<WeatherData[]> => {
     );
     const data = await response.json();
     const weatherData = {
-      cityName: city.name,
+      cityname: city.name, // Changed from cityName to cityname
       province: city.province,
       temperature: data.current.temperature_2m,
       humidity: data.current.relative_humidity_2m
@@ -30,12 +30,9 @@ const fetchAndStoreWeatherData = async (): Promise<WeatherData[]> => {
     const { error } = await supabase
       .from('weather_data')
       .upsert(
+        weatherData,
         { 
-          ...weatherData,
-          updated_at: new Date().toISOString()
-        },
-        { 
-          onConflict: 'cityName',
+          onConflict: 'cityname', // Changed from cityName to cityname
           ignoreDuplicates: false 
         }
       );
@@ -102,7 +99,7 @@ const CanadianCitiesWeather = () => {
               <TableRow>
                 <TableCell className="border-0">
                   <div>
-                    <div className="text-3xl font-bold text-blue-600">{coldest.cityName}</div>
+                    <div className="text-3xl font-bold text-blue-600">{coldest.cityname}</div>
                     <div className="text-xl text-blue-500">{coldest.temperature}°C</div>
                   </div>
                 </TableCell>
@@ -137,7 +134,7 @@ const CanadianCitiesWeather = () => {
               <TableRow>
                 <TableCell className="border-0">
                   <div>
-                    <div className="text-3xl font-bold text-red-600">{warmest.cityName}</div>
+                    <div className="text-3xl font-bold text-red-600">{warmest.cityname}</div>
                     <div className="text-xl text-red-500">{warmest.temperature}°C</div>
                   </div>
                 </TableCell>

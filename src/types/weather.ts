@@ -1,3 +1,4 @@
+
 export interface City {
   name: string;
   province: string;
@@ -6,7 +7,7 @@ export interface City {
 }
 
 export interface WeatherData {
-  cityName: string;
+  cityname: string;  // Changed from cityName to match DB
   province: string;
   temperature: number;
   humidity: number;
