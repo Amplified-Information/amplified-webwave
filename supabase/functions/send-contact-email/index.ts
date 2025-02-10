@@ -91,7 +91,8 @@ const handler = async (req: Request): Promise<Response> => {
                 .content { max-width: 600px; margin: 20px 0; }
                 .footer { margin-top: 30px; color: #666; }
                 .footer p { margin: 3px 0; font-size: 8pt; }
-                .name { color: #1a56db; font-weight: bold; font-size: 12pt !important; }
+                .name { color: #000000; font-weight: bold; font-size: 12pt !important; }
+                .title { font-weight: normal; }
                 a { color: #666; text-decoration: none; }
               </style>
             </head>
@@ -100,7 +101,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>Hello ${name},</p>
                 <p>We have received your message and will get back to you as soon as possible.</p>
                 <div class="footer">
-                  <p class="name">Mark Gratton, CBIP</p>
+                  <p class="name"><strong>Mark Gratton</strong>, <span class="title">CBIP</span></p>
                   <img src="https://amplified.info/lovable-uploads/f50a8f6c-1a61-46ac-8e5f-bda51fdb2300.png" alt="Amplified Information" class="logo">
                   <p><a href="mailto:mark@amplified.info">mark@amplified.info</a></p>
                   <p>(613) 859-3905</p>
