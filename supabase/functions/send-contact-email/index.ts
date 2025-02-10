@@ -101,6 +101,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>We have received your message and will get back to you as soon as possible.</p>
                 <div class="footer">
                   <p class="name"><strong>Mark Gratton</strong>, <span class="title">CBIP</span></p>
+                  <p><strong>Amplified Information Inc.</strong></p>
                   <p>mark@amplified.info</p>
                   <p>+1 (613) 859-3905</p>
                   <p>3473 Dove Creek Road</p>
