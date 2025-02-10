@@ -25,7 +25,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Trade Data Analysis",
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
-      isActive: true
+      status: "in development"
     },
     {
       title: "Cloud Infrastructure",
@@ -57,26 +57,22 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     {
       title: "Supply Chain Optimization",
       description: "Streamline logistics and inventory management with AI",
-      path: "/demo/supply-chain",
-      isActive: true
+      path: "/demo/supply-chain"
     },
     {
       title: "Predictive Maintenance",
       description: "Forecast equipment maintenance needs using IoT sensors",
-      path: "/demo/predictive-maintenance",
-      isActive: true
+      path: "/demo/predictive-maintenance"
     },
     {
       title: "Customer Segmentation",
       description: "Advanced customer analytics and behavior prediction",
-      path: "/demo/customer-segmentation",
-      isActive: true
+      path: "/demo/customer-segmentation"
     },
     {
       title: "Energy Management",
       description: "Monitor and optimize energy consumption patterns",
-      path: "/demo/energy-management",
-      isActive: true
+      path: "/demo/energy-management"
     }
   ];
 
