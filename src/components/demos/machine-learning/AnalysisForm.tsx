@@ -43,8 +43,8 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     setIsExtracting(true);
     try {
       const { data: extractionData, error: extractionError } = await supabase.functions
-        .invoke('analyze-article', {
-          body: { content: "", url }
+        .invoke('extract-article', {
+          body: { url }
         });
 
       if (extractionError) throw extractionError;
@@ -52,8 +52,14 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
       if (extractionData?.content) {
         form.setValue("content", extractionData.content);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Article extraction error:', error);
+      // Handle the error and show it to the user
+      const errorMessage = error.message || 'Failed to extract article content';
+      form.setError('url', { 
+        type: 'manual',
+        message: errorMessage 
+      });
     } finally {
       setIsExtracting(false);
     }
@@ -166,4 +172,3 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     </Card>
   );
 };
-
