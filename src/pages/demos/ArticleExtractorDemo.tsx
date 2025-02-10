@@ -1,73 +1,21 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArticleExtractionForm } from "@/components/demos/article-extractor/ArticleExtractionForm";
-import { ExtractedArticle } from "@/components/demos/article-extractor/ExtractedArticle";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Separator } from "@/components/ui/separator";
-
-interface ArticleData {
-  id: string;
-  title: string | null;
-  description: string | null;
-  author: string | null;
-  published: string | null;
-  content: string;
-  url: string | null;
-  source: string | null;
-  ttr: number | null;
-}
 
 const ArticleExtractorDemo = () => {
-  const [extractedArticle, setExtractedArticle] = useState<ArticleData | null>(null);
-  const [isExtracting, setIsExtracting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleExtraction = async (url: string) => {
-    setIsExtracting(true);
-    setError(null);
-    setPreviewUrl(url);
-    
+  const handleSubmitUrl = async (url: string) => {
     try {
-      const { data: extractionData, error: extractionError } = await supabase.functions
-        .invoke('extract-article', {
-          body: { url }
-        });
-
-      if (extractionError) {
-        console.error('Article extraction error:', extractionError);
-        throw new Error(extractionError.message || 'Failed to extract article content');
-      }
-
-      if (!extractionData?.content) {
-        throw new Error('No content found in the article');
-      }
-
-      // Store the extracted article in the database
-      const { data: savedArticle, error: saveError } = await supabase
-        .from('extracted_articles')
-        .insert({
-          url: extractionData.url,
-          title: extractionData.title,
-          description: extractionData.description,
-          author: extractionData.author,
-          published: extractionData.published,
-          content: extractionData.content,
-          source: extractionData.source,
-          ttr: extractionData.ttr
-        })
-        .select()
-        .single();
-
-      if (saveError) throw saveError;
-      
-      setExtractedArticle(savedArticle);
-    } catch (err: any) {
-      console.error('Article extraction error:', err);
-      setError(err.message || 'Failed to extract article content');
-    } finally {
-      setIsExtracting(false);
+      // Validate URL
+      new URL(url);
+      setPreviewUrl(url);
+      setError(null);
+    } catch (err) {
+      setError("Please enter a valid URL");
     }
   };
 
@@ -85,42 +33,27 @@ const ArticleExtractorDemo = () => {
           </CardHeader>
           <CardContent>
             <ArticleExtractionForm 
-              onSubmit={handleExtraction}
-              isExtracting={isExtracting}
+              onSubmit={handleSubmitUrl}
+              isExtracting={false}
               error={error}
             />
           </CardContent>
         </Card>
 
-        {(previewUrl || extractedArticle) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {previewUrl && (
-              <Card className="h-[800px] overflow-hidden">
-                <CardHeader>
-                  <CardTitle>Original Page</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 h-full">
-                  <iframe 
-                    src={previewUrl}
-                    className="w-full h-full border-0"
-                    title="Original article preview"
-                    sandbox="allow-same-origin allow-scripts"
-                  />
-                </CardContent>
-              </Card>
-            )}
-            
-            {extractedArticle && (
-              <Card className="h-[800px] overflow-auto">
-                <CardHeader>
-                  <CardTitle>Extracted Content</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ExtractedArticle article={extractedArticle} />
-                </CardContent>
-              </Card>
-            )}
-          </div>
+        {previewUrl && (
+          <Card className="h-[800px] overflow-hidden">
+            <CardHeader>
+              <CardTitle>Original Page</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 h-full">
+              <iframe 
+                src={previewUrl}
+                className="w-full h-full border-0"
+                title="Original article preview"
+                sandbox="allow-same-origin allow-scripts"
+              />
+            </CardContent>
+          </Card>
         )}
       </main>
     </div>
