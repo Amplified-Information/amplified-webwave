@@ -19,6 +19,7 @@ const MachineLearningDemo = () => {
   const onSubmit = async (values: { url?: string; content?: string }) => {
     setIsAnalyzing(true);
     setError(null);
+    
     try {
       // Create the article first
       const { data: article, error: articleError } = await supabase
@@ -46,26 +47,22 @@ const MachineLearningDemo = () => {
         });
 
       if (analysisError) {
-        let errorMessage = "Failed to analyze the article.";
-        let errorDetails = "";
+        console.error('Analysis error:', analysisError);
         
         try {
-          // Try to parse the error response
+          // Parse the error body
           const errorBody = JSON.parse(analysisError.message);
+          const parsedBody = errorBody.body ? JSON.parse(errorBody.body) : null;
           
-          // Check if we have a structured error response
-          if (typeof errorBody === 'object' && errorBody.body) {
-            const parsedBody = JSON.parse(errorBody.body);
-            errorMessage = parsedBody.error || errorMessage;
-            errorDetails = parsedBody.details || "";
-          }
-
           // Handle specific error cases
           if (analysisError.status === 400) {
+            const errorMessage = parsedBody?.error || "Failed to process the URL";
+            const errorDetails = parsedBody?.details || "Please try pasting the article content directly.";
+            
             setError(errorMessage);
             toast({
               title: "URL Processing Failed",
-              description: errorDetails || "Please paste the article content directly instead.",
+              description: errorDetails,
               variant: "destructive"
             });
             return;
@@ -94,15 +91,16 @@ const MachineLearningDemo = () => {
             return;
           }
 
-          setError(errorMessage);
+          // Handle other errors
+          setError(parsedBody?.error || "An unexpected error occurred");
           toast({
             title: "Analysis Failed",
-            description: errorDetails || errorMessage,
+            description: parsedBody?.details || "Please try again later",
             variant: "destructive"
           });
         } catch (parseError) {
           console.error('Error parsing error response:', parseError);
-          setError("An unexpected error occurred. Please try again.");
+          setError("An unexpected error occurred");
           toast({
             title: "Error",
             description: "An unexpected error occurred. Please try again.",

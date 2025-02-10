@@ -1,4 +1,3 @@
-
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
@@ -37,7 +36,7 @@ async function extractArticleContent(url: string): Promise<string> {
     
     if (!article) {
       console.log('No article data returned from extraction');
-      throw new Error('No article content found');
+      throw new Error('Could not extract content from the provided URL');
     }
 
     if (!article.content) {
@@ -59,7 +58,7 @@ async function extractArticleContent(url: string): Promise<string> {
     return cleanContent;
   } catch (error) {
     console.error('Article extraction error:', error);
-    throw new Error('URL extraction failed: ' + error.message);
+    throw new Error('URL extraction failed');
   }
 }
 
