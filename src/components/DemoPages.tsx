@@ -36,7 +36,8 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     {
       title: "News Article Analysis with AI",
       description: "Analyze news articles with AI for key insights and summaries",
-      path: "/demo/machine-learning"
+      path: "/demo/machine-learning",
+      status: "in development"
     },
     {
       title: "Data Visualization",
@@ -130,3 +131,4 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     </section>
   );
 };
+
