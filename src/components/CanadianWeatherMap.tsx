@@ -58,15 +58,15 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     }
   });
 
-  // Initialize map
+  // Initialize map only once
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || mapInitialized) return;
+    if (!mapContainer.current || !mapboxToken || map.current) return;
 
     try {
       console.log('Initializing map with token');
       mapboxgl.accessToken = mapboxToken;
 
-      map.current = new mapboxgl.Map({
+      const newMap = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
         center: [-96, 62],
@@ -83,12 +83,14 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         ]
       });
 
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      map.current.on('load', () => {
+      newMap.on('load', () => {
         console.log('Map loaded successfully');
         setMapInitialized(true);
       });
+
+      map.current = newMap;
 
     } catch (err) {
       console.error('Error initializing map:', err);
@@ -99,17 +101,18 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       });
     }
 
+    // Cleanup function
     return () => {
-      console.log('Cleaning up map instance');
-      markers.current.forEach(marker => marker.remove());
-      popups.current.forEach(popup => popup.remove());
       if (map.current) {
+        console.log('Cleaning up map instance');
+        markers.current.forEach(marker => marker.remove());
+        popups.current.forEach(popup => popup.remove());
         map.current.remove();
         map.current = null;
+        setMapInitialized(false);
       }
-      setMapInitialized(false);
     };
-  }, [mapboxToken, mapInitialized, toast]);
+  }, [mapboxToken, toast]); // Remove mapInitialized from dependencies
 
   // Add markers when weather data changes
   useEffect(() => {
@@ -155,10 +158,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       }
     });
 
-    return () => {
-      markers.current.forEach(marker => marker.remove());
-      popups.current.forEach(popup => popup.remove());
-    };
+    // No cleanup needed here as it's handled in the map initialization effect
   }, [weatherData, mapInitialized]);
 
   if (error) {
