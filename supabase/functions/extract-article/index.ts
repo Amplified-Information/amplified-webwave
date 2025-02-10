@@ -12,24 +12,34 @@ const openai = new OpenAI({
 
 // Helper function to extract main content area from HTML
 function extractMainContent(html: string): string {
-  // Common content wrapper patterns
+  // More specific content patterns for articles
   const mainContentPatterns = [
+    // Primary article patterns
     /<article[^>]*>([\s\S]*?)<\/article>/i,
     /<main[^>]*>([\s\S]*?)<\/main>/i,
-    /<div[^>]*(?:class|id)=['"](?:.*?article.*?|.*?content.*?|.*?post.*?)['"][^>]*>([\s\S]*?)<\/div>/i
+    // Common article container patterns
+    /<div[^>]*(?:class|id)=['"](?:.*?post-content.*?|.*?article-content.*?|.*?entry-content.*?|.*?story-content.*?|.*?article-body.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
+    // Content area patterns
+    /<div[^>]*(?:class|id)=['"](?:.*?content-area.*?|.*?main-content.*?|.*?page-content.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
+    // Blog post patterns
+    /<div[^>]*(?:class|id)=['"](?:.*?blog-post.*?|.*?post-body.*?|.*?post-text.*?)['"][^>]*>([\s\S]*?)<\/div>/i
   ];
 
   let mainContent = '';
+  
+  // Try each pattern until we find a match
   for (const pattern of mainContentPatterns) {
     const match = html.match(pattern);
     if (match && match[1]) {
       mainContent = match[1];
+      console.log('Found content using pattern:', pattern.toString().slice(0, 50) + '...');
       break;
     }
   }
 
-  // If no main content found, take a portion of the body
+  // If no main content found, try to extract from body but more selectively
   if (!mainContent) {
+    console.log('No specific article container found, attempting body content extraction');
     const bodyMatch = /<body[^>]*>([\s\S]*?)<\/body>/i.exec(html);
     if (bodyMatch && bodyMatch[1]) {
       mainContent = bodyMatch[1];
@@ -40,12 +50,29 @@ function extractMainContent(html: string): string {
 
   // Clean up the content
   mainContent = mainContent
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') // Remove styles
-    .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, '') // Remove navigation
-    .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, '') // Remove header
-    .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ''); // Remove footer
+    // Remove scripts
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    // Remove styles
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    // Remove navigation
+    .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, '')
+    // Remove headers
+    .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, '')
+    // Remove footers
+    .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, '')
+    // Remove comments
+    .replace(/<!--[\s\S]*?-->/g, '')
+    // Remove social media widgets
+    .replace(/<div[^>]*(?:class|id)=['"](?:.*?social.*?|.*?share.*?|.*?widget.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
+    // Remove advertisements
+    .replace(/<div[^>]*(?:class|id)=['"](?:.*?ad.*?|.*?advertisement.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
+    // Remove related articles sections
+    .replace(/<div[^>]*(?:class|id)=['"](?:.*?related.*?|.*?recommended.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
+    // Clean whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
 
+  console.log('Cleaned content length:', mainContent.length);
   return mainContent;
 }
 
