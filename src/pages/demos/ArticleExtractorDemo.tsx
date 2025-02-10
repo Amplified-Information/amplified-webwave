@@ -5,6 +5,7 @@ import { ArticleExtractionForm } from "@/components/demos/article-extractor/Arti
 import { ExtractedArticle } from "@/components/demos/article-extractor/ExtractedArticle";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Separator } from "@/components/ui/separator";
 
 interface ArticleData {
   id: string;
@@ -22,10 +23,12 @@ const ArticleExtractorDemo = () => {
   const [extractedArticle, setExtractedArticle] = useState<ArticleData | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleExtraction = async (url: string) => {
     setIsExtracting(true);
     setError(null);
+    setPreviewUrl(url);
     
     try {
       const { data: extractionData, error: extractionError } = await supabase.functions
@@ -87,8 +90,35 @@ const ArticleExtractorDemo = () => {
           </CardContent>
         </Card>
 
-        {extractedArticle && (
-          <ExtractedArticle article={extractedArticle} />
+        {(previewUrl || extractedArticle) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {previewUrl && (
+              <Card className="h-[800px] overflow-hidden">
+                <CardHeader>
+                  <CardTitle>Original Page</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 h-full">
+                  <iframe 
+                    src={previewUrl}
+                    className="w-full h-full border-0"
+                    title="Original article preview"
+                    sandbox="allow-same-origin allow-scripts"
+                  />
+                </CardContent>
+              </Card>
+            )}
+            
+            {extractedArticle && (
+              <Card className="h-[800px] overflow-auto">
+                <CardHeader>
+                  <CardTitle>Extracted Content</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ExtractedArticle article={extractedArticle} />
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
       </main>
     </div>
