@@ -33,26 +33,34 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
     prompt += "\n\nPrevious analyses:\n" + JSON.stringify(previousAnalyses, null, 2);
   }
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini", // Updated to use the correct model
-    messages: [
-      { role: "system", content: systemPrompts[role] },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.2,
-  });
-
   try {
-    const analysis = JSON.parse(response.choices[0].message.content || "{}");
-    return {
-      analysis,
-      confidence: 0.85
-    };
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompts[role] },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.2,
+    });
+
+    try {
+      const analysis = JSON.parse(response.choices[0].message.content || "{}");
+      return {
+        analysis,
+        confidence: 0.85
+      };
+    } catch (error) {
+      return {
+        analysis: { text: response.choices[0].message.content },
+        confidence: 0.7
+      };
+    }
   } catch (error) {
-    return {
-      analysis: { text: response.choices[0].message.content },
-      confidence: 0.7
-    };
+    console.error('OpenAI API Error:', error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API rate limit exceeded. Please try again in a few minutes.");
+    }
+    throw error;
   }
 }
 
@@ -85,23 +93,43 @@ Deno.serve(async (req) => {
     const analyses: Record<string, any>[] = [];
     
     for (const agent of agents) {
-      console.log(`Running ${agent.name} analysis...`);
-      const result = await runAgent(agent.type, content, analyses);
-      
-      const { data, error } = await supabaseClient
-        .from('analysis_results')
-        .insert({
-          article_id: articleId,
-          agent_id: agent.id,
-          analysis_data: result.analysis,
-          confidence_score: result.confidence,
-          status: 'completed'
-        })
-        .select()
-        .single();
+      try {
+        console.log(`Running ${agent.name} analysis...`);
+        const result = await runAgent(agent.type, content, analyses);
+        
+        const { data, error } = await supabaseClient
+          .from('analysis_results')
+          .insert({
+            article_id: articleId,
+            agent_id: agent.id,
+            analysis_data: result.analysis,
+            confidence_score: result.confidence,
+            status: 'completed'
+          })
+          .select()
+          .single();
 
-      if (error) throw error;
-      analyses.push(result.analysis);
+        if (error) throw error;
+        analyses.push(result.analysis);
+      } catch (error) {
+        console.error(`Error in agent ${agent.name}:`, error);
+        
+        // Store the error in the analysis results
+        await supabaseClient
+          .from('analysis_results')
+          .insert({
+            article_id: articleId,
+            agent_id: agent.id,
+            analysis_data: { error: error.message },
+            confidence_score: 0,
+            status: 'failed'
+          });
+
+        // If it's a rate limit error, stop processing further agents
+        if (error.message.includes('rate limit')) {
+          throw error;
+        }
+      }
     }
 
     return new Response(JSON.stringify({ success: true, analyses }), {
@@ -110,9 +138,15 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('Error:', error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.message.includes('rate limit') ? 
+          'The AI service is currently at capacity. Please try again in a few minutes.' : 
+          'An error occurred during analysis.'
+      }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
+      status: error.message.includes('rate limit') ? 429 : 500,
     });
   }
 });
