@@ -2,6 +2,7 @@
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import { extract } from 'https://esm.sh/@extractus/article-extractor@8.0.4';
 
 const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY'),
@@ -16,6 +17,21 @@ interface AnalysisRequest {
 interface AgentResponse {
   analysis: Record<string, any>;
   confidence: number;
+}
+
+async function extractArticleContent(url: string): Promise<string> {
+  try {
+    console.log('Extracting article content from URL:', url);
+    const article = await extract(url);
+    if (!article || !article.content) {
+      throw new Error('Could not extract article content');
+    }
+    // Return clean text content
+    return article.content.replace(/<[^>]*>/g, '');
+  } catch (error) {
+    console.error('Error extracting article:', error);
+    throw new Error(`Failed to extract article content: ${error.message}`);
+  }
 }
 
 async function runAgent(role: string, content: string, previousAnalyses: Record<string, any>[] = []): Promise<AgentResponse> {
@@ -106,10 +122,34 @@ Deno.serve(async (req) => {
   try {
     const { articleId, content, url } = await req.json() as AnalysisRequest;
     
+    // Extract article content if URL is provided
+    let articleContent = content;
+    if (url && !content) {
+      try {
+        articleContent = await extractArticleContent(url);
+        console.log('Successfully extracted article content from URL');
+      } catch (error) {
+        console.error('Failed to extract article:', error);
+        throw new Error('Could not extract article content from the provided URL. Please try pasting the article content directly.');
+      }
+    }
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Update article with extracted content
+    if (url && articleContent !== content) {
+      const { error: updateError } = await supabaseClient
+        .from('articles')
+        .update({ content: articleContent })
+        .eq('id', articleId);
+
+      if (updateError) {
+        console.error('Error updating article content:', updateError);
+      }
+    }
 
     const { data: agents, error: agentsError } = await supabaseClient
       .from('agent_configurations')
@@ -129,7 +169,7 @@ Deno.serve(async (req) => {
     for (const agent of agents) {
       try {
         console.log(`Running ${agent.name} analysis...`);
-        const result = await runAgent(agent.type, content, analyses);
+        const result = await runAgent(agent.type, articleContent, analyses);
         
         const { data, error } = await supabaseClient
           .from('analysis_results')
@@ -148,7 +188,6 @@ Deno.serve(async (req) => {
       } catch (error) {
         console.error(`Error in agent ${agent.name}:`, error);
         
-        // Store the error in the analysis results
         await supabaseClient
           .from('analysis_results')
           .insert({
@@ -159,7 +198,6 @@ Deno.serve(async (req) => {
             status: 'failed'
           });
 
-        // If it's a rate limit error, stop processing further agents
         if (error.message.includes('rate limit')) {
           throw error;
         }
