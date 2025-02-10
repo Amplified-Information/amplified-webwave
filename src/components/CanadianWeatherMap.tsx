@@ -45,12 +45,16 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     queryKey: ['mapbox-token'],
     queryFn: fetchMapboxToken,
     retry: 1,
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error loading map",
-        description: error instanceof Error ? error.message : 'Failed to initialize map'
-      });
+    meta: {
+      onSettled: (_, error) => {
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Error loading map",
+            description: error instanceof Error ? error.message : 'Failed to initialize map'
+          });
+        }
+      }
     }
   });
 
