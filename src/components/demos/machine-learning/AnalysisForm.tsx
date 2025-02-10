@@ -1,3 +1,4 @@
+
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -81,11 +82,13 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
             message: 'Unable to extract article. Please paste the content manually.'
           });
 
-          // Focus the content textarea after error
-          const contentTextarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement;
-          if (contentTextarea) {
-            contentTextarea.focus();
-          }
+          // Fix: Properly type the textarea element
+          setTimeout(() => {
+            const contentTextarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement | null;
+            if (contentTextarea) {
+              contentTextarea.focus();
+            }
+          }, 0);
 
         } catch (parseError) {
           form.setError('url', { 
