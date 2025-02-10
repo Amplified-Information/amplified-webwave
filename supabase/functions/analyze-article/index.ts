@@ -1,6 +1,7 @@
 
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY'),
@@ -62,19 +63,24 @@ Deno.serve(async (req) => {
 
   try {
     const { articleId, content, url } = await req.json() as AnalysisRequest;
+    
+    // Create Supabase client with proper credentials
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     // Get agent configurations
-    const { data: agents } = await supabaseClient
+    const { data: agents, error: agentsError } = await supabaseClient
       .from('agent_configurations')
       .select('*')
       .eq('is_active', true);
 
-    if (!agents) {
+    if (agentsError) {
+      throw new Error(`Failed to fetch agents: ${agentsError.message}`);
+    }
+
+    if (!agents || agents.length === 0) {
       throw new Error('No active agents found');
     }
 
