@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import WeatherTable from './WeatherTable';
@@ -9,19 +10,41 @@ import { Thermometer } from 'lucide-react';
 import { format } from 'date-fns';
 import { PROVINCIAL_FLAGS } from '@/data/provincialFlags';
 import { Table, TableBody, TableCell, TableRow } from './ui/table';
+import { supabase } from '@/integrations/supabase/client';
 
-const fetchWeatherData = async (): Promise<WeatherData[]> => {
+const fetchAndStoreWeatherData = async (): Promise<WeatherData[]> => {
+  // Fetch from API
   const promises = CANADIAN_CITIES.map(async (city) => {
     const response = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,relative_humidity_2m`
     );
     const data = await response.json();
-    return {
+    const weatherData = {
       cityName: city.name,
       province: city.province,
       temperature: data.current.temperature_2m,
       humidity: data.current.relative_humidity_2m
     };
+
+    // Store in Supabase
+    const { error } = await supabase
+      .from('weather_data')
+      .upsert(
+        { 
+          ...weatherData,
+          updated_at: new Date().toISOString()
+        },
+        { 
+          onConflict: 'cityName',
+          ignoreDuplicates: false 
+        }
+      );
+
+    if (error) {
+      console.error('Error storing weather data:', error);
+    }
+
+    return weatherData;
   });
 
   return Promise.all(promises);
@@ -30,7 +53,7 @@ const fetchWeatherData = async (): Promise<WeatherData[]> => {
 const CanadianCitiesWeather = () => {
   const { data: weatherData, isLoading, error } = useQuery({
     queryKey: ['canadianWeather'],
-    queryFn: fetchWeatherData,
+    queryFn: fetchAndStoreWeatherData,
     refetchInterval: 300000, // Refetch every 5 minutes
   });
 

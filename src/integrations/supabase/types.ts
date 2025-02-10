@@ -132,6 +132,36 @@ export type Database = {
         }
         Relationships: []
       }
+      weather_data: {
+        Row: {
+          cityname: string
+          created_at: string
+          humidity: number
+          id: string
+          province: string
+          temperature: number
+          updated_at: string
+        }
+        Insert: {
+          cityname: string
+          created_at?: string
+          humidity: number
+          id?: string
+          province: string
+          temperature: number
+          updated_at?: string
+        }
+        Update: {
+          cityname?: string
+          created_at?: string
+          humidity?: number
+          id?: string
+          province?: string
+          temperature?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
