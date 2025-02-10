@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -5,44 +6,51 @@ import { WeatherData } from '@/types/weather';
 import { CANADIAN_CITIES } from '@/data/canadianCities';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from './ui/alert';
+import { useQuery } from '@tanstack/react-query';
 
 interface CanadianWeatherMapProps {
   weatherData: WeatherData[];
 }
+
+const fetchMapboxToken = async () => {
+  const { data, error } = await supabase
+    .from('secrets')
+    .select('value')
+    .eq('name', 'MAPBOX_PUBLIC_TOKEN')
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to fetch Mapbox token: ${error.message}`);
+  }
+
+  if (!data?.value) {
+    throw new Error('Mapbox token not found in Supabase secrets');
+  }
+
+  return data.value;
+};
 
 const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const popups = useRef<mapboxgl.Popup[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
+
+  const { data: mapboxToken, isLoading, error } = useQuery({
+    queryKey: ['mapbox-token'],
+    queryFn: fetchMapboxToken,
+    retry: 1,
+  });
 
   useEffect(() => {
     let mounted = true;
 
     const initializeMap = async () => {
-      if (!mapContainer.current || mapInitialized) return;
+      if (!mapContainer.current || mapInitialized || !mapboxToken) return;
 
       try {
-        const { data: secretData, error: secretError } = await supabase
-          .from('secrets')
-          .select('value')
-          .eq('name', 'MAPBOX_PUBLIC_TOKEN')
-          .single();
-
-        if (secretError) {
-          console.error('Error fetching Mapbox token:', secretError);
-          throw new Error(`Failed to fetch Mapbox token: ${secretError.message}`);
-        }
-
-        if (!secretData?.value) {
-          console.error('No Mapbox token found in secrets');
-          throw new Error('Mapbox token not found in secrets');
-        }
-
-        mapboxgl.accessToken = secretData.value;
+        mapboxgl.accessToken = mapboxToken;
 
         if (!mounted) return;
 
@@ -70,7 +78,6 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           if (!mounted) return;
           
           console.log('Map loaded successfully');
-          setIsLoading(false);
           setMapInitialized(true);
           
           map.current?.setTerrain({ 
@@ -92,17 +99,10 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
       } catch (err) {
         console.error('Error initializing map:', err);
-        if (mounted) {
-          setError(err instanceof Error ? err.message : 'Failed to initialize map');
-          setIsLoading(false);
-        }
       }
     };
 
-    // Small delay to ensure container is mounted
-    setTimeout(() => {
-      initializeMap();
-    }, 100);
+    initializeMap();
 
     return () => {
       mounted = false;
@@ -114,7 +114,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         map.current = null;
       }
     };
-  }, []);
+  }, [mapboxToken, mapInitialized, weatherData]);
 
   useEffect(() => {
     if (map.current && mapInitialized && weatherData.length > 0) {
@@ -169,7 +169,12 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   if (error) {
     return (
       <Alert variant="destructive" className="mb-4">
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>
+          {error instanceof Error ? error.message : 'Failed to initialize map'}
+          <div className="mt-2 text-sm">
+            Please ensure the MAPBOX_PUBLIC_TOKEN is set in your Supabase secrets.
+          </div>
+        </AlertDescription>
       </Alert>
     );
   }
