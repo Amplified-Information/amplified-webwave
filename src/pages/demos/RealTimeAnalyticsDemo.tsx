@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartBar } from "lucide-react";
@@ -59,17 +58,15 @@ const RealTimeAnalyticsDemo = () => {
 
         <Card className="mb-8">
           <CardContent className="p-6">
+            {!isLoading && weatherData && <CanadianWeatherMap weatherData={weatherData} />}
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardContent className="p-6">
             <CanadianCitiesWeather />
           </CardContent>
         </Card>
-        
-        {!isLoading && weatherData && (
-          <Card className="mb-8">
-            <CardContent className="p-6">
-              <CanadianWeatherMap weatherData={weatherData} />
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
