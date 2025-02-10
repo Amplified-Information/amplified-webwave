@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CheckCircle } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -103,7 +104,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                     : 'hover:shadow-lg hover:bg-primary/10'
               }`}>
                 <CardHeader>
-                  <CardTitle>{demo.title}</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    {demo.isActive && (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    )}
+                    {demo.title}
+                  </CardTitle>
                   <CardDescription>{demo.description}</CardDescription>
                 </CardHeader>
                 {!demo.isActive && !demo.status && (
@@ -124,3 +130,4 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     </section>
   );
 };
+
