@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   url: z.string().url().optional(),
@@ -21,6 +22,7 @@ const formSchema = z.object({
 
 const MachineLearningDemo = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState<any[]>([]);
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,16 +35,52 @@ const MachineLearningDemo = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsAnalyzing(true);
     try {
-      // TODO: Implement analysis logic with CrewAI
-      console.log("Analyzing:", values);
+      // Insert the article first
+      const { data: article, error: articleError } = await supabase
+        .from('articles')
+        .insert({
+          content: values.content || '',
+          url: values.url || null
+        })
+        .select()
+        .single();
+
+      if (articleError) throw articleError;
+
+      // Call the analyze-article function
+      const { data: analysisData, error: analysisError } = await supabase.functions
+        .invoke('analyze-article', {
+          body: {
+            articleId: article.id,
+            content: values.content || '',
+            url: values.url || null
+          }
+        });
+
+      if (analysisError) throw analysisError;
+
+      // Get all analysis results for this article
+      const { data: results, error: resultsError } = await supabase
+        .from('analysis_results')
+        .select(`
+          *,
+          agent:agent_configurations(*)
+        `)
+        .eq('article_id', article.id);
+
+      if (resultsError) throw resultsError;
+
+      setAnalysisResults(results);
+      
       toast({
-        title: "Analysis started",
-        description: "Your content is being analyzed. This may take a few moments."
+        title: "Analysis completed",
+        description: "The article has been analyzed successfully."
       });
     } catch (error) {
+      console.error('Analysis error:', error);
       toast({
         title: "Error",
-        description: "Failed to start analysis. Please try again.",
+        description: "Failed to analyze the article. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -199,6 +237,27 @@ const MachineLearningDemo = () => {
             </Form>
           </CardContent>
         </Card>
+
+        {analysisResults.length > 0 && (
+          <div className="mt-8 max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold mb-4">Analysis Results</h2>
+            <div className="space-y-4">
+              {analysisResults.map((result) => (
+                <Card key={result.id} className="p-4">
+                  <h3 className="font-semibold text-lg mb-2">{result.agent.name}</h3>
+                  <div className="prose prose-sm">
+                    <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded">
+                      {JSON.stringify(result.analysis_data, null, 2)}
+                    </pre>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-500">
+                    Confidence Score: {(result.confidence_score * 100).toFixed(1)}%
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>Our AI system analyzes articles for:</p>
