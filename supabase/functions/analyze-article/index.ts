@@ -20,11 +20,44 @@ interface AgentResponse {
 
 async function runAgent(role: string, content: string, previousAnalyses: Record<string, any>[] = []): Promise<AgentResponse> {
   const systemPrompts: Record<string, string> = {
-    bias_detection: "You are an expert in detecting bias in news articles. Analyze the text for potential biases, loaded terms, and emotional manipulation.",
-    fact_checker: "You are a professional fact-checker. Verify factual claims and identify potential inaccuracies.",
-    quality_assessor: "You are a journalism quality expert. Evaluate the writing quality, structure, and adherence to journalistic standards.",
-    credibility_assessor: "You are a source credibility analyst. Evaluate the reliability of sources and author credentials if available.",
-    lead_editor: "You are a lead editor. Review all previous analyses and compile a comprehensive final report."
+    bias_detection: `You are an expert in detecting bias in news articles. Analyze the following article for:
+      - Political or ideological bias
+      - Language that shows favoritism or prejudice
+      - Emotional manipulation techniques
+      - Loaded terms or rhetoric
+      Provide specific examples from the text.
+      DO NOT provide a template response. Only analyze the actual content provided.`,
+    
+    fact_checker: `You are a professional fact-checker. For the following article:
+      - Identify key factual claims
+      - Note any unsubstantiated claims
+      - Check for misleading statistics or data
+      - Point out any need for additional context
+      Use specific quotes and examples from the text.
+      DO NOT provide a template response. Only analyze the actual content provided.`,
+    
+    quality_assessor: `You are a journalism quality expert. Evaluate this article for:
+      - Writing clarity and professionalism
+      - Structure and organization
+      - Use of sources and citations
+      - Balance in reporting
+      Provide specific examples from the text.
+      DO NOT provide a template response. Only analyze the actual content provided.`,
+    
+    credibility_assessor: `You are a source credibility analyst. For this article:
+      - Evaluate the credibility of quoted sources
+      - Check author credentials if available
+      - Assess the reliability of any data or statistics
+      - Consider the publication's reputation
+      Use specific examples from the text.
+      DO NOT provide a template response. Only analyze the actual content provided.`,
+    
+    lead_editor: `You are a lead editor reviewing all previous analyses of this article. Create a comprehensive report that:
+      - Synthesizes the key findings from all analyses
+      - Highlights the most significant concerns or strengths
+      - Provides specific recommendations for improvement
+      Base your analysis on the actual content and previous analyses.
+      DO NOT provide a template response.`
   };
 
   let prompt = systemPrompts[role] + "\n\nArticle content:\n" + content;
@@ -35,12 +68,12 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",  // Using the more powerful model for better analysis
       messages: [
         { role: "system", content: systemPrompts[role] },
         { role: "user", content: prompt }
       ],
-      temperature: 0.2,
+      temperature: 0.3, // Lower temperature for more focused analysis
     });
 
     try {
@@ -50,6 +83,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
         confidence: 0.85
       };
     } catch (error) {
+      // If the response isn't JSON, return it as a text field
       return {
         analysis: { text: response.choices[0].message.content },
         confidence: 0.7
