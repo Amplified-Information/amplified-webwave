@@ -45,54 +45,62 @@ const MachineLearningDemo = () => {
         let errorDetails = "";
         
         try {
+          // Parse the error body which contains our custom error message
           const errorBody = JSON.parse(analysisError.message);
           errorMessage = errorBody.error || errorMessage;
           errorDetails = errorBody.details || "";
+
+          // Handle rate limit case specifically
+          if (analysisError.status === 429) {
+            const retryAfter = 60;
+            setRetryDelay(retryAfter);
+            setError(`Our AI service is currently at capacity. Please try again in ${retryAfter} seconds.`);
+            
+            const timer = setInterval(() => {
+              setRetryDelay((prev) => {
+                if (prev <= 1) {
+                  clearInterval(timer);
+                  return 0;
+                }
+                return prev - 1;
+              });
+            }, 1000);
+
+            toast({
+              title: "Rate Limit Exceeded",
+              description: "Please wait a minute before trying again.",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          // Handle URL extraction failure specifically
+          if (analysisError.status === 400 && errorMessage.includes("URL")) {
+            setError(errorMessage);
+            toast({
+              title: "URL Processing Failed",
+              description: errorDetails || "Please paste the article content directly instead.",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          setError(errorMessage);
+          toast({
+            title: "Analysis Failed",
+            description: errorDetails || errorMessage,
+            variant: "destructive"
+          });
+          return;
         } catch {
           // If parsing fails, use the raw error message
-          errorMessage = analysisError.message;
-        }
-
-        if (analysisError.status === 429) {
-          const retryAfter = 60;
-          setRetryDelay(retryAfter);
-          setError(`Our AI service is currently at capacity. Please try again in ${retryAfter} seconds.`);
-          
-          const timer = setInterval(() => {
-            setRetryDelay((prev) => {
-              if (prev <= 1) {
-                clearInterval(timer);
-                return 0;
-              }
-              return prev - 1;
-            });
-          }, 1000);
-
+          setError(analysisError.message);
           toast({
-            title: "Rate Limit Exceeded",
-            description: "Please wait a minute before trying again.",
+            title: "Analysis Failed",
+            description: "An unexpected error occurred. Please try again.",
             variant: "destructive"
           });
-          return;
         }
-
-        // If URL extraction failed, show a more user-friendly message
-        if (errorMessage.includes("Unable to extract article from URL")) {
-          setError("We couldn't extract the article from the provided URL. Please try pasting the article content directly in the text box below.");
-          toast({
-            title: "URL Extraction Failed",
-            description: "Please paste the article content directly instead.",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        setError(errorMessage);
-        toast({
-          title: "Analysis Failed",
-          description: errorDetails || errorMessage,
-          variant: "destructive"
-        });
         return;
       }
 
@@ -162,3 +170,4 @@ const MachineLearningDemo = () => {
 };
 
 export default MachineLearningDemo;
+
