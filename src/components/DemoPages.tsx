@@ -13,7 +13,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Smart Garden Planning",
       description: "Plan and optimize your garden with AI-powered companion planting",
       path: "/demo/data-integration",
-      status: "in development"
+      isActive: true
     },
     {
       title: "Real-time Weather Analytics",
