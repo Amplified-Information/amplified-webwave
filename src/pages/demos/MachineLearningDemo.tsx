@@ -82,7 +82,7 @@ const MachineLearningDemo = () => {
           description: errorDetails || errorMessage,
           variant: "destructive"
         });
-        throw new Error(errorMessage);
+        return; // Don't throw error since we're handling it with UI feedback
       }
 
       const { data: results, error: resultsError } = await supabase
@@ -104,6 +104,11 @@ const MachineLearningDemo = () => {
     } catch (error: any) {
       console.error('Analysis error:', error);
       setError(error.message || "Failed to analyze the article. Please try again.");
+      toast({
+        title: "Error",
+        description: error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsAnalyzing(false);
     }
