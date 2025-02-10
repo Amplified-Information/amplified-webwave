@@ -44,7 +44,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       path: "/demo/data-visualization"
     },
     {
-      title: "Find a Mortgage that saves you money",
+      title: "Find A Mortgage That Saves You Money",
       description: "Connect with external services through our API platform",
       path: "/demo/api-integration",
       isActive: true
