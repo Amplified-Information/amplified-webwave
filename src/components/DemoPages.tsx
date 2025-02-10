@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Brain, Newspaper } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -34,8 +34,8 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       path: "/demo/cloud-infrastructure"
     },
     {
-      title: "Machine Learning",
-      description: "Implement AI/ML models for predictive analytics",
+      title: "News Article Analysis with AI",
+      description: "Analyze news articles with AI for key insights and summaries",
       path: "/demo/machine-learning"
     },
     {
@@ -130,4 +130,3 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     </section>
   );
 };
-
