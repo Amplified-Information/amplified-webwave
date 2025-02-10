@@ -134,7 +134,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     popups.current = [];
 
     weatherData.forEach((cityWeather) => {
-      const cityData = CANADIAN_CITIES.find(c => c.name === cityWeather.cityName);
+      const cityData = CANADIAN_CITIES.find(c => c.name === cityWeather.cityname);
       
       if (cityData) {
         const popup = new mapboxgl.Popup({
@@ -143,7 +143,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           offset: 25
         }).setHTML(
           `<div class="p-2 text-sm bg-white/90 backdrop-blur-sm rounded shadow-lg">
-            <h3 class="font-bold text-gray-900">${cityWeather.cityName}</h3>
+            <h3 class="font-bold text-gray-900">${cityWeather.cityname}</h3>
             <p class="text-gray-700">Temperature: ${cityWeather.temperature}°C</p>
             <p class="text-gray-700">Humidity: ${cityWeather.humidity}%</p>
           </div>`
