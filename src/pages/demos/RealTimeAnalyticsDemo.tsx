@@ -63,11 +63,13 @@ const RealTimeAnalyticsDemo = () => {
           </CardContent>
         </Card>
 
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            {!isLoading && weatherData && <CanadianWeatherMap weatherData={weatherData} />}
-          </CardContent>
-        </Card>
+        {!isLoading && weatherData && (
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <CanadianWeatherMap weatherData={weatherData} />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
