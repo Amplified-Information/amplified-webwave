@@ -62,7 +62,7 @@ const RealTimeAnalyticsDemo = () => {
             <CanadianCitiesWeather />
           </CardContent>
         </Card>
-
+        
         {!isLoading && weatherData && (
           <Card className="mb-8">
             <CardContent className="p-6">
