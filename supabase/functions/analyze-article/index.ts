@@ -1,3 +1,4 @@
+
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
@@ -116,7 +117,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o", // Fixed model name
       messages: [
         { role: "system", content: systemPrompts[role] },
         { role: "user", content: prompt }
