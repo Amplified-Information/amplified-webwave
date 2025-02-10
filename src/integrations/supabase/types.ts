@@ -9,6 +9,111 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agent_configurations: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          name: string
+          skills: Json
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          name: string
+          skills?: Json
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          skills?: Json
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      analysis_results: {
+        Row: {
+          agent_id: string
+          analysis_data: Json
+          article_id: string
+          confidence_score: number | null
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          analysis_data?: Json
+          article_id: string
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          analysis_data?: Json
+          article_id?: string
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_results_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agent_configurations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_results_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      articles: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       cloud_provider_metrics: {
         Row: {
           availability: Json | null
