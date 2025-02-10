@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProcessDiagram } from "@/components/ProcessDiagram";
 import { MLDemoHeader } from "@/components/demos/machine-learning/MLDemoHeader";
 import { AIAgentsDescription } from "@/components/demos/machine-learning/AIAgentsDescription";
-import { ImplementationRoadmap } from "@/components/demos/machine-learning/ImplementationRoadmap";
 import { AnalysisForm } from "@/components/demos/machine-learning/AnalysisForm";
 import { AnalysisResults } from "@/components/demos/machine-learning/AnalysisResults";
 
@@ -14,7 +12,7 @@ const MachineLearningDemo = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [retryDelay, setRetryDelay] = useState(0); // Reset to 0 to enable the button
+  const [retryDelay, setRetryDelay] = useState(0);
   const { toast } = useToast();
 
   const onSubmit = async (values: { url?: string; content?: string }) => {
@@ -102,14 +100,12 @@ const MachineLearningDemo = () => {
       <div className="container mx-auto px-6 py-20">
         <MLDemoHeader />
 
-        {/* Process Diagram */}
         <div className="max-w-4xl mx-auto mb-12">
           <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
           <ProcessDiagram />
         </div>
 
         <AIAgentsDescription />
-        <ImplementationRoadmap />
 
         <AnalysisForm 
           onSubmit={onSubmit}
