@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -68,7 +69,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       const newMap = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
-        center: [-97.1384, 49.8951], // Winnipeg coordinates
+        center: [-93.2650, 44.9778], // Minneapolis coordinates
         zoom: 3.5,
         minZoom: 2,
         maxZoom: 9,
