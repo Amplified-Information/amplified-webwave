@@ -14,7 +14,7 @@ const MachineLearningDemo = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [retryDelay, setRetryDelay] = useState(60);
+  const [retryDelay, setRetryDelay] = useState(0); // Reset to 0 to enable the button
   const { toast } = useToast();
 
   const onSubmit = async (values: { url?: string; content?: string }) => {
