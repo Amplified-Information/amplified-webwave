@@ -5,7 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Newspaper, Upload, LinkIcon } from "lucide-react";
+import { Newspaper, Upload, LinkIcon, CheckCircle2, Clock } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -57,9 +57,51 @@ const MachineLearningDemo = () => {
         <div className="text-center mb-12">
           <Newspaper className="w-12 h-12 mx-auto mb-4 text-primary" />
           <h1 className="text-4xl font-bold mb-4">News Article Analysis with AI</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
             Upload or paste news articles for AI-powered analysis of bias and journalistic quality
           </p>
+
+          {/* Implementation Roadmap */}
+          <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg mb-12">
+            <h2 className="text-xl font-semibold mb-4">Implementation Roadmap</h2>
+            <div className="grid gap-4 text-left">
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 mt-1 text-orange-500" />
+                <div>
+                  <h3 className="font-medium">1. Database Setup</h3>
+                  <p className="text-sm text-gray-600">Creating tables for article analyses, user submissions, and results tracking</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 mt-1 text-orange-500" />
+                <div>
+                  <h3 className="font-medium">2. Backend Infrastructure</h3>
+                  <p className="text-sm text-gray-600">Edge functions for article processing, URL scraping, and CrewAI integration</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 mt-1 text-orange-500" />
+                <div>
+                  <h3 className="font-medium">3. Analysis Components</h3>
+                  <p className="text-sm text-gray-600">AI agents for bias detection, fact-checking, quality assessment, and credibility evaluation</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 mt-1 text-green-500" />
+                <div>
+                  <h3 className="font-medium">4. Frontend Implementation</h3>
+                  <p className="text-sm text-gray-600">Basic form interface complete, pending results display and historical view</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 mt-1 text-orange-500" />
+                <div>
+                  <h3 className="font-medium">5. Integrations</h3>
+                  <p className="text-sm text-gray-600">Supabase connection, OpenAI setup, and real-time updates</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <Card className="max-w-2xl mx-auto">
