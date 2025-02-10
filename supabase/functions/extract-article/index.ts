@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     console.error('Error in extract-article function:', error);
     
     return new Response(JSON.stringify({
-      error: error.message,
+      error: error.message || 'Failed to extract content from URL',
       details: 'Failed to extract article content. Please check the URL and try again.'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

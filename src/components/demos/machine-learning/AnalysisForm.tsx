@@ -47,18 +47,41 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
           body: { url }
         });
 
-      if (extractionError) throw extractionError;
+      if (extractionError) {
+        console.error('Extraction error:', extractionError);
+        try {
+          // Parse the error body if it's a JSON string
+          const errorBody = typeof extractionError.message === 'string' 
+            ? JSON.parse(extractionError.message)
+            : extractionError;
+          
+          form.setError('url', { 
+            type: 'manual',
+            message: errorBody.error || 'Failed to extract article content'
+          });
+        } catch (parseError) {
+          form.setError('url', { 
+            type: 'manual',
+            message: 'Failed to extract article content'
+          });
+        }
+        return;
+      }
 
       if (extractionData?.content) {
         form.setValue("content", extractionData.content);
+        form.clearErrors('url');
+      } else {
+        form.setError('url', { 
+          type: 'manual',
+          message: 'No content found in the article'
+        });
       }
     } catch (error: any) {
       console.error('Article extraction error:', error);
-      // Handle the error and show it to the user
-      const errorMessage = error.message || 'Failed to extract article content';
       form.setError('url', { 
         type: 'manual',
-        message: errorMessage 
+        message: error.message || 'Failed to extract article content'
       });
     } finally {
       setIsExtracting(false);
