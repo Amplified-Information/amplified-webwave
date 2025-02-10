@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -69,7 +68,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       const newMap = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/outdoors-v12',
-        center: [-96, 62],
+        center: [-97.1384, 49.8951], // Winnipeg coordinates
         zoom: 3.5,
         minZoom: 2,
         maxZoom: 9,
@@ -112,7 +111,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         setMapInitialized(false);
       }
     };
-  }, [mapboxToken, toast]); // Remove mapInitialized from dependencies
+  }, [mapboxToken, toast]);
 
   // Add markers when weather data changes
   useEffect(() => {
