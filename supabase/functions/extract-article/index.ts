@@ -38,16 +38,21 @@ Deno.serve(async (req) => {
         throw new Error('Invalid URL protocol');
       }
 
-      // Extract article data with configuration and extra error handling
-      console.log('Starting extraction with timeout and headers...');
+      // Extract article data with enhanced configuration for news sites
+      console.log('Starting extraction with enhanced configuration...');
       const article = await extract(url, {
-        timeout: 30000, // 30 second timeout
+        timeout: 60000, // Increased timeout to 60 seconds
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
           'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          'Upgrade-Insecure-Requests': '1',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+          'Sec-Fetch-User': '?1'
         }
       }).catch(error => {
         console.error('Extraction error caught:', error);
@@ -59,18 +64,18 @@ Deno.serve(async (req) => {
         throw new Error('Could not extract content from URL');
       }
 
+      console.log('Article extraction attempt completed. Data received:', {
+        hasTitle: !!article.title,
+        hasDescription: !!article.description,
+        hasContent: !!article.content,
+        contentLength: article.content?.length || 0,
+        url: article.url || url
+      });
+
       if (!article.content && !article.description) {
         console.log('Article extracted but no content or description found');
         throw new Error('No content found at the provided URL');
       }
-
-      console.log('Successfully extracted article data:', {
-        title: article.title,
-        description: article.description?.substring(0, 100),
-        content: article.content?.substring(0, 100) + '...',
-        hasContent: !!article.content,
-        hasDescription: !!article.description
-      });
 
       return new Response(
         JSON.stringify({
@@ -102,7 +107,7 @@ Deno.serve(async (req) => {
         errorMessage = 'Connection refused by the server';
       } else if (error.message.includes('No content found')) {
         errorMessage = 'No extractable content found';
-        details = 'The URL provided does not contain any article content that can be extracted';
+        details = 'The URL provided does not contain any article content that can be extracted. This might be due to the site\'s content protection or structure.';
       }
 
       return new Response(
