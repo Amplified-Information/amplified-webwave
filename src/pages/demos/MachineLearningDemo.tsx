@@ -76,13 +76,24 @@ const MachineLearningDemo = () => {
           return;
         }
 
+        // If URL extraction failed, show a more user-friendly message
+        if (errorMessage.includes("Unable to extract article from URL")) {
+          setError("We couldn't extract the article from the provided URL. Please try pasting the article content directly in the text box below.");
+          toast({
+            title: "URL Extraction Failed",
+            description: "Please paste the article content directly instead.",
+            variant: "destructive"
+          });
+          return;
+        }
+
         setError(errorMessage);
         toast({
           title: "Analysis Failed",
           description: errorDetails || errorMessage,
           variant: "destructive"
         });
-        return; // Don't throw error since we're handling it with UI feedback
+        return;
       }
 
       const { data: results, error: resultsError } = await supabase
