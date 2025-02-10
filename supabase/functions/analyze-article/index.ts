@@ -68,12 +68,12 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",  // Using the more powerful model for better analysis
+      model: "gpt-4o-mini",  // Fixed: Using the correct model name
       messages: [
         { role: "system", content: systemPrompts[role] },
         { role: "user", content: prompt }
       ],
-      temperature: 0.3, // Lower temperature for more focused analysis
+      temperature: 0.3,
     });
 
     try {
