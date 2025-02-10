@@ -30,6 +30,18 @@ export const AIAgentsDescription = () => {
           <p className="text-sm text-gray-600">Analyzes source reliability and author credentials</p>
         </div>
       </div>
+      
+      <div className="mt-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+        <h3 className="font-medium text-primary mb-2">Understanding Confidence Scores</h3>
+        <p className="text-sm text-gray-600">
+          Each agent provides a confidence score (0-100%) indicating how certain they are about their analysis:
+        </p>
+        <ul className="mt-2 space-y-1 text-sm">
+          <li className="text-green-700">• ≥80%: High confidence - Very certain about the analysis</li>
+          <li className="text-amber-600">• 60-79%: Moderate confidence - Some uncertainty but reasonably confident</li>
+          <li className="text-red-600">• &lt;60%: Low confidence - Less certain about the analysis</li>
+        </ul>
+      </div>
     </div>
   );
 };
