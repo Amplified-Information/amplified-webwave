@@ -54,22 +54,30 @@ Deno.serve(async (req) => {
       }
 
       const html = await response.text();
+      console.log('Successfully fetched HTML content, length:', html.length);
 
       // Use OpenAI to extract the article content
+      console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",  // Fixed the model name to use gpt-4o-mini
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return the data in JSON format with the following fields: title, description, content, author (if available), published (if available). Make sure to clean any advertisements or irrelevant content. Preserve important formatting in the content field."
+            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return ONLY a JSON object with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Make sure to clean any advertisements or irrelevant content."
           },
           {
             role: "user",
             content: html
           }
         ],
+        temperature: 0.3,
         response_format: { type: "json_object" }
       });
+
+      if (!completion.choices?.[0]?.message?.content) {
+        console.error('OpenAI API returned invalid response format');
+        throw new Error('Failed to extract content: Invalid API response');
+      }
 
       const extractedData = JSON.parse(completion.choices[0].message.content);
       console.log('Successfully extracted article data:', {
@@ -94,6 +102,7 @@ Deno.serve(async (req) => {
       console.error('Article extraction error:', error);
       let errorMessage = 'Failed to extract content from URL';
       let details = error.message;
+      let status = 400;
       
       if (error.message.includes('Invalid URL')) {
         errorMessage = 'Invalid URL format';
@@ -101,6 +110,9 @@ Deno.serve(async (req) => {
         errorMessage = 'Request timed out while trying to access the URL';
       } else if (error.message.includes('ECONNREFUSED')) {
         errorMessage = 'Connection refused by the server';
+      } else if (error.message.includes('Failed to parse as JSON')) {
+        errorMessage = 'Failed to parse AI response';
+        status = 500;
       }
 
       return new Response(
@@ -109,7 +121,7 @@ Deno.serve(async (req) => {
           details: details
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
+          status: status,
         }
       );
     }
