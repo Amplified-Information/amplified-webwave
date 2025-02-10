@@ -9,6 +9,8 @@ import { Upload, LinkIcon, AlertTriangle, InfoIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   url: z.string().url().optional(),
@@ -25,6 +27,7 @@ interface AnalysisFormProps {
 }
 
 export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: AnalysisFormProps) => {
+  const [isExtracting, setIsExtracting] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,6 +35,29 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
       content: ""
     }
   });
+
+  const handleExtractArticle = async () => {
+    const url = form.getValues("url");
+    if (!url) return;
+
+    setIsExtracting(true);
+    try {
+      const { data: extractionData, error: extractionError } = await supabase.functions
+        .invoke('analyze-article', {
+          body: { url }
+        });
+
+      if (extractionError) throw extractionError;
+
+      if (extractionData?.content) {
+        form.setValue("content", extractionData.content);
+      }
+    } catch (error) {
+      console.error('Article extraction error:', error);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -61,24 +87,35 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <LinkIcon className="w-4 h-4" />
-                    Article URL
-                  </FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="https://news-source.com/article" 
-                      {...field} 
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <LinkIcon className="w-4 h-4" />
+                      Article URL
+                    </FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="https://news-source.com/article" 
+                        {...field} 
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleExtractArticle}
+                disabled={isExtracting || !form.getValues("url")}
+                className="w-full"
+              >
+                {isExtracting ? "Extracting..." : "Extract Article"}
+              </Button>
+            </div>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
