@@ -58,74 +58,48 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     }
   });
 
+  // Initialize map
   useEffect(() => {
-    let mounted = true;
+    if (!mapContainer.current || !mapboxToken || mapInitialized) return;
 
-    const initializeMap = async () => {
-      if (!mapContainer.current || mapInitialized || !mapboxToken) return;
+    try {
+      console.log('Initializing map with token');
+      mapboxgl.accessToken = mapboxToken;
 
-      try {
-        mapboxgl.accessToken = mapboxToken;
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/outdoors-v12',
+        center: [-96, 62],
+        zoom: 3.5,
+        minZoom: 2,
+        maxZoom: 9,
+        bounds: [
+          [-141, 41.7],
+          [-52, 83.3]
+        ],
+        maxBounds: [
+          [-180, 30],
+          [-30, 90]
+        ]
+      });
 
-        if (!mounted) return;
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-        console.log('Creating new map instance');
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/outdoors-v12',
-          center: [-96, 62],
-          zoom: 3.5,
-          minZoom: 2,
-          maxZoom: 9,
-          bounds: [
-            [-141, 41.7],
-            [-52, 83.3]
-          ],
-          maxBounds: [
-            [-180, 30],
-            [-30, 90]
-          ]
-        });
+      map.current.on('load', () => {
+        console.log('Map loaded successfully');
+        setMapInitialized(true);
+      });
 
-        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-        map.current.on('load', () => {
-          if (!mounted) return;
-          
-          console.log('Map loaded successfully');
-          setMapInitialized(true);
-          
-          map.current?.setTerrain({ 
-            source: 'mapbox-dem', 
-            exaggeration: 1.5 
-          });
-          
-          map.current?.addSource('mapbox-dem', {
-            'type': 'raster-dem',
-            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-            'tileSize': 512,
-            'maxzoom': 14
-          });
-
-          if (weatherData.length > 0) {
-            addMarkersToMap();
-          }
-        });
-
-      } catch (err) {
-        console.error('Error initializing map:', err);
-        toast({
-          variant: "destructive",
-          title: "Map Error",
-          description: err instanceof Error ? err.message : 'Failed to initialize map'
-        });
-      }
-    };
-
-    initializeMap();
+    } catch (err) {
+      console.error('Error initializing map:', err);
+      toast({
+        variant: "destructive",
+        title: "Map Error",
+        description: err instanceof Error ? err.message : 'Failed to initialize map'
+      });
+    }
 
     return () => {
-      mounted = false;
       console.log('Cleaning up map instance');
       markers.current.forEach(marker => marker.remove());
       popups.current.forEach(popup => popup.remove());
@@ -133,21 +107,17 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         map.current.remove();
         map.current = null;
       }
+      setMapInitialized(false);
     };
-  }, [mapboxToken, mapInitialized, weatherData, toast]);
+  }, [mapboxToken, mapInitialized, toast]);
 
+  // Add markers when weather data changes
   useEffect(() => {
-    if (map.current && mapInitialized && weatherData.length > 0) {
-      addMarkersToMap();
-    }
-  }, [weatherData, mapInitialized]);
+    if (!map.current || !mapInitialized || !weatherData.length) return;
 
-  const addMarkersToMap = () => {
-    if (!map.current) {
-      console.error('Cannot add markers: map instance is null');
-      return;
-    }
-
+    console.log('Adding markers to map:', weatherData.length);
+    
+    // Clear existing markers and popups
     markers.current.forEach(marker => marker.remove());
     popups.current.forEach(popup => popup.remove());
     markers.current = [];
@@ -184,7 +154,12 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         popups.current.push(popup);
       }
     });
-  };
+
+    return () => {
+      markers.current.forEach(marker => marker.remove());
+      popups.current.forEach(popup => popup.remove());
+    };
+  }, [weatherData, mapInitialized]);
 
   if (error) {
     return (
