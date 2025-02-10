@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
         console.error('Failed to extract article:', error);
         // If we have content, use it as fallback instead of failing
         if (!content) {
-          throw new Error('Could not extract article content from the provided URL. Please try pasting the article content directly.');
+          throw new Error('Unable to extract article from URL. Please paste the article content directly in the text box instead.');
         } else {
           console.log('Using provided content as fallback after URL extraction failed');
         }
@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
     }
 
     if (!articleContent || articleContent.trim().length === 0) {
-      throw new Error('No valid content available for analysis');
+      throw new Error('Please provide article content either through URL or by pasting it directly.');
     }
     
     const supabaseClient = createClient(
@@ -247,7 +247,7 @@ Deno.serve(async (req) => {
         error: error.message,
         details: error.message.includes('rate limit') ? 
           'The AI service is currently at capacity. Please try again in a few minutes.' : 
-          'An error occurred during analysis.'
+          'Please try pasting the article content directly in the text box instead of using the URL.'
       }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: error.message.includes('rate limit') ? 429 : 500,
