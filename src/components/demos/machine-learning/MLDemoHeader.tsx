@@ -27,7 +27,7 @@ export const MLDemoHeader = () => {
         </div>
         <div className="flex items-center gap-2">
           <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/5/51/Crewai.png" 
+            src="/lovable-uploads/42bf1ab0-d92f-4aa6-ba20-81c4b97db8d6.png" 
             alt="CrewAI Logo" 
             className="h-8 w-8"
           />
