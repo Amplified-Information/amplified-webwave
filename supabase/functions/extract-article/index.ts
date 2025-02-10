@@ -38,7 +38,8 @@ Deno.serve(async (req) => {
         throw new Error('Invalid URL protocol');
       }
 
-      // Extract article data with configuration
+      // Extract article data with configuration and extra error handling
+      console.log('Starting extraction with timeout and headers...');
       const article = await extract(url, {
         timeout: 30000, // 30 second timeout
         headers: {
@@ -48,6 +49,9 @@ Deno.serve(async (req) => {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
         }
+      }).catch(error => {
+        console.error('Extraction error caught:', error);
+        throw error;
       });
       
       if (!article) {
@@ -55,10 +59,17 @@ Deno.serve(async (req) => {
         throw new Error('Could not extract content from URL');
       }
 
+      if (!article.content && !article.description) {
+        console.log('Article extracted but no content or description found');
+        throw new Error('No content found at the provided URL');
+      }
+
       console.log('Successfully extracted article data:', {
         title: article.title,
         description: article.description?.substring(0, 100),
-        content: article.content?.substring(0, 100) + '...'
+        content: article.content?.substring(0, 100) + '...',
+        hasContent: !!article.content,
+        hasDescription: !!article.description
       });
 
       return new Response(
@@ -81,6 +92,7 @@ Deno.serve(async (req) => {
     } catch (error) {
       console.error('Article extraction error:', error);
       let errorMessage = 'Failed to extract content from URL';
+      let details = error.message;
       
       if (error.message.includes('Invalid URL')) {
         errorMessage = 'Invalid URL format';
@@ -88,12 +100,15 @@ Deno.serve(async (req) => {
         errorMessage = 'Request timed out while trying to access the URL';
       } else if (error.message.includes('ECONNREFUSED')) {
         errorMessage = 'Connection refused by the server';
+      } else if (error.message.includes('No content found')) {
+        errorMessage = 'No extractable content found';
+        details = 'The URL provided does not contain any article content that can be extracted';
       }
 
       return new Response(
         JSON.stringify({
           error: errorMessage,
-          details: error.message
+          details: details
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
