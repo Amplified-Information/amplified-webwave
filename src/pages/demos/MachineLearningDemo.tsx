@@ -1,10 +1,11 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Newspaper, Upload, LinkIcon, CheckCircle2, Clock, Users } from "lucide-react";
+import { Newspaper, Upload, LinkIcon, CheckCircle2, Clock, Users, AlertCircle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -12,6 +13,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProcessDiagram } from "@/components/ProcessDiagram";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
   url: z.string().url().optional(),
@@ -23,6 +25,7 @@ const formSchema = z.object({
 const MachineLearningDemo = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,6 +37,7 @@ const MachineLearningDemo = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsAnalyzing(true);
+    setError(null);
     try {
       const { data: article, error: articleError } = await supabase
         .from('articles')
@@ -55,7 +59,19 @@ const MachineLearningDemo = () => {
           }
         });
 
-      if (analysisError) throw analysisError;
+      if (analysisError) {
+        // Check if it's a rate limit error
+        if (analysisError.status === 429) {
+          setError("Our AI service is currently at capacity. Please wait a few minutes and try again.");
+          toast({
+            title: "Rate Limit Exceeded",
+            description: "Please wait a few minutes before trying again.",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw analysisError;
+      }
 
       const { data: results, error: resultsError } = await supabase
         .from('analysis_results')
@@ -73,11 +89,12 @@ const MachineLearningDemo = () => {
         title: "Analysis completed",
         description: "The article has been analyzed successfully."
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Analysis error:', error);
+      setError(error.message || "Failed to analyze the article. Please try again.");
       toast({
         title: "Error",
-        description: "Failed to analyze the article. Please try again.",
+        description: error.message || "Failed to analyze the article. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -177,6 +194,14 @@ const MachineLearningDemo = () => {
 
         <Card className="max-w-2xl mx-auto">
           <CardContent className="p-6">
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
