@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +25,10 @@ import DataVisualizationDemo from "./pages/demos/DataVisualizationDemo";
 import ApiIntegrationDemo from "./pages/demos/ApiIntegrationDemo";
 import AutomatedWorkflowsDemo from "./pages/demos/AutomatedWorkflowsDemo";
 import TradeDataDemo from "./pages/demos/TradeDataDemo";
+import SupplyChainDemo from "./pages/demos/SupplyChainDemo";
+import PredictiveMaintenanceDemo from "./pages/demos/PredictiveMaintenanceDemo";
+import CustomerSegmentationDemo from "./pages/demos/CustomerSegmentationDemo";
+import EnergyManagementDemo from "./pages/demos/EnergyManagementDemo";
 import Methodologies from "./pages/Methodologies";
 
 const queryClient = new QueryClient();
@@ -56,6 +61,10 @@ const App = () => (
           <Route path="/demo/api-integration" element={<ApiIntegrationDemo />} />
           <Route path="/demo/automated-workflows" element={<AutomatedWorkflowsDemo />} />
           <Route path="/demo/trade-data" element={<TradeDataDemo />} />
+          <Route path="/demo/supply-chain" element={<SupplyChainDemo />} />
+          <Route path="/demo/predictive-maintenance" element={<PredictiveMaintenanceDemo />} />
+          <Route path="/demo/customer-segmentation" element={<CustomerSegmentationDemo />} />
+          <Route path="/demo/energy-management" element={<EnergyManagementDemo />} />
           <Route path="/methodologies" element={<Methodologies />} />
         </Routes>
       </BrowserRouter>

@@ -53,6 +53,30 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
       isActive: true
+    },
+    {
+      title: "Supply Chain Optimization",
+      description: "Streamline logistics and inventory management with AI",
+      path: "/demo/supply-chain",
+      isActive: true
+    },
+    {
+      title: "Predictive Maintenance",
+      description: "Forecast equipment maintenance needs using IoT sensors",
+      path: "/demo/predictive-maintenance",
+      isActive: true
+    },
+    {
+      title: "Customer Segmentation",
+      description: "Advanced customer analytics and behavior prediction",
+      path: "/demo/customer-segmentation",
+      isActive: true
+    },
+    {
+      title: "Energy Management",
+      description: "Monitor and optimize energy consumption patterns",
+      path: "/demo/energy-management",
+      isActive: true
     }
   ];
 
