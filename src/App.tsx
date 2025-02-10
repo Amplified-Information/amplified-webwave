@@ -34,42 +34,44 @@ import Methodologies from "./pages/Methodologies";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/why-us" element={<WhyUs />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/services/data-architecture" element={<DataArchitecture />} />
-          <Route path="/services/cloud-integration" element={<CloudIntegration />} />
-          <Route path="/services/security-solutions" element={<SecuritySolutions />} />
-          <Route path="/services/analytics-insights" element={<AnalyticsInsights />} />
-          <Route path="/demo/overview" element={<DemoOverview />} />
-          <Route path="/demo/integration" element={<DemoIntegration />} />
-          <Route path="/demo/analytics" element={<DemoAnalytics />} />
-          <Route path="/demo/security" element={<DemoSecurity />} />
-          <Route path="/demo/data-integration" element={<DataIntegrationDemo />} />
-          <Route path="/demo/real-time-analytics" element={<RealTimeAnalyticsDemo />} />
-          <Route path="/demo/security-features" element={<SecurityFeaturesDemo />} />
-          <Route path="/demo/cloud-infrastructure" element={<CloudInfrastructureDemo />} />
-          <Route path="/demo/machine-learning" element={<MachineLearningDemo />} />
-          <Route path="/demo/data-visualization" element={<DataVisualizationDemo />} />
-          <Route path="/demo/api-integration" element={<ApiIntegrationDemo />} />
-          <Route path="/demo/automated-workflows" element={<AutomatedWorkflowsDemo />} />
-          <Route path="/demo/trade-data" element={<TradeDataDemo />} />
-          <Route path="/demo/supply-chain" element={<SupplyChainDemo />} />
-          <Route path="/demo/predictive-maintenance" element={<PredictiveMaintenanceDemo />} />
-          <Route path="/demo/customer-segmentation" element={<CustomerSegmentationDemo />} />
-          <Route path="/demo/energy-management" element={<EnergyManagementDemo />} />
-          <Route path="/methodologies" element={<Methodologies />} />
-        </Routes>
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/why-us" element={<WhyUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/services/data-architecture" element={<DataArchitecture />} />
+            <Route path="/services/cloud-integration" element={<CloudIntegration />} />
+            <Route path="/services/security-solutions" element={<SecuritySolutions />} />
+            <Route path="/services/analytics-insights" element={<AnalyticsInsights />} />
+            <Route path="/demo/overview" element={<DemoOverview />} />
+            <Route path="/demo/integration" element={<DemoIntegration />} />
+            <Route path="/demo/analytics" element={<DemoAnalytics />} />
+            <Route path="/demo/security" element={<DemoSecurity />} />
+            <Route path="/demo/data-integration" element={<DataIntegrationDemo />} />
+            <Route path="/demo/real-time-analytics" element={<RealTimeAnalyticsDemo />} />
+            <Route path="/demo/security-features" element={<SecurityFeaturesDemo />} />
+            <Route path="/demo/cloud-infrastructure" element={<CloudInfrastructureDemo />} />
+            <Route path="/demo/machine-learning" element={<MachineLearningDemo />} />
+            <Route path="/demo/data-visualization" element={<DataVisualizationDemo />} />
+            <Route path="/demo/api-integration" element={<ApiIntegrationDemo />} />
+            <Route path="/demo/automated-workflows" element={<AutomatedWorkflowsDemo />} />
+            <Route path="/demo/trade-data" element={<TradeDataDemo />} />
+            <Route path="/demo/supply-chain" element={<SupplyChainDemo />} />
+            <Route path="/demo/predictive-maintenance" element={<PredictiveMaintenanceDemo />} />
+            <Route path="/demo/customer-segmentation" element={<CustomerSegmentationDemo />} />
+            <Route path="/demo/energy-management" element={<EnergyManagementDemo />} />
+            <Route path="/methodologies" element={<Methodologies />} />
+          </Routes>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </StrictMode>
 );
 
 export default App;
