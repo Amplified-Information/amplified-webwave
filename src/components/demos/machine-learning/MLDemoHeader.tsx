@@ -14,7 +14,7 @@ export const MLDemoHeader = () => {
           <img 
             src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" 
             alt="OpenAI Logo" 
-            className="h-8 w-8"
+            className="h-12 w-12"
           />
           <a 
             href="https://openai.com" 
@@ -29,7 +29,7 @@ export const MLDemoHeader = () => {
           <img 
             src="/lovable-uploads/42bf1ab0-d92f-4aa6-ba20-81c4b97db8d6.png" 
             alt="CrewAI Logo" 
-            className="h-8 w-8"
+            className="h-12 w-12"
           />
           <a 
             href="https://github.com/joaomdmoura/crewAI" 
@@ -44,3 +44,4 @@ export const MLDemoHeader = () => {
     </div>
   );
 };
+
