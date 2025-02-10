@@ -20,6 +20,7 @@ const MachineLearningDemo = () => {
     setIsAnalyzing(true);
     setError(null);
     try {
+      // Create the article first
       const { data: article, error: articleError } = await supabase
         .from('articles')
         .insert({
@@ -29,8 +30,12 @@ const MachineLearningDemo = () => {
         .select()
         .single();
 
-      if (articleError) throw articleError;
+      if (articleError) {
+        console.error('Article creation error:', articleError);
+        throw articleError;
+      }
 
+      // Call the analyze-article function
       const { data: analysisData, error: analysisError } = await supabase.functions
         .invoke('analyze-article', {
           body: {
@@ -45,12 +50,27 @@ const MachineLearningDemo = () => {
         let errorDetails = "";
         
         try {
-          // Parse the error body which contains our custom error message
+          // Try to parse the error response
           const errorBody = JSON.parse(analysisError.message);
-          errorMessage = errorBody.error || errorMessage;
-          errorDetails = errorBody.details || "";
+          
+          // Check if we have a structured error response
+          if (typeof errorBody === 'object' && errorBody.body) {
+            const parsedBody = JSON.parse(errorBody.body);
+            errorMessage = parsedBody.error || errorMessage;
+            errorDetails = parsedBody.details || "";
+          }
 
-          // Handle rate limit case specifically
+          // Handle specific error cases
+          if (analysisError.status === 400) {
+            setError(errorMessage);
+            toast({
+              title: "URL Processing Failed",
+              description: errorDetails || "Please paste the article content directly instead.",
+              variant: "destructive"
+            });
+            return;
+          }
+
           if (analysisError.status === 429) {
             const retryAfter = 60;
             setRetryDelay(retryAfter);
@@ -74,29 +94,17 @@ const MachineLearningDemo = () => {
             return;
           }
 
-          // Handle URL extraction failure specifically
-          if (analysisError.status === 400 && errorMessage.includes("URL")) {
-            setError(errorMessage);
-            toast({
-              title: "URL Processing Failed",
-              description: errorDetails || "Please paste the article content directly instead.",
-              variant: "destructive"
-            });
-            return;
-          }
-
           setError(errorMessage);
           toast({
             title: "Analysis Failed",
             description: errorDetails || errorMessage,
             variant: "destructive"
           });
-          return;
-        } catch {
-          // If parsing fails, use the raw error message
-          setError(analysisError.message);
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          setError("An unexpected error occurred. Please try again.");
           toast({
-            title: "Analysis Failed",
+            title: "Error",
             description: "An unexpected error occurred. Please try again.",
             variant: "destructive"
           });
@@ -104,6 +112,7 @@ const MachineLearningDemo = () => {
         return;
       }
 
+      // Fetch the analysis results
       const { data: results, error: resultsError } = await supabase
         .from('analysis_results')
         .select(`
@@ -114,7 +123,7 @@ const MachineLearningDemo = () => {
 
       if (resultsError) throw resultsError;
 
-      setAnalysisResults(results);
+      setAnalysisResults(results || []);
       
       toast({
         title: "Analysis completed",
@@ -170,4 +179,3 @@ const MachineLearningDemo = () => {
 };
 
 export default MachineLearningDemo;
-

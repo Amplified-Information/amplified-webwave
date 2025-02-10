@@ -22,8 +22,14 @@ interface AgentResponse {
 async function extractArticleContent(url: string): Promise<string> {
   console.log('Starting URL extraction for:', url);
   
+  if (!url) {
+    console.log('No URL provided');
+    throw new Error('No URL provided');
+  }
+
   try {
     if (!url.startsWith('http')) {
+      console.log('Invalid URL format:', url);
       throw new Error('Invalid URL format');
     }
 
@@ -107,7 +113,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",  // Fixed: Using the correct model name
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompts[role] },
         { role: "user", content: prompt }
@@ -115,8 +121,12 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
       temperature: 0.3,
     });
 
+    if (!response.choices[0].message?.content) {
+      throw new Error('No response from OpenAI');
+    }
+
     try {
-      const analysis = JSON.parse(response.choices[0].message.content || "{}");
+      const analysis = JSON.parse(response.choices[0].message.content);
       return {
         analysis,
         confidence: 0.85
@@ -167,7 +177,7 @@ Deno.serve(async (req) => {
         articleContent = await extractArticleContent(url);
         console.log('Successfully extracted content from URL');
       } catch (error) {
-        console.error('URL extraction failed:', error);
+        console.error('URL extraction error:', error);
         return new Response(
           JSON.stringify({
             error: 'URL extraction failed',
