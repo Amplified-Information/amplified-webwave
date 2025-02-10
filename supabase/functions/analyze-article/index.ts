@@ -23,11 +23,29 @@ async function extractArticleContent(url: string): Promise<string> {
   try {
     console.log('Extracting article content from URL:', url);
     const article = await extract(url);
-    if (!article || !article.content) {
-      throw new Error('Could not extract article content');
+    console.log('Article extraction result:', article ? 'Success' : 'Failed');
+    
+    if (!article) {
+      throw new Error('Article extraction failed - no content returned');
     }
-    // Return clean text content
-    return article.content.replace(/<[^>]*>/g, '');
+
+    if (!article.content) {
+      console.log('Article metadata:', JSON.stringify(article, null, 2));
+      throw new Error('Article found but no content available');
+    }
+
+    // Clean the content more thoroughly
+    const cleanContent = article.content
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/\s+/g, ' ')    // Normalize whitespace
+      .trim();                 // Remove leading/trailing whitespace
+
+    if (!cleanContent) {
+      throw new Error('Article content was empty after cleaning');
+    }
+
+    console.log('Extracted content length:', cleanContent.length);
+    return cleanContent;
   } catch (error) {
     console.error('Error extracting article:', error);
     throw new Error(`Failed to extract article content: ${error.message}`);
@@ -124,14 +142,28 @@ Deno.serve(async (req) => {
     
     // Extract article content if URL is provided
     let articleContent = content;
-    if (url && !content) {
+    if (url) {
       try {
-        articleContent = await extractArticleContent(url);
-        console.log('Successfully extracted article content from URL');
+        const extractedContent = await extractArticleContent(url);
+        if (extractedContent) {
+          articleContent = extractedContent;
+          console.log('Successfully extracted article content from URL');
+        } else {
+          console.log('Using provided content as fallback');
+        }
       } catch (error) {
         console.error('Failed to extract article:', error);
-        throw new Error('Could not extract article content from the provided URL. Please try pasting the article content directly.');
+        // If we have content, use it as fallback instead of failing
+        if (!content) {
+          throw new Error('Could not extract article content from the provided URL. Please try pasting the article content directly.');
+        } else {
+          console.log('Using provided content as fallback after URL extraction failed');
+        }
       }
+    }
+
+    if (!articleContent || articleContent.trim().length === 0) {
+      throw new Error('No valid content available for analysis');
     }
     
     const supabaseClient = createClient(
