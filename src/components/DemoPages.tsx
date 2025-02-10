@@ -44,7 +44,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       path: "/demo/data-visualization"
     },
     {
-      title: "API Integration",
+      title: "Find a Mortgage that saves you money",
       description: "Connect with external services through our API platform",
       path: "/demo/api-integration",
       isActive: true
