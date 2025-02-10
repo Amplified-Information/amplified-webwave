@@ -18,13 +18,14 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     {
       title: "Real-time Analytics",
       description: "Monitor and analyze data streams in real-time",
-      path: "/demo/real-time-analytics"
+      path: "/demo/real-time-analytics",
+      isActive: true
     },
     {
       title: "Trade Data Analysis",
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
-      status: "in development"
+      isActive: true
     },
     {
       title: "Cloud Infrastructure",
@@ -44,32 +45,38 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     {
       title: "API Integration",
       description: "Connect with external services through our API platform",
-      path: "/demo/api-integration"
+      path: "/demo/api-integration",
+      isActive: true
     },
     {
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
-      path: "/demo/automated-workflows"
+      path: "/demo/automated-workflows",
+      isActive: true
     },
     {
       title: "Supply Chain Optimization",
       description: "Streamline logistics and inventory management with AI",
-      path: "/demo/supply-chain"
+      path: "/demo/supply-chain",
+      isActive: true
     },
     {
       title: "Predictive Maintenance",
       description: "Forecast equipment maintenance needs using IoT sensors",
-      path: "/demo/predictive-maintenance"
+      path: "/demo/predictive-maintenance",
+      isActive: true
     },
     {
       title: "Customer Segmentation",
       description: "Advanced customer analytics and behavior prediction",
-      path: "/demo/customer-segmentation"
+      path: "/demo/customer-segmentation",
+      isActive: true
     },
     {
       title: "Energy Management",
       description: "Monitor and optimize energy consumption patterns",
-      path: "/demo/energy-management"
+      path: "/demo/energy-management",
+      isActive: true
     }
   ];
 
@@ -95,13 +102,15 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
               <Card className={`h-full transition-all duration-300 ${
                 demo.status === "in development" 
                   ? 'hover:shadow-lg hover:bg-orange-50' 
-                  : 'hover:shadow-lg hover:bg-primary/10'
+                  : demo.isActive 
+                    ? 'hover:shadow-lg hover:bg-[#F2FCE2]' 
+                    : 'hover:shadow-lg hover:bg-primary/10'
               }`}>
                 <CardHeader>
                   <CardTitle>{demo.title}</CardTitle>
                   <CardDescription>{demo.description}</CardDescription>
                 </CardHeader>
-                {!demo.status && (
+                {!demo.isActive && !demo.status && (
                   <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-gray-500">
                     Coming Soon
                   </div>
