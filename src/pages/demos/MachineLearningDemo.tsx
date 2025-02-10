@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -40,6 +41,18 @@ const MachineLearningDemo = () => {
         });
 
       if (analysisError) {
+        let errorMessage = "Failed to analyze the article.";
+        let errorDetails = "";
+        
+        try {
+          const errorBody = JSON.parse(analysisError.message);
+          errorMessage = errorBody.error || errorMessage;
+          errorDetails = errorBody.details || "";
+        } catch {
+          // If parsing fails, use the raw error message
+          errorMessage = analysisError.message;
+        }
+
         if (analysisError.status === 429) {
           const retryAfter = 60;
           setRetryDelay(retryAfter);
@@ -62,7 +75,14 @@ const MachineLearningDemo = () => {
           });
           return;
         }
-        throw analysisError;
+
+        setError(errorMessage);
+        toast({
+          title: "Analysis Failed",
+          description: errorDetails || errorMessage,
+          variant: "destructive"
+        });
+        throw new Error(errorMessage);
       }
 
       const { data: results, error: resultsError } = await supabase
@@ -84,11 +104,6 @@ const MachineLearningDemo = () => {
     } catch (error: any) {
       console.error('Analysis error:', error);
       setError(error.message || "Failed to analyze the article. Please try again.");
-      toast({
-        title: "Error",
-        description: error.message || "Failed to analyze the article. Please try again.",
-        variant: "destructive"
-      });
     } finally {
       setIsAnalyzing(false);
     }
