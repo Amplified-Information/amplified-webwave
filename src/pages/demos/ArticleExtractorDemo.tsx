@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArticleExtractionForm } from "@/components/demos/article-extractor/ArticleExtractionForm";
@@ -36,7 +35,10 @@ const ArticleExtractorDemo = () => {
           body: { url }
         });
 
-      if (extractionError) throw extractionError;
+      if (extractionError) {
+        console.error('Article extraction error:', extractionError);
+        throw new Error(extractionError.message || 'Failed to extract article content');
+      }
 
       if (!extractionData?.content) {
         throw new Error('No content found in the article');

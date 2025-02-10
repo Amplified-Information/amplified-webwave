@@ -37,24 +37,38 @@ Deno.serve(async (req) => {
       }
 
       // Extract article data with full response
-      const article = await extract(url);
+      const article = await extract(url, {
+        timeout: 10000, // 10 second timeout
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
       
       if (!article) {
         console.log('No article data returned from extraction');
         throw new Error('Could not extract content from URL');
       }
 
+      // Clean up content to remove problematic elements
+      let cleanContent = article.content || '';
+      // Remove iframe tags and their content
+      cleanContent = cleanContent.replace(/<iframe[^>]*>.*?<\/iframe>/gs, '');
+      // Remove script tags and their content
+      cleanContent = cleanContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      // Remove style tags and their content
+      cleanContent = cleanContent.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
       // Log the full article object to understand what we're getting
       console.log('Full article data:', JSON.stringify(article, null, 2));
 
-      // Return more complete article data
+      // Return cleaned article data
       return new Response(
         JSON.stringify({
           title: article.title,
           description: article.description,
           author: article.author,
           published: article.published,
-          content: article.content,
+          content: cleanContent,
           url: article.url,
           source: article.source,
           links: article.links,
