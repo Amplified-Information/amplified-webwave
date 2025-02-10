@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
 
       // Use OpenAI to extract the article content
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",  // Fixed the model name to use gpt-4o-mini
         messages: [
           {
             role: "system",
