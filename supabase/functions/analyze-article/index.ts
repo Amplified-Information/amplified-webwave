@@ -27,16 +27,17 @@ async function extractArticleContent(url: string): Promise<string> {
   }
 
   try {
-    if (!url.startsWith('http')) {
-      console.log('Invalid URL format:', url);
-      throw new Error('Invalid URL format');
+    const urlObj = new URL(url);
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      console.log('Invalid URL protocol:', urlObj.protocol);
+      throw new Error('Invalid URL protocol');
     }
 
     const article = await extract(url);
     
     if (!article) {
       console.log('No article data returned from extraction');
-      throw new Error('Could not extract content from the provided URL');
+      throw new Error('Could not extract content from URL');
     }
 
     if (!article.content) {
@@ -58,7 +59,10 @@ async function extractArticleContent(url: string): Promise<string> {
     return cleanContent;
   } catch (error) {
     console.error('Article extraction error:', error);
-    throw new Error('URL extraction failed');
+    if (error.message.includes('Invalid URL')) {
+      throw new Error('Invalid URL format');
+    }
+    throw new Error('Failed to extract content from URL');
   }
 }
 
@@ -179,8 +183,8 @@ Deno.serve(async (req) => {
         console.error('URL extraction error:', error);
         return new Response(
           JSON.stringify({
-            error: 'URL extraction failed',
-            details: 'Please paste the article content directly in the text box instead.'
+            error: 'URL processing failed',
+            details: 'Unable to extract content from the provided URL. Please paste the article content directly.'
           }), {
             status: 400,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
