@@ -5,7 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Newspaper, Upload, LinkIcon, CheckCircle2, Clock, Users, AlertCircle } from "lucide-react";
+import { Newspaper, Upload, LinkIcon, CheckCircle2, Clock, Users, AlertCircle, AlertTriangle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -26,6 +26,7 @@ const MachineLearningDemo = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [retryDelay, setRetryDelay] = useState(60); // 60 seconds default retry delay
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,10 +63,24 @@ const MachineLearningDemo = () => {
       if (analysisError) {
         // Check if it's a rate limit error
         if (analysisError.status === 429) {
-          setError("Our AI service is currently at capacity. Please wait a few minutes and try again.");
+          const retryAfter = 60; // Default to 60 seconds if no retry-after header
+          setRetryDelay(retryAfter);
+          setError(`Our AI service is currently at capacity. Please try again in ${retryAfter} seconds.`);
+          
+          // Start a countdown timer
+          const timer = setInterval(() => {
+            setRetryDelay((prev) => {
+              if (prev <= 1) {
+                clearInterval(timer);
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+
           toast({
             title: "Rate Limit Exceeded",
-            description: "Please wait a few minutes before trying again.",
+            description: "Please wait a minute before trying again.",
             variant: "destructive"
           });
           return;
@@ -195,10 +210,17 @@ const MachineLearningDemo = () => {
         <Card className="max-w-2xl mx-auto">
           <CardContent className="p-6">
             {error && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+              <Alert variant={retryDelay > 0 ? "warning" : "destructive"} className="mb-6">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>
+                  {retryDelay > 0 ? "Please Wait" : "Error"}
+                </AlertTitle>
+                <AlertDescription>
+                  {retryDelay > 0 
+                    ? `${error} (${retryDelay} seconds remaining)`
+                    : error
+                  }
+                </AlertDescription>
               </Alert>
             )}
             
@@ -257,9 +279,14 @@ const MachineLearningDemo = () => {
                 <Button 
                   type="submit" 
                   className="w-full"
-                  disabled={isAnalyzing}
+                  disabled={isAnalyzing || retryDelay > 0}
                 >
-                  {isAnalyzing ? "Analyzing..." : "Analyze Article"}
+                  {isAnalyzing 
+                    ? "Analyzing..." 
+                    : retryDelay > 0 
+                      ? `Try again in ${retryDelay}s` 
+                      : "Analyze Article"
+                  }
                 </Button>
               </form>
             </Form>
