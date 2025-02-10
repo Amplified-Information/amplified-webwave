@@ -12,9 +12,9 @@ export const MLDemoHeader = () => {
       <div className="flex items-center justify-center gap-8 mt-6">
         <div className="flex items-center gap-2">
           <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg" 
+            src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" 
             alt="OpenAI Logo" 
-            className="h-6 w-6"
+            className="h-8 w-8"
           />
           <a 
             href="https://openai.com" 
@@ -27,9 +27,9 @@ export const MLDemoHeader = () => {
         </div>
         <div className="flex items-center gap-2">
           <img 
-            src="https://raw.githubusercontent.com/joaomdmoura/crewAI/main/docs/assets/crewai_logo.png" 
+            src="https://upload.wikimedia.org/wikipedia/commons/5/51/Crewai.png" 
             alt="CrewAI Logo" 
-            className="h-6 w-6"
+            className="h-8 w-8"
           />
           <a 
             href="https://github.com/joaomdmoura/crewAI" 
