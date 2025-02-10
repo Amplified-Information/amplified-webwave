@@ -16,6 +16,7 @@ Deno.serve(async (req) => {
     const { url } = await req.json() as ExtractRequest;
     
     if (!url) {
+      console.log('No URL provided');
       return new Response(
         JSON.stringify({
           error: 'No URL provided',
