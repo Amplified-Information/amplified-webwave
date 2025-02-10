@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, LinkIcon, AlertTriangle, InfoIcon } from "lucide-react";
+import { Upload, LinkIcon, AlertTriangle, InfoIcon, Clock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,8 +26,21 @@ interface AnalysisFormProps {
   retryDelay: number;
 }
 
+interface ArticleData {
+  title?: string;
+  description?: string;
+  author?: string;
+  published?: string;
+  content: string;
+  url?: string;
+  source?: string;
+  ttr?: number; // time to read in minutes
+}
+
 export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: AnalysisFormProps) => {
   const [isExtracting, setIsExtracting] = useState(false);
+  const [articleData, setArticleData] = useState<ArticleData | null>(null);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,6 +54,8 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     if (!url) return;
 
     setIsExtracting(true);
+    setArticleData(null);
+    
     try {
       const { data: extractionData, error: extractionError } = await supabase.functions
         .invoke('extract-article', {
@@ -50,7 +65,6 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
       if (extractionError) {
         console.error('Extraction error:', extractionError);
         try {
-          // Parse the error body if it's a JSON string
           const errorBody = typeof extractionError.message === 'string' 
             ? JSON.parse(extractionError.message)
             : extractionError;
@@ -69,6 +83,7 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
       }
 
       if (extractionData?.content) {
+        setArticleData(extractionData);
         form.setValue("content", extractionData.content);
         form.clearErrors('url');
       } else {
@@ -110,6 +125,24 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
                 ? `${error} (${retryDelay} seconds remaining)`
                 : error
               }
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {articleData && (
+          <Alert className="mb-6">
+            <InfoIcon className="h-4 w-4" />
+            <AlertTitle>{articleData.title || 'Article Extracted'}</AlertTitle>
+            <AlertDescription className="space-y-2">
+              {articleData.author && <p>Author: {articleData.author}</p>}
+              {articleData.published && <p>Published: {new Date(articleData.published).toLocaleDateString()}</p>}
+              {articleData.ttr && (
+                <p className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  Reading time: {articleData.ttr} minutes
+                </p>
+              )}
+              {articleData.description && <p>{articleData.description}</p>}
             </AlertDescription>
           </Alert>
         )}

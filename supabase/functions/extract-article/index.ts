@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
         throw new Error('Invalid URL protocol');
       }
 
+      // Extract article data with full response
       const article = await extract(url);
       
       if (!article) {
@@ -43,28 +44,27 @@ Deno.serve(async (req) => {
         throw new Error('Could not extract content from URL');
       }
 
-      if (!article.content) {
-        console.log('Article found but no content available:', article);
-        throw new Error('No content found in article');
-      }
+      // Log the full article object to understand what we're getting
+      console.log('Full article data:', JSON.stringify(article, null, 2));
 
-      const cleanContent = article.content
-        .replace(/<[^>]*>/g, '')  // Remove HTML tags
-        .replace(/\s+/g, ' ')     // Normalize whitespace
-        .trim();                  // Remove leading/trailing whitespace
-
-      if (!cleanContent) {
-        console.log('Content was empty after cleaning');
-        throw new Error('Content was empty after cleaning');
-      }
-
-      console.log('Successfully extracted content from URL, length:', cleanContent.length);
+      // Return more complete article data
       return new Response(
-        JSON.stringify({ content: cleanContent }), {
+        JSON.stringify({
+          title: article.title,
+          description: article.description,
+          author: article.author,
+          published: article.published,
+          content: article.content,
+          url: article.url,
+          source: article.source,
+          links: article.links,
+          ttr: article.ttr // time to read
+        }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
         }
       );
+
     } catch (error) {
       console.error('Article extraction error:', error);
       if (error.message.includes('Invalid URL')) {
