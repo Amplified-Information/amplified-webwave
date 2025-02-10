@@ -1,9 +1,34 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartBar } from "lucide-react";
 import CanadianCitiesWeather from "@/components/CanadianCitiesWeather";
+import CanadianWeatherMap from "@/components/CanadianWeatherMap";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { WeatherData } from "@/types/weather";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const fetchWeatherData = async (): Promise<WeatherData[]> => {
+  const { data, error } = await supabase
+    .from('weather_data')
+    .select('*')
+    .order('cityName', { ascending: true });
+
+  if (error) {
+    throw new Error('Failed to fetch weather data');
+  }
+
+  return data || [];
+};
 
 const RealTimeAnalyticsDemo = () => {
+  const { data: weatherData, isLoading, error } = useQuery({
+    queryKey: ['weather-data'],
+    queryFn: fetchWeatherData,
+    refetchInterval: 300000, // Refetch every 5 minutes
+  });
+
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
@@ -23,6 +48,20 @@ const RealTimeAnalyticsDemo = () => {
             </p>
           </div>
         </div>
+
+        {error && (
+          <Alert variant="destructive" className="mb-8">
+            <AlertDescription>
+              Failed to load weather data. Please try again later.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            {weatherData && <CanadianWeatherMap weatherData={weatherData} />}
+          </CardContent>
+        </Card>
 
         <Card className="mb-8">
           <CardContent className="p-6">
