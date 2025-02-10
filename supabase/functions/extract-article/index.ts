@@ -10,6 +10,45 @@ const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY')
 });
 
+// Helper function to extract main content area from HTML
+function extractMainContent(html: string): string {
+  // Common content wrapper patterns
+  const mainContentPatterns = [
+    /<article[^>]*>([\s\S]*?)<\/article>/i,
+    /<main[^>]*>([\s\S]*?)<\/main>/i,
+    /<div[^>]*(?:class|id)=['"](?:.*?article.*?|.*?content.*?|.*?post.*?)['"][^>]*>([\s\S]*?)<\/div>/i
+  ];
+
+  let mainContent = '';
+  for (const pattern of mainContentPatterns) {
+    const match = html.match(pattern);
+    if (match && match[1]) {
+      mainContent = match[1];
+      break;
+    }
+  }
+
+  // If no main content found, take a portion of the body
+  if (!mainContent) {
+    const bodyMatch = /<body[^>]*>([\s\S]*?)<\/body>/i.exec(html);
+    if (bodyMatch && bodyMatch[1]) {
+      mainContent = bodyMatch[1];
+    } else {
+      mainContent = html;
+    }
+  }
+
+  // Clean up the content
+  mainContent = mainContent
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '') // Remove styles
+    .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, '') // Remove navigation
+    .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, '') // Remove header
+    .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, ''); // Remove footer
+
+  return mainContent;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -56,6 +95,10 @@ Deno.serve(async (req) => {
       const html = await response.text();
       console.log('Successfully fetched HTML content, length:', html.length);
 
+      // Extract and clean main content before sending to OpenAI
+      const mainContent = extractMainContent(html);
+      console.log('Extracted main content length:', mainContent.length);
+
       // Use OpenAI to extract the article content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
@@ -67,7 +110,7 @@ Deno.serve(async (req) => {
           },
           {
             role: "user",
-            content: html
+            content: mainContent
           }
         ],
         temperature: 0.3,
