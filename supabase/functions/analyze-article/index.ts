@@ -34,7 +34,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
   }
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o-mini", // Updated to use the correct model
     messages: [
       { role: "system", content: systemPrompts[role] },
       { role: "user", content: prompt }
@@ -46,7 +46,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
     const analysis = JSON.parse(response.choices[0].message.content || "{}");
     return {
       analysis,
-      confidence: 0.85 // This could be calculated based on various factors
+      confidence: 0.85
     };
   } catch (error) {
     return {
@@ -64,13 +64,11 @@ Deno.serve(async (req) => {
   try {
     const { articleId, content, url } = await req.json() as AnalysisRequest;
     
-    // Create Supabase client with proper credentials
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get agent configurations
     const { data: agents, error: agentsError } = await supabaseClient
       .from('agent_configurations')
       .select('*')
@@ -86,12 +84,10 @@ Deno.serve(async (req) => {
 
     const analyses: Record<string, any>[] = [];
     
-    // Run each agent in sequence
     for (const agent of agents) {
       console.log(`Running ${agent.name} analysis...`);
       const result = await runAgent(agent.type, content, analyses);
       
-      // Store the analysis result
       const { data, error } = await supabaseClient
         .from('analysis_results')
         .insert({
