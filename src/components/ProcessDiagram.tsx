@@ -6,8 +6,8 @@ import {
   Background,
   useNodesState,
   useEdgesState,
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
 const initialNodes = [
   {
