@@ -28,16 +28,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Starting URL extraction for:', url);
+    console.log('Attempting to extract content from URL:', url);
     
     try {
+      // Validate URL format
       const urlObj = new URL(url);
       if (!['http:', 'https:'].includes(urlObj.protocol)) {
         console.log('Invalid URL protocol:', urlObj.protocol);
         throw new Error('Invalid URL protocol');
       }
 
-      // Extract article data with full response
+      // Extract article data
       const article = await extract(url, {
         timeout: 30000, // 30 second timeout
         headers: {
@@ -45,7 +46,6 @@ Deno.serve(async (req) => {
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
           'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1'
         }
       });
       
@@ -54,37 +54,23 @@ Deno.serve(async (req) => {
         throw new Error('Could not extract content from URL');
       }
 
-      // Clean up content to remove problematic elements
-      let cleanContent = article.content || '';
-      // Remove iframe tags and their content
-      cleanContent = cleanContent.replace(/<iframe[^>]*>.*?<\/iframe>/gs, '');
-      // Remove script tags and their content
-      cleanContent = cleanContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-      // Remove style tags and their content
-      cleanContent = cleanContent.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-      // Remove other potentially problematic elements
-      cleanContent = cleanContent.replace(/<video[^>]*>.*?<\/video>/gs, '');
-      cleanContent = cleanContent.replace(/<object[^>]*>.*?<\/object>/gs, '');
-      cleanContent = cleanContent.replace(/<embed[^>]*>.*?<\/embed>/gs, '');
+      console.log('Successfully extracted article data:', {
+        title: article.title,
+        description: article.description?.substring(0, 100),
+        content: article.content?.substring(0, 100) + '...'
+      });
 
-      // Log the full article object to understand what we're getting
-      console.log('Full article data:', JSON.stringify({
-        ...article,
-        content: cleanContent.substring(0, 200) + '...' // Log only first 200 chars of content
-      }, null, 2));
-
-      // Return cleaned article data
       return new Response(
         JSON.stringify({
           title: article.title,
           description: article.description,
           author: article.author,
           published: article.published,
-          content: cleanContent,
+          content: article.content,
           url: article.url,
           source: article.source,
           links: article.links,
-          ttr: article.ttr // time to read
+          ttr: article.ttr
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
@@ -93,26 +79,37 @@ Deno.serve(async (req) => {
 
     } catch (error) {
       console.error('Article extraction error:', error);
+      let errorMessage = 'Failed to extract content from URL';
+      
       if (error.message.includes('Invalid URL')) {
-        throw new Error('Invalid URL format');
+        errorMessage = 'Invalid URL format';
+      } else if (error.message.includes('ETIMEDOUT') || error.message.includes('timeout')) {
+        errorMessage = 'Request timed out while trying to access the URL';
+      } else if (error.message.includes('ECONNREFUSED')) {
+        errorMessage = 'Connection refused by the server';
       }
-      if (error.message.includes('ETIMEDOUT') || error.message.includes('timeout')) {
-        throw new Error('Request timed out while trying to access the URL');
-      }
-      if (error.message.includes('ECONNREFUSED')) {
-        throw new Error('Connection refused by the server');
-      }
-      throw new Error('Failed to extract content from URL');
+
+      return new Response(
+        JSON.stringify({
+          error: errorMessage,
+          details: error.message
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
     }
   } catch (error) {
-    console.error('Error in extract-article function:', error);
+    console.error('Error processing request:', error);
     
-    return new Response(JSON.stringify({
-      error: error.message || 'Failed to extract content from URL',
-      details: 'Failed to extract article content. Please check the URL and try again.'
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to process request',
+        details: error.message
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    );
   }
 });
