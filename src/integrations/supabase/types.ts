@@ -159,6 +159,45 @@ export type Database = {
         }
         Relationships: []
       }
+      extracted_articles: {
+        Row: {
+          author: string | null
+          content: string
+          created_at: string
+          description: string | null
+          id: string
+          published: string | null
+          source: string | null
+          title: string | null
+          ttr: number | null
+          url: string | null
+        }
+        Insert: {
+          author?: string | null
+          content: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          published?: string | null
+          source?: string | null
+          title?: string | null
+          ttr?: number | null
+          url?: string | null
+        }
+        Update: {
+          author?: string | null
+          content?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          published?: string | null
+          source?: string | null
+          title?: string | null
+          ttr?: number | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       secrets: {
         Row: {
           created_at: string
