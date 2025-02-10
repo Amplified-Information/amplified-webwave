@@ -16,7 +16,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       status: "in development"
     },
     {
-      title: "Real-time Analytics",
+      title: "Real-time Weather Analytics",
       description: "Monitor and analyze data streams in real-time",
       path: "/demo/real-time-analytics",
       isActive: true
