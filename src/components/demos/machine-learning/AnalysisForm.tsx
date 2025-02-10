@@ -44,7 +44,7 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     try {
       const { data: extractionData, error: extractionError } = await supabase.functions
         .invoke('analyze-article', {
-          body: { url }
+          body: { content: "", url }
         });
 
       if (extractionError) throw extractionError;
@@ -166,3 +166,4 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     </Card>
   );
 };
+
