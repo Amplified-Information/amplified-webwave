@@ -20,28 +20,35 @@ interface AgentResponse {
 
 async function extractArticleContent(url: string): Promise<string> {
   try {
-    console.log('Extracting article content from URL:', url);
+    console.log('Attempting to extract content from URL:', url);
     const article = await extract(url);
     
-    if (!article || !article.content) {
-      console.log('No article content found:', article);
-      throw new Error('No content found at the provided URL');
+    if (!article) {
+      console.log('No article data returned from extraction');
+      throw new Error('No article data found');
+    }
+
+    if (!article.content) {
+      console.log('Article found but no content available:', article);
+      throw new Error('No content available in article');
     }
 
     const cleanContent = article.content
-      .replace(/<[^>]*>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+      .replace(/<[^>]*>/g, '')  // Remove HTML tags
+      .replace(/\s+/g, ' ')     // Normalize whitespace
+      .trim();                  // Remove leading/trailing whitespace
 
     if (!cleanContent) {
-      throw new Error('Extracted content was empty after cleaning');
+      console.log('Content was empty after cleaning');
+      throw new Error('Content was empty after cleaning');
     }
 
     console.log('Successfully extracted content, length:', cleanContent.length);
     return cleanContent;
   } catch (error) {
     console.error('Article extraction error:', error);
-    throw new Error('Unable to extract article content. Please paste the article text directly.');
+    // Throw a user-friendly error message
+    throw new Error('Could not extract content from URL');
   }
 }
 
@@ -134,18 +141,37 @@ Deno.serve(async (req) => {
     const { articleId, content, url } = await req.json() as AnalysisRequest;
     
     let articleContent = content;
+    
+    // Only attempt URL extraction if no direct content is provided
     if (url && !content) {
       try {
         articleContent = await extractArticleContent(url);
         console.log('Successfully extracted content from URL');
       } catch (error) {
         console.error('URL extraction failed:', error);
-        throw new Error('Unable to extract article from URL. Please paste the article content directly.');
+        // Return a specific error response for URL extraction failure
+        return new Response(
+          JSON.stringify({
+            error: 'Could not extract content from the provided URL',
+            details: 'Please paste the article content directly in the text box instead.'
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
       }
     }
 
     if (!articleContent || articleContent.trim().length === 0) {
-      throw new Error('No article content provided. Please provide content either through URL or direct input.');
+      return new Response(
+        JSON.stringify({
+          error: 'No article content provided',
+          details: 'Please provide content either through URL or direct input.'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
     
     const supabaseClient = createClient(
@@ -153,7 +179,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Update article with extracted content
+    // Update article with extracted content if it came from URL
     if (url && articleContent !== content) {
       const { error: updateError } = await supabaseClient
         .from('articles')
@@ -225,11 +251,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error:', error.message);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message,
-        details: error.message.includes('rate limit') ? 
-          'The AI service is currently at capacity. Please try again in a few minutes.' : 
-          'Please try pasting the article content directly in the text box instead of using the URL.'
+        details: error.message.includes('rate limit') 
+          ? 'The AI service is currently at capacity. Please try again in a few minutes.' 
+          : 'Please try pasting the article content directly in the text box instead.'
       }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: error.message.includes('rate limit') ? 429 : 500,
