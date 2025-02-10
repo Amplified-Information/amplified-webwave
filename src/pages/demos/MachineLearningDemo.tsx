@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -12,6 +11,7 @@ import * as z from "zod";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ProcessDiagram } from "@/components/ProcessDiagram";
 
 const formSchema = z.object({
   url: z.string().url().optional(),
@@ -35,7 +35,6 @@ const MachineLearningDemo = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsAnalyzing(true);
     try {
-      // Insert the article first
       const { data: article, error: articleError } = await supabase
         .from('articles')
         .insert({
@@ -47,7 +46,6 @@ const MachineLearningDemo = () => {
 
       if (articleError) throw articleError;
 
-      // Call the analyze-article function
       const { data: analysisData, error: analysisError } = await supabase.functions
         .invoke('analyze-article', {
           body: {
@@ -59,7 +57,6 @@ const MachineLearningDemo = () => {
 
       if (analysisError) throw analysisError;
 
-      // Get all analysis results for this article
       const { data: results, error: resultsError } = await supabase
         .from('analysis_results')
         .select(`
@@ -98,6 +95,12 @@ const MachineLearningDemo = () => {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
             Upload or paste news articles for AI-powered analysis of bias and journalistic quality
           </p>
+
+          {/* Process Diagram */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
+            <ProcessDiagram />
+          </div>
 
           {/* AI Agents Description */}
           <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg mb-12">
