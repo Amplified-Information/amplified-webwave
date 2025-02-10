@@ -1,13 +1,16 @@
 
 import { corsHeaders } from '../_shared/cors.ts';
-import { extract } from 'npm:@extractus/article-extractor';
+import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
 interface ExtractRequest {
   url: string;
 }
 
+const openai = new OpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY')
+});
+
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -38,56 +41,49 @@ Deno.serve(async (req) => {
         throw new Error('Invalid URL protocol');
       }
 
-      // Extract article data with enhanced configuration for news sites
-      console.log('Starting extraction with enhanced configuration...');
-      const article = await extract(url, {
-        timeout: 60000, // Increased timeout to 60 seconds
+      // Fetch the webpage content
+      const response = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          'Upgrade-Insecure-Requests': '1',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1'
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         }
-      }).catch(error => {
-        console.error('Extraction error caught:', error);
-        throw error;
-      });
-      
-      if (!article) {
-        console.log('No article data returned from extraction');
-        throw new Error('Could not extract content from URL');
-      }
-
-      console.log('Article extraction attempt completed. Data received:', {
-        hasTitle: !!article.title,
-        hasDescription: !!article.description,
-        hasContent: !!article.content,
-        contentLength: article.content?.length || 0,
-        url: article.url || url
       });
 
-      if (!article.content && !article.description) {
-        console.log('Article extracted but no content or description found');
-        throw new Error('No content found at the provided URL');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
       }
+
+      const html = await response.text();
+
+      // Use OpenAI to extract the article content
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return the data in JSON format with the following fields: title, description, content, author (if available), published (if available). Make sure to clean any advertisements or irrelevant content. Preserve important formatting in the content field."
+          },
+          {
+            role: "user",
+            content: html
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+
+      const extractedData = JSON.parse(completion.choices[0].message.content);
+      console.log('Successfully extracted article data:', {
+        hasTitle: !!extractedData.title,
+        hasDescription: !!extractedData.description,
+        hasContent: !!extractedData.content,
+        contentLength: extractedData.content?.length || 0
+      });
 
       return new Response(
         JSON.stringify({
-          title: article.title,
-          description: article.description,
-          author: article.author,
-          published: article.published,
-          content: article.content,
-          url: article.url,
-          source: article.source,
-          links: article.links,
-          ttr: article.ttr
+          ...extractedData,
+          url,
+          source: urlObj.hostname
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
@@ -105,9 +101,6 @@ Deno.serve(async (req) => {
         errorMessage = 'Request timed out while trying to access the URL';
       } else if (error.message.includes('ECONNREFUSED')) {
         errorMessage = 'Connection refused by the server';
-      } else if (error.message.includes('No content found')) {
-        errorMessage = 'No extractable content found';
-        details = 'The URL provided does not contain any article content that can be extracted. This might be due to the site\'s content protection or structure.';
       }
 
       return new Response(
