@@ -27,18 +27,23 @@ const ArticleExtractorDemo = () => {
       });
 
       if (extractError) {
+        console.error('Edge function error:', extractError);
         throw new Error(extractError.message);
       }
 
-      if (data) {
-        setExtractedArticle({
-          id: Date.now().toString(), // temporary ID for the interface
-          ...data
-        });
+      if (!data) {
+        throw new Error('No data returned from extraction');
       }
+
+      setExtractedArticle({
+        id: Date.now().toString(), // temporary ID for the interface
+        ...data
+      });
     } catch (err: any) {
-      setError(err.message);
-      toast.error("Failed to extract article");
+      console.error('Article extraction error:', err);
+      const errorMessage = err.message || 'Failed to extract article';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsExtracting(false);
     }
