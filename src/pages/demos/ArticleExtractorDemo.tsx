@@ -23,20 +23,6 @@ const ArticleExtractorDemo = () => {
       setIsExtracting(true);
       setRawHtml(null);
 
-      // First fetch the raw HTML
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
-      }
-
-      const html = await response.text();
-      setRawHtml(html);
-
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
         body: { url }
@@ -51,9 +37,14 @@ const ArticleExtractorDemo = () => {
         throw new Error('No data returned from extraction');
       }
 
+      // Set the raw HTML from the edge function response
+      setRawHtml(data.rawHtml);
+      
+      // Remove rawHtml from the data before setting extracted article
+      const { rawHtml: _, ...articleData } = data;
       setExtractedArticle({
         id: Date.now().toString(), // temporary ID for the interface
-        ...data
+        ...articleData
       });
     } catch (err: any) {
       console.error('Article extraction error:', err);

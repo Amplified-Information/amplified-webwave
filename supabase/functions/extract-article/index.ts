@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Attempting to extract content from URL:', url);
+    console.log('Attempting to fetch content from URL:', url);
     
     try {
       // Validate URL format
@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
       // Use OpenAI to extract the article content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4",
         messages: [
           {
             role: "system",
@@ -161,7 +161,8 @@ Deno.serve(async (req) => {
         JSON.stringify({
           ...extractedData,
           url,
-          source: urlObj.hostname
+          source: urlObj.hostname,
+          rawHtml: html // Include the raw HTML in the response
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
