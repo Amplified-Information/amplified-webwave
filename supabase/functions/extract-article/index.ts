@@ -186,7 +186,7 @@ Deno.serve(async (req) => {
       // Use OpenAI to process the content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4",
         messages: [
           {
             role: "system",

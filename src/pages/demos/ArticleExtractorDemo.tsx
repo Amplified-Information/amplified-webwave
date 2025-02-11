@@ -8,7 +8,7 @@ import { ArticleDatabaseDiagram } from "@/components/demos/article-extractor/Art
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -18,27 +18,6 @@ const ArticleExtractorDemo = () => {
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
-  const [rawHtml, setRawHtml] = useState<string | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  // Effect to get HTML content from iframe after it loads
-  useEffect(() => {
-    if (previewUrl && iframeRef.current) {
-      const iframe = iframeRef.current;
-      iframe.onload = () => {
-        try {
-          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
-          if (iframeDocument) {
-            const html = iframeDocument.documentElement.outerHTML;
-            setRawHtml(html);
-          }
-        } catch (err) {
-          console.error('Error accessing iframe content:', err);
-          toast.error('Unable to access page content due to security restrictions');
-        }
-      };
-    }
-  }, [previewUrl]);
 
   const handleSubmit = async (url: string) => {
     try {
@@ -49,7 +28,6 @@ const ArticleExtractorDemo = () => {
       setIsExtracting(true);
       setExtractedArticle(null);
       setRawContent(null);
-      setRawHtml(null);
 
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
@@ -122,7 +100,7 @@ const ArticleExtractorDemo = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {previewUrl && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
@@ -130,25 +108,11 @@ const ArticleExtractorDemo = () => {
               </CardHeader>
               <CardContent className="p-0 h-full">
                 <iframe 
-                  ref={iframeRef}
                   src={previewUrl}
                   className="w-full h-full border-0"
                   title="Original article preview"
                   sandbox="allow-same-origin allow-scripts"
                 />
-              </CardContent>
-            </Card>
-          )}
-
-          {rawHtml && (
-            <Card className="h-[800px] overflow-hidden">
-              <CardHeader>
-                <CardTitle>Raw HTML</CardTitle>
-              </CardHeader>
-              <CardContent className="h-full overflow-auto">
-                <pre className="whitespace-pre-wrap text-sm font-mono p-4 bg-gray-50 rounded">
-                  {rawHtml}
-                </pre>
               </CardContent>
             </Card>
           )}
