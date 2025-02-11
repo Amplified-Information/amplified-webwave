@@ -6,6 +6,8 @@ import { ExtractedArticle } from "@/components/demos/article-extractor/Extracted
 import { ArticleExtractorDiagram } from "@/components/demos/article-extractor/ArticleExtractorDiagram";
 import { ArticleDatabaseDiagram } from "@/components/demos/article-extractor/ArticleDatabaseDiagram";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -17,13 +19,15 @@ const ArticleExtractorDemo = () => {
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
 
-  const handleSubmitUrl = async (url: string) => {
+  const handleSubmit = async (url: string) => {
     try {
       // Validate URL
       new URL(url);
       setPreviewUrl(url);
       setError(null);
       setIsExtracting(true);
+      setExtractedArticle(null);
+      setRawContent(null);
 
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
@@ -32,7 +36,13 @@ const ArticleExtractorDemo = () => {
 
       if (extractError) {
         console.error('Edge function error:', extractError);
-        throw new Error(extractError.message);
+        const errorDetails = typeof extractError === 'object' && extractError.message 
+          ? extractError.message 
+          : 'Failed to extract article content';
+        setError(errorDetails);
+        setRawContent(`Error extracting content: ${errorDetails}`);
+        toast.error(errorDetails);
+        return;
       }
 
       if (!data) {
@@ -41,7 +51,6 @@ const ArticleExtractorDemo = () => {
 
       // Set the raw content from the response
       setRawContent(data.rawContent);
-
       setExtractedArticle({
         id: Date.now().toString(), // temporary ID for the interface
         ...data
@@ -50,6 +59,7 @@ const ArticleExtractorDemo = () => {
       console.error('Article extraction error:', err);
       const errorMessage = err.message || 'Failed to extract article';
       setError(errorMessage);
+      setRawContent(`Error: ${errorMessage}`);
       toast.error(errorMessage);
     } finally {
       setIsExtracting(false);
@@ -70,7 +80,7 @@ const ArticleExtractorDemo = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <ArticleExtractionForm 
-              onSubmit={handleSubmitUrl}
+              onSubmit={handleSubmit}
               isExtracting={isExtracting}
               error={error}
             />
@@ -110,17 +120,33 @@ const ArticleExtractorDemo = () => {
           {rawContent && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
-                <CardTitle>Raw Extracted Content</CardTitle>
+                <CardTitle>
+                  {error ? (
+                    <div className="flex items-center gap-2 text-destructive">
+                      <AlertCircle className="h-5 w-5" />
+                      Extraction Error
+                    </div>
+                  ) : (
+                    "Raw Extracted Content"
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent className="h-full overflow-auto">
-                <pre className="whitespace-pre-wrap text-sm font-mono p-4 bg-gray-50 rounded">
-                  {rawContent}
-                </pre>
+                {error ? (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{rawContent}</AlertDescription>
+                  </Alert>
+                ) : (
+                  <pre className="whitespace-pre-wrap text-sm font-mono p-4 bg-gray-50 rounded">
+                    {rawContent}
+                  </pre>
+                )}
               </CardContent>
             </Card>
           )}
 
-          {extractedArticle && (
+          {extractedArticle && !error && (
             <ExtractedArticle article={extractedArticle} />
           )}
         </div>
