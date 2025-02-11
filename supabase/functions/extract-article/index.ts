@@ -9,9 +9,8 @@ const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY')
 });
 
-// Helper function to extract main content area from HTML
-function extractMainContent(html: string): string {
-  // More specific content patterns for articles
+// Helper function to find the main content section using patterns
+function findMainContentSection(html: string): { content: string; patternUsed: string } {
   const mainContentPatterns = [
     // Primary article patterns
     /<article[^>]*>([\s\S]*?)<\/article>/i,
@@ -24,14 +23,14 @@ function extractMainContent(html: string): string {
     /<div[^>]*(?:class|id)=['"](?:.*?content.*?|.*?main.*?|.*?body.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
   ];
 
-  let mainContent = '';
+  let content = '';
   let patternUsed = '';
   
   // Try each pattern until we find a match
   for (const pattern of mainContentPatterns) {
     const match = html.match(pattern);
     if (match && match[1]) {
-      mainContent = match[1];
+      content = match[1];
       patternUsed = pattern.toString().slice(0, 50) + '...';
       console.log('Found content using pattern:', patternUsed);
       break;
@@ -39,20 +38,26 @@ function extractMainContent(html: string): string {
   }
 
   // If no main content found, try to extract from body
-  if (!mainContent) {
+  if (!content) {
     console.log('No specific article container found, attempting body content extraction');
     const bodyMatch = /<body[^>]*>([\s\S]*?)<\/body>/i.exec(html);
     if (bodyMatch && bodyMatch[1]) {
-      mainContent = bodyMatch[1];
+      content = bodyMatch[1];
+      patternUsed = 'body tag';
       console.log('Extracted content from body tag');
     } else {
-      mainContent = html;
+      content = html;
+      patternUsed = 'full HTML';
       console.log('Using full HTML as content');
     }
   }
 
-  // Clean up the content more carefully
-  mainContent = mainContent
+  return { content, patternUsed };
+}
+
+// Helper function to clean HTML content
+function cleanHtmlContent(html: string): string {
+  return html
     // Remove scripts
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     // Remove styles
@@ -69,21 +74,24 @@ function extractMainContent(html: string): string {
     .replace(/<div[^>]*(?:class|id)=['"](?:.*?social.*?|.*?share.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
     // Remove advertisements
     .replace(/<div[^>]*(?:class|id)=['"](?:.*?ad.*?|.*?advertisement.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
-    // Remove remaining HTML tags
-    .replace(/<[^>]+>/g, ' ')
-    // Clean up excessive whitespace
-    .replace(/\s+/g, ' ')
+    // Keep HTML tags for display
     .trim();
+}
+
+// Main content extraction function
+function extractMainContent(html: string): string {
+  const { content, patternUsed } = findMainContentSection(html);
+  const cleanedContent = cleanHtmlContent(content);
 
   console.log('Content extraction stats:', {
     originalLength: html.length,
-    extractedLength: mainContent.length,
-    patternUsed: patternUsed || 'full body',
-    hasContent: mainContent.length > 0,
-    contentPreview: mainContent.slice(0, 200) + '...' // Added content preview for debugging
+    extractedLength: cleanedContent.length,
+    patternUsed: patternUsed,
+    hasContent: cleanedContent.length > 0,
+    contentPreview: cleanedContent.slice(0, 200) + '...'
   });
 
-  return mainContent;
+  return cleanedContent;
 }
 
 Deno.serve(async (req) => {
