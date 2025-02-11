@@ -12,7 +12,6 @@ const ArticleExtractorDemo = () => {
   const [error, setError] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
-  const [rawHtml, setRawHtml] = useState<string | null>(null);
 
   const handleSubmitUrl = async (url: string) => {
     try {
@@ -21,7 +20,6 @@ const ArticleExtractorDemo = () => {
       setPreviewUrl(url);
       setError(null);
       setIsExtracting(true);
-      setRawHtml(null);
 
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
@@ -37,14 +35,9 @@ const ArticleExtractorDemo = () => {
         throw new Error('No data returned from extraction');
       }
 
-      // Set the raw HTML from the edge function response (which is now the cleaned content)
-      setRawHtml(data.rawHtml);
-      
-      // Remove rawHtml from the data before setting extracted article
-      const { rawHtml: _, ...articleData } = data;
       setExtractedArticle({
         id: Date.now().toString(), // temporary ID for the interface
-        ...articleData
+        ...data
       });
     } catch (err: any) {
       console.error('Article extraction error:', err);
@@ -77,7 +70,7 @@ const ArticleExtractorDemo = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {previewUrl && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
@@ -90,20 +83,6 @@ const ArticleExtractorDemo = () => {
                   title="Original article preview"
                   sandbox="allow-same-origin allow-scripts"
                 />
-              </CardContent>
-            </Card>
-          )}
-
-          {rawHtml && (
-            <Card className="h-[800px] overflow-hidden">
-              <CardHeader>
-                <CardTitle>Extracted Content</CardTitle>
-                <CardDescription>Content that will be sent to AI for analysis</CardDescription>
-              </CardHeader>
-              <CardContent className="p-4 h-full overflow-auto">
-                <pre className="text-xs whitespace-pre-wrap break-words">
-                  {rawHtml}
-                </pre>
               </CardContent>
             </Card>
           )}

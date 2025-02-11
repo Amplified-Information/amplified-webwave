@@ -1,3 +1,4 @@
+
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
@@ -96,7 +97,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Attempting to fetch content from URL:', url);
+    console.log('Attempting to extract content from URL:', url);
     
     try {
       // Validate URL format
@@ -128,19 +129,22 @@ Deno.serve(async (req) => {
       // Use OpenAI to extract the article content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return your response as valid JSON with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Make sure to clean any advertisements or irrelevant content."
+            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return ONLY a JSON object with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Clean any advertisements or irrelevant content. If you cannot find any article content, return an error message in the JSON."
           },
           {
             role: "user",
             content: mainContent
           }
         ],
-        temperature: 0.3
+        temperature: 0.3,
+        response_format: { type: "json_object" }
       });
+
+      console.log('OpenAI API response received');
 
       if (!completion.choices?.[0]?.message?.content) {
         console.error('OpenAI API returned invalid response format');
@@ -148,6 +152,13 @@ Deno.serve(async (req) => {
       }
 
       const extractedData = JSON.parse(completion.choices[0].message.content);
+      
+      // Validate the extracted content
+      if (!extractedData.content || extractedData.content.trim().length < 50) {
+        console.error('Extracted content is too short or empty');
+        throw new Error('Failed to extract meaningful content from the article');
+      }
+
       console.log('Successfully extracted article data:', {
         hasTitle: !!extractedData.title,
         hasDescription: !!extractedData.description,
@@ -159,8 +170,7 @@ Deno.serve(async (req) => {
         JSON.stringify({
           ...extractedData,
           url,
-          source: urlObj.hostname,
-          rawHtml: mainContent // Send the cleaned content instead of raw HTML
+          source: urlObj.hostname
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
