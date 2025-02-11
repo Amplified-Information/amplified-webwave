@@ -31,22 +31,10 @@ const initialNodes = [
   },
   {
     id: 'clean',
+    type: 'output',
     data: { label: 'Clean & Format Content' },
     position: { x: 250, y: 300 },
     style: { backgroundColor: '#fef3c7', padding: '10px' }
-  },
-  {
-    id: 'ai',
-    data: { label: 'AI Content Processing' },
-    position: { x: 250, y: 400 },
-    style: { backgroundColor: '#f3e8ff', padding: '10px' }
-  },
-  {
-    id: 'output',
-    type: 'output',
-    data: { label: 'Formatted Article' },
-    position: { x: 250, y: 500 },
-    style: { backgroundColor: '#f3f4f6', padding: '10px' }
   },
 ];
 
@@ -54,8 +42,6 @@ const initialEdges = [
   { id: 'e1', source: 'input', target: 'fetch', animated: true },
   { id: 'e2', source: 'fetch', target: 'extract', animated: true },
   { id: 'e3', source: 'extract', target: 'clean', animated: true },
-  { id: 'e4', source: 'clean', target: 'ai', animated: true },
-  { id: 'e5', source: 'ai', target: 'output', animated: true },
 ];
 
 export const ArticleExtractorDiagram = () => {
