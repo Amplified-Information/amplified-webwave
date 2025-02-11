@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, LinkIcon, AlertTriangle, Info, Clock } from "lucide-react";
+import { Upload, LinkIcon, AlertTriangle, Info, Clock, Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -202,7 +202,14 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
                 disabled={isExtracting || !form.getValues("url")}
                 className="w-full"
               >
-                {isExtracting ? "Extracting..." : "Extract Article"}
+                {isExtracting ? (
+                  <span className="flex items-center gap-2">
+                    <Loader className="h-4 w-4 animate-spin" />
+                    Extracting...
+                  </span>
+                ) : (
+                  "Extract Article"
+                )}
               </Button>
             </div>
 
@@ -242,12 +249,16 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
               className="w-full"
               disabled={isAnalyzing || retryDelay > 0}
             >
-              {isAnalyzing 
-                ? "Analyzing..." 
-                : retryDelay > 0 
-                  ? `Try again in ${retryDelay}s` 
-                  : "Analyze Article"
-              }
+              {isAnalyzing ? (
+                <span className="flex items-center gap-2">
+                  <Loader className="h-4 w-4 animate-spin" />
+                  Analyzing...
+                </span>
+              ) : retryDelay > 0 ? (
+                `Try again in ${retryDelay}s`
+              ) : (
+                "Analyze Article"
+              )}
             </Button>
           </form>
         </Form>
