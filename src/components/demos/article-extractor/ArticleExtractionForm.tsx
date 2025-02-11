@@ -30,8 +30,16 @@ export const ArticleExtractionForm = ({
     }
   });
 
+  const [isExtractingWithAI, setIsExtractingWithAI] = useState(false);
+  const [isExtractingWithCode, setIsExtractingWithCode] = useState(false);
+
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onSubmit(values.url, false);
+    setIsExtractingWithCode(true);
+    try {
+      await onSubmit(values.url, false);
+    } finally {
+      setIsExtractingWithCode(false);
+    }
   };
 
   const handleAISubmit = async () => {
@@ -40,7 +48,12 @@ export const ArticleExtractionForm = ({
       form.trigger();
       return;
     }
-    await onSubmit(values.url, true);
+    setIsExtractingWithAI(true);
+    try {
+      await onSubmit(values.url, true);
+    } finally {
+      setIsExtractingWithAI(false);
+    }
   };
 
   return (
@@ -74,9 +87,9 @@ export const ArticleExtractionForm = ({
             <Button 
               type="submit" 
               className="w-full"
-              disabled={isExtracting}
+              disabled={isExtractingWithCode || isExtractingWithAI}
             >
-              {isExtracting ? (
+              {isExtractingWithCode ? (
                 <>
                   <Loader className="w-4 h-4 mr-2 animate-spin" />
                   Extracting...
@@ -90,10 +103,10 @@ export const ArticleExtractionForm = ({
               type="button"
               onClick={handleAISubmit}
               className="w-full bg-[#61892F] hover:bg-[#86C232]"
-              disabled={isExtracting}
+              disabled={isExtractingWithCode || isExtractingWithAI}
               variant="secondary"
             >
-              {isExtracting ? (
+              {isExtractingWithAI ? (
                 <>
                   <Loader className="w-4 h-4 mr-2 animate-spin" />
                   Extracting with AI...
