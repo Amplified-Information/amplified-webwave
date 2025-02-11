@@ -19,71 +19,60 @@ function extractMainContent(html: string): string {
     /<main[^>]*>([\s\S]*?)<\/main>/i,
     // Common article container patterns
     /<div[^>]*(?:class|id)=['"](?:.*?post-content.*?|.*?article-content.*?|.*?entry-content.*?|.*?story-content.*?|.*?article-body.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
-    // News site specific patterns
-    /<div[^>]*(?:class|id)=['"](?:.*?news-content.*?|.*?story-body.*?|.*?article-text.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
-    // Generic content patterns
-    /<div[^>]*(?:class|id)=['"](?:.*?content.*?|.*?main.*?|.*?body.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
+    // Content area patterns
+    /<div[^>]*(?:class|id)=['"](?:.*?content-area.*?|.*?main-content.*?|.*?page-content.*?)['"][^>]*>([\s\S]*?)<\/div>/i,
+    // Blog post patterns
+    /<div[^>]*(?:class|id)=['"](?:.*?blog-post.*?|.*?post-body.*?|.*?post-text.*?)['"][^>]*>([\s\S]*?)<\/div>/i
   ];
 
   let mainContent = '';
-  let patternUsed = '';
   
   // Try each pattern until we find a match
   for (const pattern of mainContentPatterns) {
     const match = html.match(pattern);
     if (match && match[1]) {
       mainContent = match[1];
-      patternUsed = pattern.toString().slice(0, 50) + '...';
-      console.log('Found content using pattern:', patternUsed);
+      console.log('Found content using pattern:', pattern.toString().slice(0, 50) + '...');
       break;
     }
   }
 
-  // If no main content found, try to extract from body
+  // If no main content found, try to extract from body but more selectively
   if (!mainContent) {
     console.log('No specific article container found, attempting body content extraction');
     const bodyMatch = /<body[^>]*>([\s\S]*?)<\/body>/i.exec(html);
     if (bodyMatch && bodyMatch[1]) {
       mainContent = bodyMatch[1];
-      console.log('Extracted content from body tag');
     } else {
       mainContent = html;
-      console.log('Using full HTML as content');
     }
   }
 
-  // Clean up the content more carefully
+  // Clean up the content
   mainContent = mainContent
     // Remove scripts
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     // Remove styles
     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+    // Remove navigation
+    .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, '')
+    // Remove headers
+    .replace(/<header\b[^<]*(?:(?!<\/header>)<[^<]*)*<\/header>/gi, '')
+    // Remove footers
+    .replace(/<footer\b[^<]*(?:(?!<\/footer>)<[^<]*)*<\/footer>/gi, '')
     // Remove comments
     .replace(/<!--[\s\S]*?-->/g, '')
-    // Remove navigation elements
-    .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, '')
-    // Remove headers (carefully)
-    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
-    // Remove footers (carefully)
-    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
     // Remove social media widgets
-    .replace(/<div[^>]*(?:class|id)=['"](?:.*?social.*?|.*?share.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
+    .replace(/<div[^>]*(?:class|id)=['"](?:.*?social.*?|.*?share.*?|.*?widget.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
     // Remove advertisements
     .replace(/<div[^>]*(?:class|id)=['"](?:.*?ad.*?|.*?advertisement.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
-    // Remove remaining HTML tags
-    .replace(/<[^>]+>/g, ' ')
-    // Clean up excessive whitespace
+    // Remove related articles sections
+    .replace(/<div[^>]*(?:class|id)=['"](?:.*?related.*?|.*?recommended.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
+    // Clean whitespace
     .replace(/\s+/g, ' ')
     .trim();
 
-  console.log('Content extraction stats:', {
-    originalLength: html.length,
-    extractedLength: mainContent.length,
-    patternUsed: patternUsed || 'full body',
-    hasContent: mainContent.length > 0,
-    contentPreview: mainContent.slice(0, 200) + '...' // Added content preview for debugging
-  });
-
+  console.log('Cleaned content length:', mainContent.length);
   return mainContent;
 }
 
@@ -118,88 +107,53 @@ Deno.serve(async (req) => {
         throw new Error('Invalid URL protocol');
       }
 
-      // Fetch the webpage content with more headers
+      // Fetch the webpage content
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         }
       });
 
       if (!response.ok) {
-        console.error('Failed to fetch URL:', response.status, response.statusText);
         throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
       }
 
       const html = await response.text();
       console.log('Successfully fetched HTML content, length:', html.length);
 
-      if (html.length < 100) {
-        console.error('Received suspiciously short HTML content');
-        throw new Error('Website returned invalid or empty content');
-      }
-
-      // Extract and clean main content
+      // Extract and clean main content before sending to OpenAI
       const mainContent = extractMainContent(html);
       console.log('Extracted main content length:', mainContent.length);
 
-      if (mainContent.length < 50) {  // Reduced minimum length for testing
-        console.error('Extracted content is suspiciously short:', mainContent);
-        throw new Error('Failed to extract meaningful content from the page');
-      }
-
-      // Use OpenAI to process the content
+      // Use OpenAI to extract the article content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",  // Changed to gpt-4o for better content extraction
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return only the extracted information in this exact format:\n\n{\n\"title\": \"Article Title\",\n\"description\": \"Brief description or summary\",\n\"content\": \"Full article content\",\n\"author\": \"Author name or null\",\n\"published\": \"Publication date or null\"\n}"
+            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return ONLY a JSON object with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Make sure to clean any advertisements or irrelevant content."
           },
           {
             role: "user",
             content: mainContent
           }
         ],
-        temperature: 0.3
+        temperature: 0.3,
+        response_format: { type: "json_object" }
       });
-
-      console.log('OpenAI API response received');
 
       if (!completion.choices?.[0]?.message?.content) {
         console.error('OpenAI API returned invalid response format');
         throw new Error('Failed to extract content: Invalid API response');
       }
 
-      let extractedData;
-      try {
-        extractedData = JSON.parse(completion.choices[0].message.content);
-        console.log('Successfully parsed OpenAI response:', {
-          hasTitle: !!extractedData.title,
-          hasDescription: !!extractedData.description,
-          contentPreview: extractedData.content?.slice(0, 100) + '...'
-        });
-      } catch (error) {
-        console.error('Failed to parse OpenAI response:', error);
-        throw new Error('Failed to parse extracted content format');
-      }
-
-      // Validate the extracted content
-      if (!extractedData.content || extractedData.content.trim().length < 50) {  // Reduced minimum length for testing
-        console.error('Extracted content validation failed:', {
-          contentLength: extractedData.content?.length || 0,
-          content: extractedData.content?.slice(0, 100) + '...'
-        });
-        throw new Error('Failed to extract meaningful content from the article');
-      }
-
+      const extractedData = JSON.parse(completion.choices[0].message.content);
       console.log('Successfully extracted article data:', {
         hasTitle: !!extractedData.title,
         hasDescription: !!extractedData.description,
+        hasContent: !!extractedData.content,
         contentLength: extractedData.content?.length || 0
       });
 
@@ -226,8 +180,8 @@ Deno.serve(async (req) => {
         errorMessage = 'Request timed out while trying to access the URL';
       } else if (error.message.includes('ECONNREFUSED')) {
         errorMessage = 'Connection refused by the server';
-      } else if (error.message.includes('Failed to parse')) {
-        errorMessage = 'Failed to parse article content';
+      } else if (error.message.includes('Failed to parse as JSON')) {
+        errorMessage = 'Failed to parse AI response';
         status = 500;
       }
 
