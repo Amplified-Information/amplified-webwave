@@ -1,4 +1,3 @@
-
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
@@ -133,15 +132,14 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return ONLY a JSON object with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Make sure to clean any advertisements or irrelevant content."
+            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return your response as valid JSON with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Make sure to clean any advertisements or irrelevant content."
           },
           {
             role: "user",
             content: mainContent
           }
         ],
-        temperature: 0.3,
-        response_format: { type: "json_object" }
+        temperature: 0.3
       });
 
       if (!completion.choices?.[0]?.message?.content) {
