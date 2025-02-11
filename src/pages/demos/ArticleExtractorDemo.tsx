@@ -37,7 +37,7 @@ const ArticleExtractorDemo = () => {
         throw new Error('No data returned from extraction');
       }
 
-      // Set the raw HTML from the edge function response
+      // Set the raw HTML from the edge function response (which is now the cleaned content)
       setRawHtml(data.rawHtml);
       
       // Remove rawHtml from the data before setting extracted article
@@ -97,8 +97,8 @@ const ArticleExtractorDemo = () => {
           {rawHtml && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
-                <CardTitle>Raw HTML</CardTitle>
-                <CardDescription>HTML content before extraction</CardDescription>
+                <CardTitle>Extracted Content</CardTitle>
+                <CardDescription>Content that will be sent to AI for analysis</CardDescription>
               </CardHeader>
               <CardContent className="p-4 h-full overflow-auto">
                 <pre className="text-xs whitespace-pre-wrap break-words">

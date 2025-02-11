@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
           ...extractedData,
           url,
           source: urlObj.hostname,
-          rawHtml: html // Include the raw HTML in the response
+          rawHtml: mainContent // Send the cleaned content instead of raw HTML
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
