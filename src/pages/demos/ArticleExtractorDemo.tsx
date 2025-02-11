@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArticleExtractionForm } from "@/components/demos/article-extractor/ArticleExtractionForm";
 import { ExtractedArticle } from "@/components/demos/article-extractor/ExtractedArticle";
 import { ArticleExtractorDiagram } from "@/components/demos/article-extractor/ArticleExtractorDiagram";
+import { ArticleDatabaseDiagram } from "@/components/demos/article-extractor/ArticleDatabaseDiagram";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -63,7 +65,18 @@ const ArticleExtractorDemo = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <ArticleExtractorDiagram />
+            <Tabs defaultValue="process" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="process">Process Flow</TabsTrigger>
+                <TabsTrigger value="datamodel">Data Model</TabsTrigger>
+              </TabsList>
+              <TabsContent value="process">
+                <ArticleExtractorDiagram />
+              </TabsContent>
+              <TabsContent value="datamodel">
+                <ArticleDatabaseDiagram />
+              </TabsContent>
+            </Tabs>
             <ArticleExtractionForm 
               onSubmit={handleSubmitUrl}
               isExtracting={isExtracting}
