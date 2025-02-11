@@ -43,18 +43,18 @@ serve(async (req) => {
 
     const html = await response.text();
 
-    // Ask GPT to extract the main article content
+    // Ask GPT to extract the main article content with source attribution
     console.log('Sending content to OpenAI for extraction');
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: "You are an expert at extracting the main content from web pages. Given an HTML document, find and extract ONLY the main article content. Remove all navigation, headers, footers, ads, and other non-article content. Return only the raw text of the article itself, preserving paragraphs with double line breaks. Do not include any HTML tags or formatting."
+          content: "You are an expert at extracting the main content from web pages. Given an HTML document and URL, extract ONLY the main article content. Add a source attribution at the top of the content. Remove all navigation, headers, footers, ads, and other non-article content. Return the content with source attribution in this format: \"Source: [Website Name] ([URL])\n\n[Article Content]\""
         },
         {
           role: "user",
-          content: html
+          content: `URL: ${url}\n\nHTML Content: ${html}`
         }
       ],
       temperature: 0.3,

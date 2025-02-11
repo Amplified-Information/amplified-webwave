@@ -1,4 +1,3 @@
-
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
@@ -186,15 +185,15 @@ Deno.serve(async (req) => {
       // Use OpenAI to process the content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return only the extracted information in this exact format:\n\n{\n\"title\": \"Article Title\",\n\"description\": \"Brief description or summary\",\n\"content\": \"Full article content\",\n\"author\": \"Author name or null\",\n\"published\": \"Publication date or null\"\n}"
+            content: "You are a precise article content extractor. Extract the main article content, title, description, and attribution details from the provided HTML. Return only the extracted information in this exact format:\n\n{\n\"title\": \"Article Title\",\n\"description\": \"Brief description or summary\",\n\"content\": \"Full article content with source attribution at the top\",\n\"author\": \"Author name or null\",\n\"published\": \"Publication date or null\",\n\"source\": \"Website name or source\"\n}"
           },
           {
             role: "user",
-            content: mainContent
+            content: `URL: ${url}\n\nContent:\n${mainContent}`
           }
         ],
         temperature: 0.3
