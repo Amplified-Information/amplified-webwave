@@ -12,6 +12,7 @@ const ArticleExtractorDemo = () => {
   const [error, setError] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
+  const [rawHtml, setRawHtml] = useState<string | null>(null);
 
   const handleSubmitUrl = async (url: string) => {
     try {
@@ -20,6 +21,21 @@ const ArticleExtractorDemo = () => {
       setPreviewUrl(url);
       setError(null);
       setIsExtracting(true);
+      setRawHtml(null);
+
+      // First fetch the raw HTML
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
+      }
+
+      const html = await response.text();
+      setRawHtml(html);
 
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
@@ -70,7 +86,7 @@ const ArticleExtractorDemo = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {previewUrl && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
@@ -83,6 +99,20 @@ const ArticleExtractorDemo = () => {
                   title="Original article preview"
                   sandbox="allow-same-origin allow-scripts"
                 />
+              </CardContent>
+            </Card>
+          )}
+
+          {rawHtml && (
+            <Card className="h-[800px] overflow-hidden">
+              <CardHeader>
+                <CardTitle>Raw HTML</CardTitle>
+                <CardDescription>HTML content before extraction</CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 h-full overflow-auto">
+                <pre className="text-xs whitespace-pre-wrap break-words">
+                  {rawHtml}
+                </pre>
               </CardContent>
             </Card>
           )}
