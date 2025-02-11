@@ -1,7 +1,7 @@
 
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload } from "lucide-react";
+import { ClipboardPaste } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
 
@@ -24,7 +24,7 @@ export const ContentInput = ({ form }: ContentInputProps) => {
       render={({ field }) => (
         <FormItem>
           <FormLabel className="flex items-center gap-2">
-            <Upload className="w-4 h-4" />
+            <ClipboardPaste className="w-4 h-4" />
             Paste Article Content
           </FormLabel>
           <FormControl>
