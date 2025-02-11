@@ -25,7 +25,7 @@ export const UrlInput = ({ form }: UrlInputProps) => {
         <FormItem>
           <FormLabel className="flex items-center gap-2">
             <LinkIcon className="w-4 h-4" />
-            Article URL
+            Article URL <span className="text-sm text-gray-500 ml-1">(Mandatory even if pasting the article manually)</span>
           </FormLabel>
           <FormControl>
             <Input 
