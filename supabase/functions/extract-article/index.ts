@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return ONLY a JSON object with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Clean any advertisements or irrelevant content. If you cannot find any article content, return an error message in the JSON."
+            content: "You are a precise article content extractor. Extract the main article content, title, and description from the provided HTML. Return ONLY a JSON object with the following fields: title (string), description (string), content (string), author (string or null), published (string or null). Make sure to clean any advertisements or irrelevant content."
           },
           {
             role: "user",
@@ -144,21 +144,12 @@ Deno.serve(async (req) => {
         response_format: { type: "json_object" }
       });
 
-      console.log('OpenAI API response received');
-
       if (!completion.choices?.[0]?.message?.content) {
         console.error('OpenAI API returned invalid response format');
         throw new Error('Failed to extract content: Invalid API response');
       }
 
       const extractedData = JSON.parse(completion.choices[0].message.content);
-      
-      // Validate the extracted content
-      if (!extractedData.content || extractedData.content.trim().length < 50) {
-        console.error('Extracted content is too short or empty');
-        throw new Error('Failed to extract meaningful content from the article');
-      }
-
       console.log('Successfully extracted article data:', {
         hasTitle: !!extractedData.title,
         hasDescription: !!extractedData.description,
