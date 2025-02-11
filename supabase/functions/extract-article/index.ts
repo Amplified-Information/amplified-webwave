@@ -78,18 +78,35 @@ function cleanHtmlContent(html: string): string {
     .trim();
 }
 
+// Helper function to get text content length (without HTML tags)
+function getTextContentLength(html: string): number {
+  // Create a temporary string without HTML tags for length calculation
+  const textContent = html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return textContent.length;
+}
+
 // Main content extraction function
 function extractMainContent(html: string): string {
   const { content, patternUsed } = findMainContentSection(html);
   const cleanedContent = cleanHtmlContent(content);
+  const textLength = getTextContentLength(cleanedContent);
 
   console.log('Content extraction stats:', {
     originalLength: html.length,
     extractedLength: cleanedContent.length,
+    textLength: textLength,
     patternUsed: patternUsed,
     hasContent: cleanedContent.length > 0,
     contentPreview: cleanedContent.slice(0, 200) + '...'
   });
+
+  if (textLength < 50) {
+    console.error('Extracted content is too short:', textLength, 'characters');
+    throw new Error('Failed to extract meaningful content from the article');
+  }
 
   return cleanedContent;
 }
