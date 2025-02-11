@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, LinkIcon, AlertTriangle, InfoIcon, Clock } from "lucide-react";
+import { Upload, LinkIcon, AlertTriangle, Info, Clock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -134,10 +134,10 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     <Card className="max-w-2xl mx-auto">
       <CardContent className="p-6">
         <Alert className="mb-6">
-          <InfoIcon className="h-4 w-4" />
+          <Info className="h-4 w-4" />
           <AlertTitle>Recommendation</AlertTitle>
           <AlertDescription>
-            For better analysis results, we recommend pasting the article content directly rather than using a URL. URL analysis currently processes the entire webpage instead of just the article content.
+            For better analysis results, we recommend pasting the article content directly rather than using a URL. URL analysis currently produces inconsistent results.
           </AlertDescription>
         </Alert>
 
@@ -158,7 +158,7 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
 
         {articleData && (
           <Alert className="mb-6">
-            <InfoIcon className="h-4 w-4" />
+            <Info className="h-4 w-4" />
             <AlertTitle>{articleData.title || 'Article Extracted'}</AlertTitle>
             <AlertDescription className="space-y-2">
               {articleData.author && <p>Author: {articleData.author}</p>}
