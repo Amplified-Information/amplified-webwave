@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArticleExtractionForm } from "@/components/demos/article-extractor/ArticleExtractionForm";
 import { ExtractedArticle } from "@/components/demos/article-extractor/ExtractedArticle";
+import { ProcessDiagram } from "@/components/ProcessDiagram";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -57,16 +58,22 @@ const ArticleExtractorDemo = () => {
           <CardHeader>
             <CardTitle>Article Extractor</CardTitle>
             <CardDescription>
-              Extract and analyze content from any article URL. Simply paste the URL 
-              and our system will extract the main content, metadata, and other relevant information.
+              Extract and analyze content from any article URL. Our intelligent system processes the 
+              content through multiple specialized AI agents to provide comprehensive analysis.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ArticleExtractionForm 
-              onSubmit={handleSubmitUrl}
-              isExtracting={isExtracting}
-              error={error}
-            />
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-4">How it works</h3>
+              <ProcessDiagram />
+            </div>
+            <div className="mt-8">
+              <ArticleExtractionForm 
+                onSubmit={handleSubmitUrl}
+                isExtracting={isExtracting}
+                error={error}
+              />
+            </div>
           </CardContent>
         </Card>
 
