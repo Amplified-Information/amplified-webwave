@@ -21,18 +21,19 @@ export const AIAgentsDescription = () => {
         <div className="p-4 bg-white rounded-lg shadow-sm">
           <h3 className="font-medium text-primary">Bias Detection Agent</h3>
           <div className="space-y-2 mt-2">
-            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Identifies potential biases, loaded terms, and emotional manipulation</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Identifies potential biases, loaded terms, and rhetoric</p>
             <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Ensure objectivity and fairness in reporting</p>
             <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> Former media watchdog specializing in identifying subtle forms of bias in journalism</p>
           </div>
         </div>
         
-        <div className="p-4 bg-white rounded-lg shadow-sm">
+        <div className="p-4 bg-white rounded-lg shadow-sm border-l-4 border-blue-400">
           <h3 className="font-medium text-primary">Fact-Checking Agent</h3>
           <div className="space-y-2 mt-2">
-            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Verifies factual claims and cross-references with reliable sources</p>
-            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Maintain high standards of accuracy and truthfulness</p>
-            <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> Experienced researcher with a background in data verification and fact-checking</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Analyzes factual claims and identifies areas needing verification</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Flag claims that require external verification</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Note:</span> This agent identifies claims that need fact-checking but does not perform real-time internet research</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Capabilities:</span> Identifies unsubstantiated claims, analyzes internal consistency, and suggests areas needing additional context or verification</p>
           </div>
         </div>
         
