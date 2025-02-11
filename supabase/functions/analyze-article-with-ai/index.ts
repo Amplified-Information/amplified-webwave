@@ -3,10 +3,6 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
-const openai = new OpenAI({
-  apiKey: Deno.env.get('OPENAI_API_KEY')
-});
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -19,9 +15,21 @@ serve(async (req) => {
   }
 
   try {
-    const { url } = await req.json();
+    const openai = new OpenAI({
+      apiKey: Deno.env.get('OPENAI_API_KEY')
+    });
 
+    if (!Deno.env.get('OPENAI_API_KEY')) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const { url } = await req.json();
     console.log('Fetching content from URL:', url);
+
+    if (!url) {
+      throw new Error('URL is required');
+    }
+
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',

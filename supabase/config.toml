@@ -26,6 +26,7 @@ enabled = true
 [realtime]
 enabled = true
 
+[functions]
 [functions.fetch-trade-data]
 verify_jwt = false
 
