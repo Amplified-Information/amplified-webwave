@@ -15,6 +15,7 @@ const ArticleExtractorDemo = () => {
   const [error, setError] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
+  const [rawContent, setRawContent] = useState<string | null>(null);
 
   const handleSubmitUrl = async (url: string) => {
     try {
@@ -37,6 +38,9 @@ const ArticleExtractorDemo = () => {
       if (!data) {
         throw new Error('No data returned from extraction');
       }
+
+      // Set the raw content from the response
+      setRawContent(data.rawContent);
 
       setExtractedArticle({
         id: Date.now().toString(), // temporary ID for the interface
@@ -85,7 +89,7 @@ const ArticleExtractorDemo = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {previewUrl && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
@@ -98,6 +102,19 @@ const ArticleExtractorDemo = () => {
                   title="Original article preview"
                   sandbox="allow-same-origin allow-scripts"
                 />
+              </CardContent>
+            </Card>
+          )}
+
+          {rawContent && (
+            <Card className="h-[800px] overflow-hidden">
+              <CardHeader>
+                <CardTitle>Raw Extracted Content</CardTitle>
+              </CardHeader>
+              <CardContent className="h-full overflow-auto">
+                <pre className="whitespace-pre-wrap text-sm font-mono p-4 bg-gray-50 rounded">
+                  {rawContent}
+                </pre>
               </CardContent>
             </Card>
           )}

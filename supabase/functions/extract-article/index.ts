@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
       const mainContent = extractMainContent(html);
       console.log('Extracted main content length:', mainContent.length);
 
-      if (mainContent.length < 50) {  // Reduced minimum length for testing
+      if (mainContent.length < 50) {
         console.error('Extracted content is suspiciously short:', mainContent);
         throw new Error('Failed to extract meaningful content from the page');
       }
@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
       // Use OpenAI to process the content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",  // Changed to gpt-4o for better content extraction
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -189,7 +189,7 @@ Deno.serve(async (req) => {
       }
 
       // Validate the extracted content
-      if (!extractedData.content || extractedData.content.trim().length < 50) {  // Reduced minimum length for testing
+      if (!extractedData.content || extractedData.content.trim().length < 50) {
         console.error('Extracted content validation failed:', {
           contentLength: extractedData.content?.length || 0,
           content: extractedData.content?.slice(0, 100) + '...'
@@ -207,7 +207,8 @@ Deno.serve(async (req) => {
         JSON.stringify({
           ...extractedData,
           url,
-          source: urlObj.hostname
+          source: urlObj.hostname,
+          rawContent: mainContent // Include the raw content in the response
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
