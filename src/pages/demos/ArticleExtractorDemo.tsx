@@ -6,8 +6,8 @@ import { ExtractedArticle } from "@/components/demos/article-extractor/Extracted
 import { ArticleExtractorDiagram } from "@/components/demos/article-extractor/ArticleExtractorDiagram";
 import { ArticleDatabaseDiagram } from "@/components/demos/article-extractor/ArticleDatabaseDiagram";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Info } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -70,6 +70,14 @@ const ArticleExtractorDemo = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <main className="container mx-auto px-6 py-8">
+        <Alert variant="default" className="mb-6 border-blue-200 bg-blue-50">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertTitle className="text-blue-600">Important Note About News Articles</AlertTitle>
+          <AlertDescription className="text-blue-700">
+            Many news providers actively block automated access to their content. If you&apos;re trying to extract content from a news website, you might encounter access restrictions. For best results, try using publicly accessible blog posts or articles, or consider copying and pasting the article content directly into the analysis tool.
+          </AlertDescription>
+        </Alert>
+
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Article Extractor</CardTitle>
