@@ -11,23 +11,47 @@ export const AIAgentsDescription = () => {
       <div className="grid gap-4 text-left">
         <div className="p-4 bg-white rounded-lg shadow-sm">
           <h3 className="font-medium text-primary">Lead Editor Agent</h3>
-          <p className="text-sm text-gray-600">Orchestrates the analysis and compiles the final report</p>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Orchestrates the analysis and compiles the final report</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Ensure comprehensive and well-structured analysis by coordinating other agents</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> A veteran editor with decades of experience in coordinating investigative journalism teams</p>
+          </div>
         </div>
+        
         <div className="p-4 bg-white rounded-lg shadow-sm">
           <h3 className="font-medium text-primary">Bias Detection Agent</h3>
-          <p className="text-sm text-gray-600">Identifies potential biases, loaded terms, and emotional manipulation</p>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Identifies potential biases, loaded terms, and emotional manipulation</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Ensure objectivity and fairness in reporting</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> Former media watchdog specializing in identifying subtle forms of bias in journalism</p>
+          </div>
         </div>
+        
         <div className="p-4 bg-white rounded-lg shadow-sm">
           <h3 className="font-medium text-primary">Fact-Checking Agent</h3>
-          <p className="text-sm text-gray-600">Verifies factual claims and cross-references with reliable sources</p>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Verifies factual claims and cross-references with reliable sources</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Maintain high standards of accuracy and truthfulness</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> Experienced researcher with a background in data verification and fact-checking</p>
+          </div>
         </div>
+        
         <div className="p-4 bg-white rounded-lg shadow-sm">
           <h3 className="font-medium text-primary">Quality Assessment Agent</h3>
-          <p className="text-sm text-gray-600">Evaluates writing quality, structure, and journalistic standards</p>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Evaluates writing quality, structure, and journalistic standards</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Ensure content meets professional journalism standards</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> Former journalism professor specializing in writing quality and storytelling</p>
+          </div>
         </div>
+        
         <div className="p-4 bg-white rounded-lg shadow-sm">
           <h3 className="font-medium text-primary">Source Credibility Agent</h3>
-          <p className="text-sm text-gray-600">Analyzes source reliability and author credentials</p>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm text-gray-600"><span className="font-medium">Role:</span> Analyzes source reliability and author credentials</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Goal:</span> Validate the credibility of information sources</p>
+            <p className="text-sm text-gray-600"><span className="font-medium">Backstory:</span> Expert in source verification with experience in digital forensics</p>
+          </div>
         </div>
       </div>
       
