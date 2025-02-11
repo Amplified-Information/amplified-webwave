@@ -1,3 +1,4 @@
+
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
@@ -142,7 +143,8 @@ Deno.serve(async (req) => {
         throw new Error('Invalid URL protocol');
       }
 
-      // Fetch the webpage content with more headers
+      // Fetch the webpage content with more headers and logging
+      console.log('Sending request to URL with headers...');
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -153,6 +155,9 @@ Deno.serve(async (req) => {
         }
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
         console.error('Failed to fetch URL:', response.status, response.statusText);
         throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
@@ -160,15 +165,18 @@ Deno.serve(async (req) => {
 
       const html = await response.text();
       console.log('Successfully fetched HTML content, length:', html.length);
+      console.log('First 500 characters of HTML:', html.substring(0, 500));
 
       if (html.length < 100) {
         console.error('Received suspiciously short HTML content');
         throw new Error('Website returned invalid or empty content');
       }
 
-      // Extract and clean main content
+      // Extract and clean main content with detailed logging
+      console.log('Attempting to extract main content...');
       const mainContent = extractMainContent(html);
       console.log('Extracted main content length:', mainContent.length);
+      console.log('First 500 characters of extracted content:', mainContent.substring(0, 500));
 
       if (mainContent.length < 50) {
         console.error('Extracted content is suspiciously short:', mainContent);
@@ -241,10 +249,17 @@ Deno.serve(async (req) => {
 
     } catch (error) {
       console.error('Article extraction error:', error);
+      console.error('Full error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+      
       let errorMessage = 'Failed to extract content from URL';
       let details = error.message;
       let status = 400;
       
+      // Enhanced error messages based on specific error types
       if (error.message.includes('Invalid URL')) {
         errorMessage = 'Invalid URL format';
       } else if (error.message.includes('ETIMEDOUT') || error.message.includes('timeout')) {
@@ -254,6 +269,12 @@ Deno.serve(async (req) => {
       } else if (error.message.includes('Failed to parse')) {
         errorMessage = 'Failed to parse article content';
         status = 500;
+      } else if (error.message.includes('403')) {
+        errorMessage = 'Access to the website is forbidden';
+        details = 'The website is blocking our request. Try copying and pasting the article content directly.';
+      } else if (error.message.includes('404')) {
+        errorMessage = 'Article not found';
+        details = 'The URL provided does not exist or has been moved.';
       }
 
       return new Response(
