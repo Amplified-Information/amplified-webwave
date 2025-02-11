@@ -18,6 +18,7 @@ const ArticleExtractorDemo = () => {
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
+  const [rawHtml, setRawHtml] = useState<string | null>(null);
 
   const handleSubmit = async (url: string) => {
     try {
@@ -28,6 +29,15 @@ const ArticleExtractorDemo = () => {
       setIsExtracting(true);
       setExtractedArticle(null);
       setRawContent(null);
+      setRawHtml(null);
+
+      // First fetch the raw HTML
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
+      }
+      const html = await response.text();
+      setRawHtml(html);
 
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
@@ -100,7 +110,7 @@ const ArticleExtractorDemo = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {previewUrl && (
             <Card className="h-[800px] overflow-hidden">
               <CardHeader>
@@ -113,6 +123,19 @@ const ArticleExtractorDemo = () => {
                   title="Original article preview"
                   sandbox="allow-same-origin allow-scripts"
                 />
+              </CardContent>
+            </Card>
+          )}
+
+          {rawHtml && (
+            <Card className="h-[800px] overflow-hidden">
+              <CardHeader>
+                <CardTitle>Raw HTML</CardTitle>
+              </CardHeader>
+              <CardContent className="h-full overflow-auto">
+                <pre className="whitespace-pre-wrap text-sm font-mono p-4 bg-gray-50 rounded">
+                  {rawHtml}
+                </pre>
               </CardContent>
             </Card>
           )}
