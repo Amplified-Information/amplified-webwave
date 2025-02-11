@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, Sparkles } from "lucide-react";
+import { AlertTriangle, Sparkles, Loader } from "lucide-react";
 
 const formSchema = z.object({
   url: z.string().url("Please enter a valid URL")
@@ -76,7 +76,14 @@ export const ArticleExtractionForm = ({
               className="w-full"
               disabled={isExtracting}
             >
-              {isExtracting ? "Extracting..." : "Extract Article"}
+              {isExtracting ? (
+                <>
+                  <Loader className="w-4 h-4 mr-2 animate-spin" />
+                  Extracting...
+                </>
+              ) : (
+                "Extract Article"
+              )}
             </Button>
 
             <Button 
@@ -86,8 +93,17 @@ export const ArticleExtractionForm = ({
               disabled={isExtracting}
               variant="secondary"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {isExtracting ? "Extracting..." : "Extract Article with AI"}
+              {isExtracting ? (
+                <>
+                  <Loader className="w-4 h-4 mr-2 animate-spin" />
+                  Extracting with AI...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Extract Article with AI
+                </>
+              )}
             </Button>
           </div>
         </form>
@@ -95,3 +111,4 @@ export const ArticleExtractionForm = ({
     </div>
   );
 };
+
