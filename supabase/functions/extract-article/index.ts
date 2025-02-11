@@ -1,4 +1,3 @@
-
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 
@@ -154,7 +153,7 @@ Deno.serve(async (req) => {
       // Use OpenAI to process the content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
