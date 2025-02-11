@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { CheckCircle, Brain, Newspaper } from "lucide-react";
+import { CheckCircle, Wrench } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -129,6 +129,9 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                   <CardTitle className="flex items-center gap-2">
                     {demo.isActive && (
                       <CheckCircle className="w-5 h-5 text-green-500" />
+                    )}
+                    {demo.status === "in development" && (
+                      <Wrench className="w-5 h-5 text-orange-500" />
                     )}
                     {demo.title}
                   </CardTitle>
