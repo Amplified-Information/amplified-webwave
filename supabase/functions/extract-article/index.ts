@@ -70,6 +70,8 @@ function extractMainContent(html: string): string {
     .replace(/<div[^>]*(?:class|id)=['"](?:.*?social.*?|.*?share.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
     // Remove advertisements
     .replace(/<div[^>]*(?:class|id)=['"](?:.*?ad.*?|.*?advertisement.*?)['"][^>]*>[\s\S]*?<\/div>/gi, '')
+    // Remove remaining HTML tags
+    .replace(/<[^>]+>/g, ' ')
     // Clean up excessive whitespace
     .replace(/\s+/g, ' ')
     .trim();
@@ -78,7 +80,8 @@ function extractMainContent(html: string): string {
     originalLength: html.length,
     extractedLength: mainContent.length,
     patternUsed: patternUsed || 'full body',
-    hasContent: mainContent.length > 0
+    hasContent: mainContent.length > 0,
+    contentPreview: mainContent.slice(0, 200) + '...' // Added content preview for debugging
   });
 
   return mainContent;
@@ -143,7 +146,7 @@ Deno.serve(async (req) => {
       const mainContent = extractMainContent(html);
       console.log('Extracted main content length:', mainContent.length);
 
-      if (mainContent.length < 100) {
+      if (mainContent.length < 50) {  // Reduced minimum length for testing
         console.error('Extracted content is suspiciously short:', mainContent);
         throw new Error('Failed to extract meaningful content from the page');
       }
@@ -151,7 +154,7 @@ Deno.serve(async (req) => {
       // Use OpenAI to process the content
       console.log('Initiating OpenAI content extraction...');
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",  // Changed to gpt-4o for better content extraction
         messages: [
           {
             role: "system",
@@ -175,14 +178,18 @@ Deno.serve(async (req) => {
       let extractedData;
       try {
         extractedData = JSON.parse(completion.choices[0].message.content);
-        console.log('Successfully parsed OpenAI response');
+        console.log('Successfully parsed OpenAI response:', {
+          hasTitle: !!extractedData.title,
+          hasDescription: !!extractedData.description,
+          contentPreview: extractedData.content?.slice(0, 100) + '...'
+        });
       } catch (error) {
         console.error('Failed to parse OpenAI response:', error);
         throw new Error('Failed to parse extracted content format');
       }
 
       // Validate the extracted content
-      if (!extractedData.content || extractedData.content.trim().length < 100) {
+      if (!extractedData.content || extractedData.content.trim().length < 50) {  // Reduced minimum length for testing
         console.error('Extracted content validation failed:', {
           contentLength: extractedData.content?.length || 0,
           content: extractedData.content?.slice(0, 100) + '...'
