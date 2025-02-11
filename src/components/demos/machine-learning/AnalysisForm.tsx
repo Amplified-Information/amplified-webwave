@@ -1,17 +1,18 @@
 
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, LinkIcon, AlertTriangle, Info, Clock, Loader, Sparkles } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AlertMessages } from "./form/AlertMessages";
+import { UrlInput } from "./form/UrlInput";
+import { ExtractionButtons } from "./form/ExtractionButtons";
+import { ContentInput } from "./form/ContentInput";
 
 const formSchema = z.object({
   url: z.string().url().optional(),
@@ -27,7 +28,7 @@ interface AnalysisFormProps {
   retryDelay: number;
 }
 
-interface ArticleData {
+export interface ArticleData {
   title?: string;
   description?: string;
   author?: string;
@@ -141,106 +142,22 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
   return (
     <Card className="max-w-2xl mx-auto">
       <CardContent className="p-6">
-        <Alert variant="default" className="mb-6 border-blue-200 bg-blue-50">
-          <Info className="h-4 w-4 text-blue-600" />
-          <AlertTitle className="text-blue-600">Important Note About News Articles</AlertTitle>
-          <AlertDescription className="text-blue-700">
-            Many news providers actively block automated access to their content. If you&apos;re trying to extract content from a news website, you might encounter access restrictions. For best results, try using publicly accessible blog posts or articles, or consider copying and pasting the article content directly into the analysis tool.
-          </AlertDescription>
-        </Alert>
-
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>
-              {retryDelay > 0 ? "Please Wait" : "Error"}
-            </AlertTitle>
-            <AlertDescription>
-              {retryDelay > 0 
-                ? `${error} (${retryDelay} seconds remaining)`
-                : error
-              }
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {articleData && (
-          <Alert className="mb-6">
-            <Info className="h-4 w-4" />
-            <AlertTitle>{articleData.title || 'Article Extracted'}</AlertTitle>
-            <AlertDescription className="space-y-2">
-              {articleData.author && <p>Author: {articleData.author}</p>}
-              {articleData.published && <p>Published: {new Date(articleData.published).toLocaleDateString()}</p>}
-              {articleData.ttr && (
-                <p className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  Reading time: {articleData.ttr} minutes
-                </p>
-              )}
-              {articleData.description && <p>{articleData.description}</p>}
-            </AlertDescription>
-          </Alert>
-        )}
+        <AlertMessages 
+          error={error}
+          retryDelay={retryDelay}
+          articleData={articleData}
+        />
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2">
-                      <LinkIcon className="w-4 h-4" />
-                      Article URL
-                    </FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="https://news-source.com/article" 
-                        {...field} 
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
+              <UrlInput form={form} />
+              <ExtractionButtons 
+                onExtract={handleExtractArticle}
+                isExtracting={isExtracting}
+                isExtractingWithAI={isExtractingWithAI}
+                isUrlProvided={!!form.getValues("url")}
               />
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => handleExtractArticle(false)}
-                  disabled={isExtracting || isExtractingWithAI || !form.getValues("url")}
-                  className="w-full"
-                >
-                  {isExtracting ? (
-                    <span className="flex items-center gap-2">
-                      <Loader className="h-4 w-4 animate-spin" />
-                      Extracting...
-                    </span>
-                  ) : (
-                    "Extract Article with Code"
-                  )}
-                </Button>
-
-                <Button
-                  type="button"
-                  onClick={() => handleExtractArticle(true)}
-                  disabled={isExtracting || isExtractingWithAI || !form.getValues("url")}
-                  className="w-full bg-[#61892F] hover:bg-[#86C232]"
-                  variant="secondary"
-                >
-                  {isExtractingWithAI ? (
-                    <span className="flex items-center gap-2">
-                      <Loader className="h-4 w-4 animate-spin" />
-                      Extracting with AI...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" />
-                      Extract Article with AI
-                    </span>
-                  )}
-                </Button>
-              </div>
             </div>
 
             <div className="relative">
@@ -254,25 +171,7 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
               </div>
             </div>
 
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    Paste Article Content
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Paste the article content here..." 
-                      className="min-h-[200px]"
-                      {...field} 
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <ContentInput form={form} />
 
             <Button 
               type="submit" 
