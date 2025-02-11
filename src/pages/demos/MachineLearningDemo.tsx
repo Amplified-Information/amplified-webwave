@@ -146,6 +146,16 @@ const MachineLearningDemo = () => {
       <div className="container mx-auto px-6 py-20">
         <MLDemoHeader />
 
+        <div className="max-w-2xl mx-auto mb-12 text-center">
+          <p className="text-lg text-gray-600 mb-4">Our AI system analyzes articles for:</p>
+          <ul className="space-y-2">
+            <li className="text-gray-700">• Potential bias indicators</li>
+            <li className="text-gray-700">• Source credibility assessment</li>
+            <li className="text-gray-700">• Fact-checking suggestions</li>
+            <li className="text-gray-700">• Writing quality metrics</li>
+          </ul>
+        </div>
+
         <div className="max-w-4xl mx-auto mb-12">
           <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
           <ProcessDiagram />
@@ -161,16 +171,6 @@ const MachineLearningDemo = () => {
         />
 
         <AnalysisResults results={analysisResults} />
-
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Our AI system analyzes articles for:</p>
-          <ul className="mt-2 space-y-1">
-            <li>• Potential bias indicators</li>
-            <li>• Source credibility assessment</li>
-            <li>• Fact-checking suggestions</li>
-            <li>• Writing quality metrics</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
