@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, LinkIcon, AlertTriangle, Info, Clock, Loader } from "lucide-react";
+import { Upload, LinkIcon, AlertTriangle, Info, Clock, Loader, Sparkles } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -40,6 +40,7 @@ interface ArticleData {
 
 export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: AnalysisFormProps) => {
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isExtractingWithAI, setIsExtractingWithAI] = useState(false);
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
   const { toast } = useToast();
   
@@ -51,16 +52,20 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     }
   });
 
-  const handleExtractArticle = async () => {
+  const handleExtractArticle = async (useAI: boolean = false) => {
     const url = form.getValues("url");
     if (!url) return;
 
-    setIsExtracting(true);
+    if (useAI) {
+      setIsExtractingWithAI(true);
+    } else {
+      setIsExtracting(true);
+    }
     setArticleData(null);
     
     try {
       const { data: extractionData, error: extractionError } = await supabase.functions
-        .invoke('extract-article', {
+        .invoke(useAI ? 'analyze-article-with-ai' : 'extract-article', {
           body: { url }
         });
 
@@ -82,7 +87,6 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
             message: 'Unable to extract article. Please paste the content manually.'
           });
 
-          // Fix: Properly type the textarea element
           setTimeout(() => {
             const contentTextarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement | null;
             if (contentTextarea) {
@@ -126,7 +130,11 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
         message: 'Failed to extract content. Please paste the article manually.'
       });
     } finally {
-      setIsExtracting(false);
+      if (useAI) {
+        setIsExtractingWithAI(false);
+      } else {
+        setIsExtracting(false);
+      }
     }
   };
 
@@ -195,22 +203,44 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
                   </FormItem>
                 )}
               />
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleExtractArticle}
-                disabled={isExtracting || !form.getValues("url")}
-                className="w-full"
-              >
-                {isExtracting ? (
-                  <span className="flex items-center gap-2">
-                    <Loader className="h-4 w-4 animate-spin" />
-                    Extracting...
-                  </span>
-                ) : (
-                  "Extract Article"
-                )}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleExtractArticle(false)}
+                  disabled={isExtracting || isExtractingWithAI || !form.getValues("url")}
+                  className="w-full"
+                >
+                  {isExtracting ? (
+                    <span className="flex items-center gap-2">
+                      <Loader className="h-4 w-4 animate-spin" />
+                      Extracting...
+                    </span>
+                  ) : (
+                    "Extract Article with Code"
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => handleExtractArticle(true)}
+                  disabled={isExtracting || isExtractingWithAI || !form.getValues("url")}
+                  className="w-full bg-[#61892F] hover:bg-[#86C232]"
+                  variant="secondary"
+                >
+                  {isExtractingWithAI ? (
+                    <span className="flex items-center gap-2">
+                      <Loader className="h-4 w-4 animate-spin" />
+                      Extracting with AI...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Extract Article with AI
+                    </span>
+                  )}
+                </Button>
+              </div>
             </div>
 
             <div className="relative">
@@ -266,4 +296,3 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     </Card>
   );
 };
-
