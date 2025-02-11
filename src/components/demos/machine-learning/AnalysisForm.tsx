@@ -133,11 +133,11 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
   return (
     <Card className="max-w-2xl mx-auto">
       <CardContent className="p-6">
-        <Alert className="mb-6">
-          <Info className="h-4 w-4" />
-          <AlertTitle>Recommendation</AlertTitle>
-          <AlertDescription>
-            For better analysis results, we recommend pasting the article content directly rather than using a URL. URL analysis currently produces inconsistent results.
+        <Alert variant="default" className="mb-6 border-blue-200 bg-blue-50">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertTitle className="text-blue-600">Important Note About News Articles</AlertTitle>
+          <AlertDescription className="text-blue-700">
+            Many news providers actively block automated access to their content. If you&apos;re trying to extract content from a news website, you might encounter access restrictions. For best results, try using publicly accessible blog posts or articles, or consider copying and pasting the article content directly into the analysis tool.
           </AlertDescription>
         </Alert>
 
@@ -266,3 +266,4 @@ export const AnalysisForm = ({ onSubmit, isAnalyzing, error, retryDelay }: Analy
     </Card>
   );
 };
+
