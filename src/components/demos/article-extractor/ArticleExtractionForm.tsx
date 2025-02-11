@@ -1,3 +1,4 @@
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -88,7 +89,7 @@ export const ArticleExtractionForm = ({
             <Button 
               type="button"
               onClick={handleAISubmit}
-              className="w-full"
+              className="w-full bg-[#86C232] hover:bg-[#61892F]"
               disabled={isExtracting}
               variant="secondary"
             >
