@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Sparkles } from "lucide-react";
 
 const formSchema = z.object({
   url: z.string().url("Please enter a valid URL")
@@ -31,6 +31,15 @@ export const ArticleExtractionForm = ({
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    await onSubmit(values.url);
+  };
+
+  const handleAISubmit = async () => {
+    const values = form.getValues();
+    if (!form.formState.isValid) {
+      form.trigger();
+      return;
+    }
     await onSubmit(values.url);
   };
 
@@ -61,15 +70,29 @@ export const ArticleExtractionForm = ({
             )}
           />
           
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={isExtracting}
-          >
-            {isExtracting ? "Extracting..." : "Extract Article"}
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isExtracting}
+            >
+              {isExtracting ? "Extracting..." : "Extract Article"}
+            </Button>
+
+            <Button 
+              type="button"
+              onClick={handleAISubmit}
+              className="w-full"
+              disabled={isExtracting}
+              variant="secondary"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {isExtracting ? "Extracting..." : "Extract Article with AI"}
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
   );
 };
+
