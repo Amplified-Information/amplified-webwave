@@ -89,7 +89,7 @@ export const ArticleExtractionForm = ({
             <Button 
               type="button"
               onClick={handleAISubmit}
-              className="w-full bg-[#86C232] hover:bg-[#61892F]"
+              className="w-full bg-[#61892F] hover:bg-[#86C232]"
               disabled={isExtracting}
               variant="secondary"
             >
