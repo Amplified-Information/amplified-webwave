@@ -8,7 +8,7 @@ import { ArticleDatabaseDiagram } from "@/components/demos/article-extractor/Art
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -19,6 +19,26 @@ const ArticleExtractorDemo = () => {
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
   const [rawHtml, setRawHtml] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Effect to get HTML content from iframe after it loads
+  useEffect(() => {
+    if (previewUrl && iframeRef.current) {
+      const iframe = iframeRef.current;
+      iframe.onload = () => {
+        try {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDocument) {
+            const html = iframeDocument.documentElement.outerHTML;
+            setRawHtml(html);
+          }
+        } catch (err) {
+          console.error('Error accessing iframe content:', err);
+          toast.error('Unable to access page content due to security restrictions');
+        }
+      };
+    }
+  }, [previewUrl]);
 
   const handleSubmit = async (url: string) => {
     try {
@@ -30,14 +50,6 @@ const ArticleExtractorDemo = () => {
       setExtractedArticle(null);
       setRawContent(null);
       setRawHtml(null);
-
-      // First fetch the raw HTML
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
-      }
-      const html = await response.text();
-      setRawHtml(html);
 
       // Call the extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
@@ -118,6 +130,7 @@ const ArticleExtractorDemo = () => {
               </CardHeader>
               <CardContent className="p-0 h-full">
                 <iframe 
+                  ref={iframeRef}
                   src={previewUrl}
                   className="w-full h-full border-0"
                   title="Original article preview"
