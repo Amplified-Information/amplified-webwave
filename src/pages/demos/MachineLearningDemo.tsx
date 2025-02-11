@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +19,9 @@ const MachineLearningDemo = () => {
   const onSubmit = async (values: { url?: string; content?: string }) => {
     setIsAnalyzing(true);
     setError(null);
+    
     try {
+      // Create the article first
       const { data: article, error: articleError } = await supabase
         .from('articles')
         .insert({
@@ -28,8 +31,12 @@ const MachineLearningDemo = () => {
         .select()
         .single();
 
-      if (articleError) throw articleError;
+      if (articleError) {
+        console.error('Article creation error:', articleError);
+        throw articleError;
+      }
 
+      // Call the analyze-article function
       const { data: analysisData, error: analysisError } = await supabase.functions
         .invoke('analyze-article', {
           body: {
@@ -40,31 +47,70 @@ const MachineLearningDemo = () => {
         });
 
       if (analysisError) {
-        if (analysisError.status === 429) {
-          const retryAfter = 60;
-          setRetryDelay(retryAfter);
-          setError(`Our AI service is currently at capacity. Please try again in ${retryAfter} seconds.`);
+        console.error('Analysis error:', analysisError);
+        
+        try {
+          // Parse the error body
+          const errorBody = JSON.parse(analysisError.message);
+          const parsedBody = errorBody.body ? JSON.parse(errorBody.body) : null;
           
-          const timer = setInterval(() => {
-            setRetryDelay((prev) => {
-              if (prev <= 1) {
-                clearInterval(timer);
-                return 0;
-              }
-              return prev - 1;
+          // Handle specific error cases
+          if (analysisError.status === 400) {
+            const errorMessage = parsedBody?.error || "Failed to process the URL";
+            const errorDetails = parsedBody?.details || "Please try pasting the article content directly.";
+            
+            setError(errorMessage);
+            toast({
+              title: "URL Processing Failed",
+              description: errorDetails,
+              variant: "destructive"
             });
-          }, 1000);
+            return;
+          }
 
+          if (analysisError.status === 429) {
+            const retryAfter = 60;
+            setRetryDelay(retryAfter);
+            setError(`Our AI service is currently at capacity. Please try again in ${retryAfter} seconds.`);
+            
+            const timer = setInterval(() => {
+              setRetryDelay((prev) => {
+                if (prev <= 1) {
+                  clearInterval(timer);
+                  return 0;
+                }
+                return prev - 1;
+              });
+            }, 1000);
+
+            toast({
+              title: "Rate Limit Exceeded",
+              description: "Please wait a minute before trying again.",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          // Handle other errors
+          setError(parsedBody?.error || "An unexpected error occurred");
           toast({
-            title: "Rate Limit Exceeded",
-            description: "Please wait a minute before trying again.",
+            title: "Analysis Failed",
+            description: parsedBody?.details || "Please try again later",
             variant: "destructive"
           });
-          return;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          setError("An unexpected error occurred");
+          toast({
+            title: "Error",
+            description: "An unexpected error occurred. Please try again.",
+            variant: "destructive"
+          });
         }
-        throw analysisError;
+        return;
       }
 
+      // Fetch the analysis results
       const { data: results, error: resultsError } = await supabase
         .from('analysis_results')
         .select(`
@@ -75,7 +121,7 @@ const MachineLearningDemo = () => {
 
       if (resultsError) throw resultsError;
 
-      setAnalysisResults(results);
+      setAnalysisResults(results || []);
       
       toast({
         title: "Analysis completed",
@@ -86,7 +132,7 @@ const MachineLearningDemo = () => {
       setError(error.message || "Failed to analyze the article. Please try again.");
       toast({
         title: "Error",
-        description: error.message || "Failed to analyze the article. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
     } finally {

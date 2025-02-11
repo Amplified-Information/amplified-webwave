@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle, Brain, Newspaper } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { CheckCircle, Wrench, Clock } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -37,6 +37,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "News Article Analysis with AI",
       description: "Analyze news articles with AI for key insights and summaries",
       path: "/demo/machine-learning",
+      status: "in development"
+    },
+    {
+      title: "Article Content Extractor",
+      description: "Extract and analyze content from any article URL",
+      path: "/demo/article-extractor",
       status: "in development"
     },
     {
@@ -90,6 +96,21 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
           </div>
         )}
 
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>About This Site</CardTitle>
+            <CardDescription>Welcome to our interactive demonstration platform</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              This demo section showcases our various capabilities and solutions through hands-on, interactive examples. 
+              Each demo is carefully crafted to demonstrate specific features and functionalities of our platform. 
+              From AI-powered garden planning to real-time analytics and financial tools, you can explore and 
+              experience our technology firsthand. Select any demo below to get started.
+            </p>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {demos.map((demo) => (
             <Link 
@@ -108,6 +129,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                   <CardTitle className="flex items-center gap-2">
                     {demo.isActive && (
                       <CheckCircle className="w-5 h-5 text-green-500" />
+                    )}
+                    {demo.status === "in development" && (
+                      <Wrench className="w-5 h-5 text-orange-500" />
+                    )}
+                    {!demo.isActive && !demo.status && (
+                      <Clock className="w-5 h-5 text-gray-500" />
                     )}
                     {demo.title}
                   </CardTitle>
@@ -131,4 +158,3 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     </section>
   );
 };
-

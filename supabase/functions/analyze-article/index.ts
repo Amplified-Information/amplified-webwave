@@ -2,6 +2,7 @@
 import { corsHeaders } from '../_shared/cors.ts';
 import { OpenAI } from 'https://esm.sh/openai@4.28.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import { extract } from 'https://esm.sh/@extractus/article-extractor@8.0.4';
 
 const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY'),
@@ -16,6 +17,54 @@ interface AnalysisRequest {
 interface AgentResponse {
   analysis: Record<string, any>;
   confidence: number;
+}
+
+async function extractArticleContent(url: string): Promise<string> {
+  console.log('Starting URL extraction for:', url);
+  
+  if (!url) {
+    console.log('No URL provided');
+    throw new Error('No URL provided');
+  }
+
+  try {
+    const urlObj = new URL(url);
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      console.log('Invalid URL protocol:', urlObj.protocol);
+      throw new Error('Invalid URL protocol');
+    }
+
+    const article = await extract(url);
+    
+    if (!article) {
+      console.log('No article data returned from extraction');
+      throw new Error('Could not extract content from URL');
+    }
+
+    if (!article.content) {
+      console.log('Article found but no content available:', article);
+      throw new Error('No content found in article');
+    }
+
+    const cleanContent = article.content
+      .replace(/<[^>]*>/g, '')  // Remove HTML tags
+      .replace(/\s+/g, ' ')     // Normalize whitespace
+      .trim();                  // Remove leading/trailing whitespace
+
+    if (!cleanContent) {
+      console.log('Content was empty after cleaning');
+      throw new Error('Content was empty after cleaning');
+    }
+
+    console.log('Successfully extracted content from URL, length:', cleanContent.length);
+    return cleanContent;
+  } catch (error) {
+    console.error('Article extraction error:', error);
+    if (error.message.includes('Invalid URL')) {
+      throw new Error('Invalid URL format');
+    }
+    throw new Error('Failed to extract content from URL');
+  }
 }
 
 async function runAgent(role: string, content: string, previousAnalyses: Record<string, any>[] = []): Promise<AgentResponse> {
@@ -68,7 +117,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",  // Fixed: Using the correct model name
+      model: "gpt-4o", // Fixed model name
       messages: [
         { role: "system", content: systemPrompts[role] },
         { role: "user", content: prompt }
@@ -76,8 +125,12 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
       temperature: 0.3,
     });
 
+    if (!response.choices[0].message?.content) {
+      throw new Error('No response from OpenAI');
+    }
+
     try {
-      const analysis = JSON.parse(response.choices[0].message.content || "{}");
+      const analysis = JSON.parse(response.choices[0].message.content);
       return {
         analysis,
         confidence: 0.85
@@ -99,6 +152,7 @@ async function runAgent(role: string, content: string, previousAnalyses: Record<
 }
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -106,10 +160,69 @@ Deno.serve(async (req) => {
   try {
     const { articleId, content, url } = await req.json() as AnalysisRequest;
     
+    let articleContent = content;
+    
+    // Validate input
+    if (!articleId) {
+      return new Response(
+        JSON.stringify({
+          error: 'Missing article ID',
+          details: 'Article ID is required'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Only attempt URL extraction if no direct content is provided
+    if (url && !content) {
+      try {
+        articleContent = await extractArticleContent(url);
+        console.log('Successfully extracted content from URL');
+      } catch (error) {
+        console.error('URL extraction error:', error);
+        return new Response(
+          JSON.stringify({
+            error: 'URL processing failed',
+            details: 'Unable to extract content from the provided URL. Please paste the article content directly.'
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+    }
+
+    // Validate content
+    if (!articleContent || articleContent.trim().length === 0) {
+      return new Response(
+        JSON.stringify({
+          error: 'No article content provided',
+          details: 'Please provide either URL or article content.'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // Update article with extracted content if it came from URL
+    if (url && articleContent !== content) {
+      const { error: updateError } = await supabaseClient
+        .from('articles')
+        .update({ content: articleContent })
+        .eq('id', articleId);
+
+      if (updateError) {
+        console.error('Error updating article content:', updateError);
+      }
+    }
 
     const { data: agents, error: agentsError } = await supabaseClient
       .from('agent_configurations')
@@ -129,9 +242,9 @@ Deno.serve(async (req) => {
     for (const agent of agents) {
       try {
         console.log(`Running ${agent.name} analysis...`);
-        const result = await runAgent(agent.type, content, analyses);
+        const result = await runAgent(agent.type, articleContent, analyses);
         
-        const { data, error } = await supabaseClient
+        const { error } = await supabaseClient
           .from('analysis_results')
           .insert({
             article_id: articleId,
@@ -139,16 +252,17 @@ Deno.serve(async (req) => {
             analysis_data: result.analysis,
             confidence_score: result.confidence,
             status: 'completed'
-          })
-          .select()
-          .single();
+          });
 
         if (error) throw error;
         analyses.push(result.analysis);
       } catch (error) {
         console.error(`Error in agent ${agent.name}:`, error);
         
-        // Store the error in the analysis results
+        if (error.message.includes('rate limit')) {
+          throw error; // Re-throw rate limit errors to be handled by outer catch
+        }
+        
         await supabaseClient
           .from('analysis_results')
           .insert({
@@ -158,11 +272,6 @@ Deno.serve(async (req) => {
             confidence_score: 0,
             status: 'failed'
           });
-
-        // If it's a rate limit error, stop processing further agents
-        if (error.message.includes('rate limit')) {
-          throw error;
-        }
       }
     }
 
@@ -171,16 +280,19 @@ Deno.serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    console.error('Error:', error.message);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error.message.includes('rate limit') ? 
-          'The AI service is currently at capacity. Please try again in a few minutes.' : 
-          'An error occurred during analysis.'
-      }), {
+    console.error('Error in analyze-article function:', error);
+    
+    const status = error.message.includes('rate limit') ? 429 : 500;
+    const details = status === 429 
+      ? 'Please try again in a few minutes.'
+      : 'An unexpected error occurred. Please try again.';
+
+    return new Response(JSON.stringify({
+      error: error.message,
+      details
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: error.message.includes('rate limit') ? 429 : 500,
+      status,
     });
   }
 });

@@ -33,3 +33,7 @@ verify_jwt = false
 [[functions]]
 [functions.analyze-article]
 verify_jwt = false
+
+[[functions]]
+[functions.extract-article]
+verify_jwt = false
