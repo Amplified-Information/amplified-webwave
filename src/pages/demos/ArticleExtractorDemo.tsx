@@ -79,6 +79,15 @@ const ArticleExtractorDemo = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <Alert>
+              <InfoIcon className="h-4 w-4" />
+              <AlertTitle>Recommendation</AlertTitle>
+              <AlertDescription>
+                For better analysis results, we recommend pasting the article content directly rather than using a URL. 
+                URL analysis currently produces inconsistent results.
+              </AlertDescription>
+            </Alert>
+
             <ArticleExtractionForm 
               onSubmit={handleSubmit}
               isExtracting={isExtracting}
