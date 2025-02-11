@@ -19,7 +19,7 @@ const ArticleExtractorDemo = () => {
   const [extractedArticle, setExtractedArticle] = useState<any>(null);
   const [rawContent, setRawContent] = useState<string | null>(null);
 
-  const handleSubmit = async (url: string) => {
+  const handleSubmit = async (url: string, useAI: boolean = false) => {
     try {
       // Validate URL
       new URL(url);
@@ -29,7 +29,28 @@ const ArticleExtractorDemo = () => {
       setExtractedArticle(null);
       setRawContent(null);
 
-      // Call the extract-article edge function
+      if (useAI) {
+        // Call the AI-powered extraction function
+        const { data: aiData, error: aiError } = await supabase.functions.invoke('analyze-article-with-ai', {
+          body: { url }
+        });
+
+        if (aiError) {
+          console.error('AI extraction error:', aiError);
+          setError(aiError.message);
+          toast.error(aiError.message);
+          return;
+        }
+
+        if (!aiData?.rawContent) {
+          throw new Error('No content extracted by AI');
+        }
+
+        setRawContent(aiData.rawContent);
+        return;
+      }
+
+      // Call the regular extract-article edge function
       const { data, error: extractError } = await supabase.functions.invoke('extract-article', {
         body: { url }
       });

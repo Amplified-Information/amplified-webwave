@@ -13,7 +13,7 @@ const formSchema = z.object({
 });
 
 interface ArticleExtractionFormProps {
-  onSubmit: (url: string) => Promise<void>;
+  onSubmit: (url: string, useAI?: boolean) => Promise<void>;
   isExtracting: boolean;
   error: string | null;
 }
@@ -31,7 +31,7 @@ export const ArticleExtractionForm = ({
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onSubmit(values.url);
+    await onSubmit(values.url, false);
   };
 
   const handleAISubmit = async () => {
@@ -40,7 +40,7 @@ export const ArticleExtractionForm = ({
       form.trigger();
       return;
     }
-    await onSubmit(values.url);
+    await onSubmit(values.url, true);
   };
 
   return (
@@ -95,4 +95,3 @@ export const ArticleExtractionForm = ({
     </div>
   );
 };
-
