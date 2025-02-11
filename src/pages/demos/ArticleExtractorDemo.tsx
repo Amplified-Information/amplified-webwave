@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArticleExtractionForm } from "@/components/demos/article-extractor/ArticleExtractionForm";
 import { ExtractedArticle } from "@/components/demos/article-extractor/ExtractedArticle";
+import { ArticleExtractorDiagram } from "@/components/demos/article-extractor/ArticleExtractorDiagram";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -61,7 +62,8 @@ const ArticleExtractorDemo = () => {
               and our system will extract the main content, metadata, and other relevant information.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
+            <ArticleExtractorDiagram />
             <ArticleExtractionForm 
               onSubmit={handleSubmitUrl}
               isExtracting={isExtracting}
