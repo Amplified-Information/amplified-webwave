@@ -2,11 +2,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, Sparkles, Loader } from "lucide-react";
+import { AlertTriangle, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ExtractButton } from "./form/ExtractButton";
+import { UrlInput } from "./form/UrlInput";
 
 const formSchema = z.object({
   url: z.string().url("Please enter a valid URL")
@@ -67,57 +68,28 @@ export const ArticleExtractionForm = ({
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="url"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Article URL</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="https://example.com/article" 
-                    {...field} 
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <UrlInput form={form} />
           
           <div className="space-y-2">
-            <Button 
-              type="submit" 
-              className="w-full"
+            <ExtractButton 
+              isExtracting={isExtractingWithCode}
               disabled={isExtractingWithCode || isExtractingWithAI}
+              className="w-full"
             >
-              {isExtractingWithCode ? (
-                <>
-                  <Loader className="w-4 h-4 mr-2 animate-spin" />
-                  Extracting...
-                </>
-              ) : (
-                "Extract Article with Code"
-              )}
-            </Button>
+              Extract Article with Code
+            </ExtractButton>
 
-            <Button 
+            <ExtractButton 
               type="button"
               onClick={handleAISubmit}
-              className="w-full bg-[#61892F] hover:bg-[#86C232]"
+              isExtracting={isExtractingWithAI}
               disabled={isExtractingWithCode || isExtractingWithAI}
+              className="w-full bg-[#61892F] hover:bg-[#86C232]"
               variant="secondary"
             >
-              {isExtractingWithAI ? (
-                <>
-                  <Loader className="w-4 h-4 mr-2 animate-spin" />
-                  Extracting with AI...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Extract Article with AI
-                </>
-              )}
-            </Button>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Extract Article with AI
+            </ExtractButton>
           </div>
         </form>
       </Form>
