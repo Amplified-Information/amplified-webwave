@@ -69,6 +69,12 @@ const ArticleExtractorDemo = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <ArticleExtractionForm 
+              onSubmit={handleSubmitUrl}
+              isExtracting={isExtracting}
+              error={error}
+            />
+
             <Tabs defaultValue="process" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="process">Process Flow</TabsTrigger>
@@ -81,11 +87,6 @@ const ArticleExtractorDemo = () => {
                 <ArticleDatabaseDiagram />
               </TabsContent>
             </Tabs>
-            <ArticleExtractionForm 
-              onSubmit={handleSubmitUrl}
-              isExtracting={isExtracting}
-              error={error}
-            />
           </CardContent>
         </Card>
 
