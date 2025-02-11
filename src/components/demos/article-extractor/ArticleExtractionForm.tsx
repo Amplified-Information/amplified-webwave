@@ -13,6 +13,8 @@ const formSchema = z.object({
   url: z.string().url("Please enter a valid URL")
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 interface ArticleExtractionFormProps {
   onSubmit: (url: string, useAI?: boolean) => Promise<void>;
   isExtracting: boolean;
@@ -24,7 +26,7 @@ export const ArticleExtractionForm = ({
   isExtracting, 
   error 
 }: ArticleExtractionFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       url: ""
@@ -34,7 +36,7 @@ export const ArticleExtractionForm = ({
   const [isExtractingWithAI, setIsExtractingWithAI] = useState(false);
   const [isExtractingWithCode, setIsExtractingWithCode] = useState(false);
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: FormData) => {
     setIsExtractingWithCode(true);
     try {
       await onSubmit(values.url, false);
@@ -96,3 +98,4 @@ export const ArticleExtractionForm = ({
     </div>
   );
 };
+

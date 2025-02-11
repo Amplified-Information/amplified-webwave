@@ -9,10 +9,14 @@ import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import * as z from "zod";
 
+const formSchema = z.object({
+  url: z.string().url("Please enter a valid URL")
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 interface UrlInputProps {
-  form: UseFormReturn<{
-    url: string;
-  }>;
+  form: UseFormReturn<FormData>;
 }
 
 export const UrlInput = ({ form }: UrlInputProps) => {
@@ -34,3 +38,4 @@ export const UrlInput = ({ form }: UrlInputProps) => {
     />
   );
 };
+
