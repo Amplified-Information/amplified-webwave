@@ -35,6 +35,7 @@ const PredictiveMaintenanceDemo = lazy(() => import("./pages/demos/PredictiveMai
 const CustomerSegmentationDemo = lazy(() => import("./pages/demos/CustomerSegmentationDemo"));
 const EnergyManagementDemo = lazy(() => import("./pages/demos/EnergyManagementDemo"));
 const ArticleExtractorDemo = lazy(() => import("./pages/demos/ArticleExtractorDemo"));
+const InvestmentResearchDemo = lazy(() => import("./pages/demos/InvestmentResearchDemo"));
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
                   <Route path="customer-segmentation" element={<CustomerSegmentationDemo />} />
                   <Route path="energy-management" element={<EnergyManagementDemo />} />
                   <Route path="article-extractor" element={<ArticleExtractorDemo />} />
+                  <Route path="investment-research" element={<InvestmentResearchDemo />} />
                 </Routes>
               </Suspense>
             } />

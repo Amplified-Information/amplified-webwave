@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { CheckCircle, Wrench, Clock } from "lucide-react";
+import { CheckCircle, Wrench, Clock, FileSearch } from "lucide-react";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -27,6 +27,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
       status: "in development"
+    },
+    {
+      title: "Investment Research",
+      description: "AI-powered investment research and analysis platform",
+      path: "/demo/investment-research",
+      isActive: true
     },
     {
       title: "Cloud Infrastructure",
@@ -158,4 +164,3 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     </section>
   );
 };
-
