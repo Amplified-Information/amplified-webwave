@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Table,
   TableBody,
   TableCell,
@@ -41,9 +34,66 @@ interface ScreenerData {
 export const StockScreener = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ScreenerData[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [marketCap, setMarketCap] = useState("");
   const [peRatio, setPeRatio] = useState("");
   const { toast } = useToast();
+
+  const searchStocks = async () => {
+    if (!searchQuery) {
+      toast({
+        title: "Error",
+        description: "Please enter a search term",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(
+          searchQuery
+        )}&apikey=${process.env.NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.bestMatches) {
+        const symbols = data.bestMatches.map((match: any) => match["1. symbol"]);
+        
+        // Fetch detailed information for each symbol from our database
+        const { data: stockData, error } = await supabase
+          .from("stock_screener")
+          .select("*")
+          .in("symbol", symbols)
+          .order("market_cap", { ascending: false });
+
+        if (error) throw error;
+
+        setResults(stockData || []);
+        toast({
+          title: "Search Complete",
+          description: `Found ${stockData?.length || 0} stocks matching your search`,
+        });
+      } else {
+        setResults([]);
+        toast({
+          title: "No Results",
+          description: "No stocks found matching your search criteria",
+        });
+      }
+    } catch (error) {
+      console.error("Error searching stocks:", error);
+      toast({
+        title: "Error",
+        description: "Failed to search stocks. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const screenStocks = async () => {
     setLoading(true);
@@ -51,7 +101,7 @@ export const StockScreener = () => {
       const { data, error } = await supabase
         .from("stock_screener")
         .select("*")
-        .gte("market_cap", marketCap ? parseFloat(marketCap) * 1e9 : 0) // Convert to billions
+        .gte("market_cap", marketCap ? parseFloat(marketCap) * 1e9 : 0)
         .lte("pe_ratio", peRatio ? parseFloat(peRatio) : 100)
         .order("market_cap", { ascending: false })
         .limit(20);
@@ -96,6 +146,34 @@ export const StockScreener = () => {
           <div className="flex items-center gap-3 mb-6">
             <SlidersHorizontal className="w-5 h-5 text-primary" />
             <h3 className="text-lg font-semibold">Stock Screener</h3>
+          </div>
+
+          {/* Search Section */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search by Company Name or Symbol
+            </label>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Enter company name or symbol..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    searchStocks();
+                  }
+                }}
+              />
+              <Button onClick={searchStocks} disabled={loading}>
+                {loading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Search className="w-4 h-4 mr-2" />
+                )}
+                Search
+              </Button>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
