@@ -288,9 +288,9 @@ export const ShortSqueezeAnalyzer = () => {
               </div>
 
               {stockData.short_percent_float === null && (
-                <Alert variant="warning" className="mt-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
+                <Alert className="mt-4 border-yellow-300 bg-yellow-50">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-yellow-800">
                     Short interest data is not available for this stock. This may affect the accuracy of the squeeze analysis.
                   </AlertDescription>
                 </Alert>
