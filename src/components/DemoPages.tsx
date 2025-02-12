@@ -24,12 +24,6 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       isActive: true
     },
     {
-      title: "Investment Research",
-      description: "AI-powered investment research and analysis platform",
-      path: "/demo/investment-research",
-      isActive: true
-    },
-    {
       title: "News Article Analysis with AI",
       description: "Analyze news articles with AI for key insights and summaries",
       path: "/demo/machine-learning",
@@ -67,6 +61,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Data Visualization Sandbox",
       description: "Create interactive dashboards and reports",
       path: "/demo/data-visualization",
+      status: "in development"
+    },
+    {
+      title: "Investment Research",
+      description: "AI-powered investment research and analysis platform",
+      path: "/demo/investment-research",
       status: "in development"
     }
   ];
