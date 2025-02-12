@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,9 +14,7 @@ export const EnhancedStockScreener = () => {
   const [results, setResults] = useState<ScreenerData[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sectors, setSectors] = useState<MetadataOption[]>([]);
-  const [countries, setCountries] = useState<MetadataOption[]>([]);
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [marketCap, setMarketCap] = useState("");
   const [peRatio, setPeRatio] = useState("");
   const [showUSA, setShowUSA] = useState(true);
@@ -36,16 +33,6 @@ export const EnhancedStockScreener = () => {
 
         if (sectorError) throw sectorError;
         setSectors(sectorData?.map(item => ({ value: item.value, label: item.value })) ?? []);
-
-        // Fetch countries
-        const { data: countryData, error: countryError } = await supabase
-          .from('stock_metadata')
-          .select('value')
-          .eq('type', 'country')
-          .order('value');
-
-        if (countryError) throw countryError;
-        setCountries(countryData?.map(item => ({ value: item.value, label: item.value })) ?? []);
       } catch (error) {
         console.error('Error fetching metadata:', error);
         toast({
@@ -60,7 +47,7 @@ export const EnhancedStockScreener = () => {
   }, [toast]);
 
   const searchStocks = async () => {
-    if (!searchQuery && selectedSectors.length === 0 && selectedCountries.length === 0) {
+    if (!searchQuery && selectedSectors.length === 0 && !showUSA && !showCanada) {
       toast({
         title: "Error",
         description: "Please enter a search term or select filters",
@@ -122,7 +109,6 @@ export const EnhancedStockScreener = () => {
 
         const filteredResults = stockResults.filter(stock => {
           const matchesSector = selectedSectors.length === 0 || (stock.sector && selectedSectors.includes(stock.sector));
-          const matchesCountry = selectedCountries.length === 0 || (stock.country && selectedCountries.includes(stock.country));
           const matchesMarketCap = !marketCap || (stock.market_cap && stock.market_cap >= parseFloat(marketCap) * 1e9);
           const matchesPE = !peRatio || (stock.pe_ratio && stock.pe_ratio <= parseFloat(peRatio));
           const matchesExchange = (
@@ -131,7 +117,7 @@ export const EnhancedStockScreener = () => {
             (showCanada && stock.country === "Canada")
           );
           
-          return matchesSector && matchesCountry && matchesMarketCap && matchesPE && matchesExchange;
+          return matchesSector && matchesMarketCap && matchesPE && matchesExchange;
         });
 
         setResults(filteredResults);
@@ -185,7 +171,7 @@ export const EnhancedStockScreener = () => {
         onShowCanadaChange={setShowCanada}
       />
 
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 gap-4">
         <div>
           <Label className="mb-3">Sectors</Label>
           <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-md p-4">
@@ -207,33 +193,6 @@ export const EnhancedStockScreener = () => {
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   {sector.label}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <Label className="mb-3">Countries</Label>
-          <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-md p-4">
-            {(countries ?? []).map((country) => (
-              <div key={country.value} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`country-${country.value}`}
-                  checked={selectedCountries.includes(country.value)}
-                  onCheckedChange={(checked) => {
-                    setSelectedCountries(prev =>
-                      checked
-                        ? [...prev, country.value]
-                        : prev.filter(c => c !== country.value)
-                    );
-                  }}
-                />
-                <label
-                  htmlFor={`country-${country.value}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {country.label}
                 </label>
               </div>
             ))}
