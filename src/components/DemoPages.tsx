@@ -9,7 +9,8 @@ interface DemoPagesProps {
 }
 
 export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps) => {
-  const demos = [
+  // Active demos
+  const activeDemos = [
     {
       title: "Smart Garden Planning",
       description: "Plan and optimize your garden with AI-powered companion planting",
@@ -23,21 +24,10 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       isActive: true
     },
     {
-      title: "Trade Data Analysis",
-      description: "Explore international trade flows and patterns",
-      path: "/demo/trade-data",
-      status: "in development"
-    },
-    {
       title: "Investment Research",
       description: "AI-powered investment research and analysis platform",
       path: "/demo/investment-research",
       isActive: true
-    },
-    {
-      title: "Cloud Infrastructure",
-      description: "Scale your infrastructure with cloud-native solutions",
-      path: "/demo/cloud-infrastructure"
     },
     {
       title: "News Article Analysis with AI",
@@ -52,21 +42,40 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       isActive: true
     },
     {
-      title: "Data Visualization",
-      description: "Create interactive dashboards and reports",
-      path: "/demo/data-visualization"
-    },
-    {
       title: "Find A Mortgage That Saves You Money",
       description: "Connect with external services through our API platform",
       path: "/demo/api-integration",
       isActive: true
+    }
+  ];
+
+  // In development demos
+  const inDevelopmentDemos = [
+    {
+      title: "Trade Data Analysis",
+      description: "Explore international trade flows and patterns",
+      path: "/demo/trade-data",
+      status: "in development"
     },
     {
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
       status: "in development"
+    }
+  ];
+
+  // Coming soon demos
+  const comingSoonDemos = [
+    {
+      title: "Cloud Infrastructure",
+      description: "Scale your infrastructure with cloud-native solutions",
+      path: "/demo/cloud-infrastructure"
+    },
+    {
+      title: "Data Visualization",
+      description: "Create interactive dashboards and reports",
+      path: "/demo/data-visualization"
     },
     {
       title: "Supply Chain Optimization",
@@ -117,48 +126,93 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {demos.map((demo) => (
-            <Link 
-              to={demo.path}
-              key={demo.path} 
-              className="group relative"
-            >
-              <Card className={`h-full transition-all duration-300 ${
-                demo.status === "in development" 
-                  ? 'hover:shadow-lg hover:bg-orange-50' 
-                  : demo.isActive 
-                    ? 'hover:shadow-lg hover:bg-[#F2FCE2]' 
-                    : 'hover:shadow-lg hover:bg-primary/10'
-              }`}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    {demo.isActive && (
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                    )}
-                    {demo.status === "in development" && (
-                      <Wrench className="w-5 h-5 text-orange-500" />
-                    )}
-                    {!demo.isActive && !demo.status && (
-                      <Clock className="w-5 h-5 text-gray-500" />
-                    )}
-                    {demo.title}
-                  </CardTitle>
-                  <CardDescription>{demo.description}</CardDescription>
-                </CardHeader>
-                {!demo.isActive && !demo.status && (
-                  <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-gray-500">
-                    Coming Soon
-                  </div>
-                )}
-                {demo.status === "in development" && (
-                  <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-orange-600">
-                    In Development
-                  </div>
-                )}
-              </Card>
-            </Link>
-          ))}
+        <div className="space-y-12">
+          {/* Active Demos Section */}
+          <div>
+            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <CheckCircle className="w-6 h-6 text-green-500" />
+              Active Demos
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {activeDemos.map((demo) => (
+                <Link 
+                  to={demo.path}
+                  key={demo.path} 
+                  className="group relative"
+                >
+                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-[#F2FCE2]">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        {demo.title}
+                      </CardTitle>
+                      <CardDescription>{demo.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* In Development Section */}
+          <div>
+            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <Wrench className="w-6 h-6 text-orange-500" />
+              In Development
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {inDevelopmentDemos.map((demo) => (
+                <Link 
+                  to={demo.path}
+                  key={demo.path} 
+                  className="group relative"
+                >
+                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-orange-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Wrench className="w-5 h-5 text-orange-500" />
+                        {demo.title}
+                      </CardTitle>
+                      <CardDescription>{demo.description}</CardDescription>
+                    </CardHeader>
+                    <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-orange-600">
+                      In Development
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Coming Soon Section */}
+          <div>
+            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+              <Clock className="w-6 h-6 text-gray-500" />
+              Coming Soon
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {comingSoonDemos.map((demo) => (
+                <Link 
+                  to={demo.path}
+                  key={demo.path} 
+                  className="group relative"
+                >
+                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-primary/10">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-gray-500" />
+                        {demo.title}
+                      </CardTitle>
+                      <CardDescription>{demo.description}</CardDescription>
+                    </CardHeader>
+                    <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-gray-500">
+                      Coming Soon
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
