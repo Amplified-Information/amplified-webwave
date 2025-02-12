@@ -42,3 +42,5 @@ verify_jwt = false
 [functions.update-stock-data]
 verify_jwt = false
 
+[functions.analyze-short-squeeze]
+verify_jwt = false

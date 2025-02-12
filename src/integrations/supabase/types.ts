@@ -222,6 +222,51 @@ export type Database = {
         }
         Relationships: []
       }
+      short_squeeze_candidates: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          days_to_cover: number | null
+          distance_from_high: number | null
+          id: string
+          price_momentum: number | null
+          relative_volume: number | null
+          rsi: number | null
+          short_interest_ratio: number | null
+          symbol: string
+          updated_at: string | null
+          volume_surge: number | null
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          days_to_cover?: number | null
+          distance_from_high?: number | null
+          id?: string
+          price_momentum?: number | null
+          relative_volume?: number | null
+          rsi?: number | null
+          short_interest_ratio?: number | null
+          symbol: string
+          updated_at?: string | null
+          volume_surge?: number | null
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          days_to_cover?: number | null
+          distance_from_high?: number | null
+          id?: string
+          price_momentum?: number | null
+          relative_volume?: number | null
+          rsi?: number | null
+          short_interest_ratio?: number | null
+          symbol?: string
+          updated_at?: string | null
+          volume_surge?: number | null
+        }
+        Relationships: []
+      }
       stock_data: {
         Row: {
           average_volume: number | null
