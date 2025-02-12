@@ -1,7 +1,7 @@
 
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileSearch, TrendingUp, ChartLine } from "lucide-react";
+import { FileSearch, TrendingUp, ChartLine, DollarSign } from "lucide-react";
 
 const InvestmentResearchDemo = () => {
   return (
@@ -42,10 +42,32 @@ const InvestmentResearchDemo = () => {
           </Card>
         </div>
 
+        {/* Investment Opportunities Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Investment Opportunities</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <DollarSign className="w-6 h-6 text-green-500" />
+                  <h3 className="text-xl font-semibold">The Short Squeeze</h3>
+                </div>
+                <p className="text-gray-600">
+                  Identify potential short squeeze opportunities through real-time market data analysis 
+                  and short interest monitoring.
+                </p>
+                <div className="text-sm text-gray-500">
+                  Demo features coming soon...
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         <Card>
           <CardContent className="p-6">
             <p className="text-center text-gray-600">
-              Demo features coming soon...
+              More features coming soon...
             </p>
           </CardContent>
         </Card>
