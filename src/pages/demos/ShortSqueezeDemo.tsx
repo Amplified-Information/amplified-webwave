@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { DollarSign, Info } from "lucide-react";
@@ -101,9 +102,21 @@ const ShortSqueezeDemo = () => {
               <li>US market coverage (~6,100 stocks): ~183MB monthly</li>
               <li>Annual data volume: ~2.2GB</li>
             </ul>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-4">
               To manage this volume efficiently, the application implements selective data storage, focusing on actively monitored stocks and maintaining rolling windows of historical data.
             </p>
+            <div className="mt-6">
+              <h3 className="font-semibold text-lg mb-3">Custom API Gateway Integration</h3>
+              <p className="text-gray-600">
+                For scenarios requiring unlimited storage capacity, the application can be configured to interface with a custom API gateway that connects to your own database infrastructure. This setup requires:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-gray-600 mt-2">
+                <li>A REST API endpoint serving as the gateway to your database</li>
+                <li>Proper authentication and CORS configuration</li>
+                <li>Rate limiting implementation for API stability</li>
+                <li>Data synchronization strategy for real-time updates</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
       </div>
