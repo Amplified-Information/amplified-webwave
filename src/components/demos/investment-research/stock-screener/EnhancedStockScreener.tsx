@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -40,7 +39,7 @@ export const EnhancedStockScreener = () => {
           .order('value');
 
         if (sectorError) throw sectorError;
-        setSectors(sectorData.map(item => ({ value: item.value, label: item.value })));
+        setSectors(sectorData?.map(item => ({ value: item.value, label: item.value })) ?? []);
 
         // Fetch countries
         const { data: countryData, error: countryError } = await supabase
@@ -50,7 +49,7 @@ export const EnhancedStockScreener = () => {
           .order('value');
 
         if (countryError) throw countryError;
-        setCountries(countryData.map(item => ({ value: item.value, label: item.value })));
+        setCountries(countryData?.map(item => ({ value: item.value, label: item.value })) ?? []);
       } catch (error) {
         console.error('Error fetching metadata:', error);
         toast({
@@ -208,7 +207,7 @@ export const EnhancedStockScreener = () => {
             <PopoverContent className="w-full p-0">
               <Command>
                 <CommandGroup>
-                  {sectors.map((sector) => (
+                  {(sectors ?? []).map((sector) => (
                     <CommandItem
                       key={sector.value}
                       onSelect={() => {
@@ -248,7 +247,7 @@ export const EnhancedStockScreener = () => {
             <PopoverContent className="w-full p-0">
               <Command>
                 <CommandGroup>
-                  {countries.map((country) => (
+                  {(countries ?? []).map((country) => (
                     <CommandItem
                       key={country.value}
                       onSelect={() => {
