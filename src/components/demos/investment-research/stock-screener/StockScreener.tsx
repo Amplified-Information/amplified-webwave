@@ -52,20 +52,22 @@ export const StockScreener = () => {
     setLoading(true);
     try {
       // Get the API key from Supabase secrets
-      const { data: secretData, error: secretError } = await supabase
+      const { data: secrets, error: secretError } = await supabase
         .from('secrets')
         .select('value')
-        .eq('name', 'ALPHA_VANTAGE_API_KEY')
-        .single();
+        .eq('name', 'ALPHA_VANTAGE_API_KEY');
 
-      if (secretError || !secretData) {
-        throw new Error('Failed to get API key');
+      if (secretError) throw secretError;
+      if (!secrets || secrets.length === 0) {
+        throw new Error('API key not found');
       }
+
+      const apiKey = secrets[0].value;
 
       const response = await fetch(
         `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(
           searchQuery
-        )}&apikey=${secretData.value}`
+        )}&apikey=${apiKey}`
       );
       
       const data = await response.json();
