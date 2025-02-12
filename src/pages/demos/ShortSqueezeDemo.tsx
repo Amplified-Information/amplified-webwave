@@ -1,10 +1,10 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { DollarSign, Info } from "lucide-react";
 import { ShortSqueezeAnalyzer } from "@/components/demos/investment-research/short-squeeze/ShortSqueezeAnalyzer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { Database } from "lucide-react";
 
 const ShortSqueezeDemo = () => {
   return (
@@ -84,6 +84,26 @@ const ShortSqueezeDemo = () => {
                 <li>Fundamental metrics like profit margins and debt levels</li>
               </ul>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-8">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Database className="w-5 h-5 text-primary" />
+              <h2 className="text-2xl font-semibold">Data Storage Considerations</h2>
+            </div>
+            <p className="text-gray-600 mb-4">
+              Processing market data at scale requires significant storage capacity. Here's an approximation of the data volume:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-gray-600 mb-4">
+              <li>Per stock: ~30KB monthly (basic info, daily prices, fundamentals)</li>
+              <li>US market coverage (~6,100 stocks): ~183MB monthly</li>
+              <li>Annual data volume: ~2.2GB</li>
+            </ul>
+            <p className="text-gray-600">
+              To manage this volume efficiently, the application implements selective data storage, focusing on actively monitored stocks and maintaining rolling windows of historical data.
+            </p>
           </CardContent>
         </Card>
       </div>
