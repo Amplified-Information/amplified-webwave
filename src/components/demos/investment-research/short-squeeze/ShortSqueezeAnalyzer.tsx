@@ -7,11 +7,36 @@ import { SearchForm } from "./SearchForm";
 import { StockAnalysisResult } from "./StockAnalysisResult";
 import { calculateRSI, calculateShortSqueezePotential } from "./utils";
 import type { StockData } from "./types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PlayCircle } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+interface ShortSqueezeCandidate {
+  symbol: string;
+  company_name: string | null;
+  short_interest_ratio: number | null;
+  relative_volume: number | null;
+  price_momentum: number | null;
+  rsi: number | null;
+  days_to_cover: number | null;
+  distance_from_high: number | null;
+  volume_surge: number | null;
+}
 
 export const ShortSqueezeAnalyzer = () => {
   const [symbol, setSymbol] = useState("");
   const [loading, setLoading] = useState(false);
   const [stockData, setStockData] = useState<StockData | null>(null);
+  const [candidates, setCandidates] = useState<ShortSqueezeCandidate[]>([]);
+  const [analyzingCandidates, setAnalyzingCandidates] = useState(false);
   const { toast } = useToast();
 
   const analyzeStock = async () => {
@@ -120,20 +145,113 @@ export const ShortSqueezeAnalyzer = () => {
     }
   };
 
+  const findShortSqueezeCandidates = async () => {
+    setAnalyzingCandidates(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-short-squeeze');
+      
+      if (error) {
+        throw error;
+      }
+
+      if (data.candidates) {
+        setCandidates(data.candidates);
+        toast({
+          title: "Analysis Complete",
+          description: `Found ${data.candidates.length} potential short squeeze candidates`,
+        });
+      }
+    } catch (error) {
+      console.error('Error analyzing short squeeze candidates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to analyze short squeeze candidates. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalyzingCandidates(false);
+    }
+  };
+
+  const formatNumber = (value: number | null, decimals: number = 2): string => {
+    if (value === null) return 'N/A';
+    return value.toFixed(decimals);
+  };
+
   return (
     <div className="space-y-6">
       <CriteriaCard />
-      <SearchForm 
-        symbol={symbol}
-        onSymbolChange={setSymbol}
-        onAnalyze={analyzeStock}
-        loading={loading}
-      />
+      <div className="flex justify-between items-center">
+        <SearchForm 
+          symbol={symbol}
+          onSymbolChange={setSymbol}
+          onAnalyze={analyzeStock}
+          loading={loading}
+        />
+        <Button
+          onClick={findShortSqueezeCandidates}
+          disabled={analyzingCandidates}
+          className="ml-4"
+        >
+          {analyzingCandidates ? (
+            <>
+              <PlayCircle className="mr-2 h-4 w-4 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            <>
+              <PlayCircle className="mr-2 h-4 w-4" />
+              Find Short Squeeze Candidates
+            </>
+          )}
+        </Button>
+      </div>
+      
       {stockData && (
         <StockAnalysisResult 
           stockData={stockData}
           calculateShortSqueezePotential={calculateShortSqueezePotential}
         />
+      )}
+
+      {candidates.length > 0 && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Short Squeeze Candidates</h3>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Symbol</TableHead>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Short Interest %</TableHead>
+                    <TableHead>Days to Cover</TableHead>
+                    <TableHead>RSI</TableHead>
+                    <TableHead>Volume Surge</TableHead>
+                    <TableHead>Price Momentum</TableHead>
+                    <TableHead>Distance from High</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {candidates.map((candidate) => (
+                    <TableRow key={candidate.symbol}>
+                      <TableCell className="font-medium">{candidate.symbol}</TableCell>
+                      <TableCell>{candidate.company_name || 'N/A'}</TableCell>
+                      <TableCell>{formatNumber(candidate.short_interest_ratio)}%</TableCell>
+                      <TableCell>{formatNumber(candidate.days_to_cover)}</TableCell>
+                      <TableCell>{formatNumber(candidate.rsi)}</TableCell>
+                      <TableCell>{candidate.volume_surge ? `${formatNumber(candidate.volume_surge)}x` : 'N/A'}</TableCell>
+                      <TableCell className={candidate.price_momentum && candidate.price_momentum > 0 ? 'text-green-600' : 'text-red-600'}>
+                        {formatNumber(candidate.price_momentum)}%
+                      </TableCell>
+                      <TableCell>{formatNumber(candidate.distance_from_high)}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
