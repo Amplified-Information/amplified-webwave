@@ -1,8 +1,9 @@
 
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileSearch, TrendingUp, ChartLine, DollarSign } from "lucide-react";
+import { FileSearch, TrendingUp, ChartLine, DollarSign, AlertCircle } from "lucide-react";
 import { ShortSqueezeAnalyzer } from "@/components/demos/investment-research/short-squeeze/ShortSqueezeAnalyzer";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const InvestmentResearchDemo = () => {
   return (
@@ -16,6 +17,17 @@ const InvestmentResearchDemo = () => {
             AI-powered research and analysis tools for smarter investment decisions
           </p>
         </div>
+
+        <Alert className="mb-8">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>API Usage Limits:</strong> This demo uses Alpha Vantage API with the following limitations:
+            <ul className="list-disc list-inside mt-2 ml-4">
+              <li>Up to 5 API requests per minute</li>
+              <li>Maximum of 500 API requests per day</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
 
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <Card>
