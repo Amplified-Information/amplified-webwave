@@ -63,6 +63,7 @@ export const StockScreener = () => {
       }
 
       const apiKey = secrets[0].value;
+      console.log("Fetching data from Alpha Vantage...");
 
       const response = await fetch(
         `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(
@@ -71,9 +72,11 @@ export const StockScreener = () => {
       );
       
       const data = await response.json();
+      console.log("Alpha Vantage response:", data);
       
       if (data.bestMatches) {
         const symbols = data.bestMatches.map((match: any) => match["1. symbol"]);
+        console.log("Found symbols:", symbols);
         
         // Fetch detailed information for each symbol from our database
         const { data: stockData, error } = await supabase
@@ -83,6 +86,7 @@ export const StockScreener = () => {
           .order("market_cap", { ascending: false });
 
         if (error) throw error;
+        console.log("Supabase stock data:", stockData);
 
         setResults(stockData || []);
         toast({
@@ -90,6 +94,7 @@ export const StockScreener = () => {
           description: `Found ${stockData?.length || 0} stocks matching your search`,
         });
       } else {
+        console.log("No matches found in Alpha Vantage response");
         setResults([]);
         toast({
           title: "No Results",
@@ -262,3 +267,4 @@ export const StockScreener = () => {
     </div>
   );
 };
+
