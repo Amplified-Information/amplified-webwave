@@ -62,6 +62,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
       status: "in development"
+    },
+    {
+      title: "Data Visualization Sandbox",
+      description: "Create interactive dashboards and reports",
+      path: "/demo/data-visualization",
+      status: "in development"
     }
   ];
 
@@ -71,11 +77,6 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       title: "Cloud Infrastructure",
       description: "Scale your infrastructure with cloud-native solutions",
       path: "/demo/cloud-infrastructure"
-    },
-    {
-      title: "Data Visualization",
-      description: "Create interactive dashboards and reports",
-      path: "/demo/data-visualization"
     },
     {
       title: "Supply Chain Optimization",
