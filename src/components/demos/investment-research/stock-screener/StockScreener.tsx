@@ -1,35 +1,14 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Search, Loader2, SlidersHorizontal } from "lucide-react";
-
-interface ScreenerData {
-  symbol: string;
-  company_name: string | null;
-  sector: string | null;
-  market_cap: number | null;
-  pe_ratio: number | null;
-  price_to_book: number | null;
-  dividend_yield: number | null;
-  fifty_day_ma: number | null;
-  two_hundred_day_ma: number | null;
-  year_high: number | null;
-  year_low: number | null;
-  volume: number | null;
-  avg_volume: number | null;
-}
+import { SearchSection } from "./SearchSection";
+import { FilterSection } from "./FilterSection";
+import { ResultsTable } from "./ResultsTable";
+import type { ScreenerData } from "./types";
 
 export const StockScreener = () => {
   const [loading, setLoading] = useState(false);
@@ -51,7 +30,6 @@ export const StockScreener = () => {
 
     setLoading(true);
     try {
-      // Get the API key from Supabase secrets
       const { data: secrets, error: secretError } = await supabase
         .from('secrets')
         .select('value')
@@ -78,7 +56,6 @@ export const StockScreener = () => {
         const symbols = data.bestMatches.map((match: any) => match["1. symbol"]);
         console.log("Found symbols:", symbols);
         
-        // Fetch detailed information for each symbol from our database
         const { data: stockData, error } = await supabase
           .from("stock_screener")
           .select("*")
@@ -166,58 +143,19 @@ export const StockScreener = () => {
             <h3 className="text-lg font-semibold">Stock Screener</h3>
           </div>
 
-          {/* Search Section */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search by Company Name or Symbol
-            </label>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Enter company name or symbol..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    searchStocks();
-                  }
-                }}
-              />
-              <Button onClick={searchStocks} disabled={loading}>
-                {loading ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Search className="w-4 h-4 mr-2" />
-                )}
-                Search
-              </Button>
-            </div>
-          </div>
+          <SearchSection
+            searchQuery={searchQuery}
+            loading={loading}
+            onSearchChange={setSearchQuery}
+            onSearch={searchStocks}
+          />
 
-          <div className="grid md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Market Cap (Minimum, in billions)
-              </label>
-              <Input
-                type="number"
-                placeholder="e.g., 10"
-                value={marketCap}
-                onChange={(e) => setMarketCap(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                P/E Ratio (Maximum)
-              </label>
-              <Input
-                type="number"
-                placeholder="e.g., 20"
-                value={peRatio}
-                onChange={(e) => setPeRatio(e.target.value)}
-              />
-            </div>
-          </div>
+          <FilterSection
+            marketCap={marketCap}
+            peRatio={peRatio}
+            onMarketCapChange={setMarketCap}
+            onPeRatioChange={setPeRatio}
+          />
 
           <Button onClick={screenStocks} disabled={loading}>
             {loading ? (
@@ -233,38 +171,14 @@ export const StockScreener = () => {
       {results.length > 0 && (
         <Card>
           <CardContent className="p-6">
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Symbol</TableHead>
-                    <TableHead>Company</TableHead>
-                    <TableHead>Market Cap</TableHead>
-                    <TableHead>P/E Ratio</TableHead>
-                    <TableHead>Price/Book</TableHead>
-                    <TableHead>Dividend Yield</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.map((stock) => (
-                    <TableRow key={stock.symbol}>
-                      <TableCell className="font-medium">{stock.symbol}</TableCell>
-                      <TableCell>{stock.company_name || "N/A"}</TableCell>
-                      <TableCell>{formatMarketCap(stock.market_cap)}</TableCell>
-                      <TableCell>{formatNumber(stock.pe_ratio)}</TableCell>
-                      <TableCell>{formatNumber(stock.price_to_book)}</TableCell>
-                      <TableCell>
-                        {stock.dividend_yield ? `${formatNumber(stock.dividend_yield)}%` : "N/A"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <ResultsTable
+              results={results}
+              formatMarketCap={formatMarketCap}
+              formatNumber={formatNumber}
+            />
           </CardContent>
         </Card>
       )}
     </div>
   );
 };
-
