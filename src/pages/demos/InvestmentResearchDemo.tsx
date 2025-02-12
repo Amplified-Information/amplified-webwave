@@ -1,7 +1,7 @@
 
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileSearch, TrendingUp, ChartLine, SlidersHorizontal } from "lucide-react";
+import { FileSearch, TrendingUp, SlidersHorizontal } from "lucide-react";
 import { StockScreener } from "@/components/demos/investment-research/stock-screener/StockScreener";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -30,7 +30,7 @@ const InvestmentResearchDemo = () => {
           </AlertDescription>
         </Alert>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="grid md:grid-cols-1 gap-8 mb-12">
           <Card>
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center gap-3">
@@ -39,18 +39,6 @@ const InvestmentResearchDemo = () => {
               </div>
               <p className="text-gray-600">
                 Real-time market data analysis and trend identification using advanced AI algorithms.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <ChartLine className="w-6 h-6 text-primary" />
-                <h2 className="text-xl font-semibold">Portfolio Analytics</h2>
-              </div>
-              <p className="text-gray-600">
-                Comprehensive portfolio analysis with risk assessment and optimization recommendations.
               </p>
             </CardContent>
           </Card>
