@@ -1,4 +1,3 @@
-
 import { StrictMode, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -36,6 +35,7 @@ const CustomerSegmentationDemo = lazy(() => import("./pages/demos/CustomerSegmen
 const EnergyManagementDemo = lazy(() => import("./pages/demos/EnergyManagementDemo"));
 const ArticleExtractorDemo = lazy(() => import("./pages/demos/ArticleExtractorDemo"));
 const InvestmentResearchDemo = lazy(() => import("./pages/demos/InvestmentResearchDemo"));
+const ShortSqueezeDemo = lazy(() => import("./pages/demos/ShortSqueezeDemo"));
 
 const queryClient = new QueryClient();
 
@@ -85,6 +85,7 @@ const App = () => (
                   <Route path="energy-management" element={<EnergyManagementDemo />} />
                   <Route path="article-extractor" element={<ArticleExtractorDemo />} />
                   <Route path="investment-research" element={<InvestmentResearchDemo />} />
+                  <Route path="short-squeeze" element={<ShortSqueezeDemo />} />
                 </Routes>
               </Suspense>
             } />

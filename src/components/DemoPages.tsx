@@ -51,6 +51,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       status: "in development"
     },
     {
+      title: "Short Squeeze Finder",
+      description: "Identify potential short squeeze opportunities in the market",
+      path: "/demo/short-squeeze",
+      status: "in development"
+    },
+    {
       title: "Find a Used Car with AI",
       description: "Let our AI crew help you find the perfect used car in Canada",
       path: "/demo/automated-workflows",
