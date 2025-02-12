@@ -3,19 +3,15 @@ import { useState, useEffect } from "react";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Loader2, Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchSection } from "./SearchSection";
+import { FilterSection } from "./FilterSection";
 import { ResultsTable } from "./ResultsTable";
-import type { ScreenerData } from "./types";
-
-interface MetadataOption {
-  value: string;
-  label: string;
-}
+import type { ScreenerData, MetadataOption } from "./types";
 
 export const EnhancedStockScreener = () => {
   const [loading, setLoading] = useState(false);
@@ -29,6 +25,8 @@ export const EnhancedStockScreener = () => {
   const [openCountry, setOpenCountry] = useState(false);
   const [marketCap, setMarketCap] = useState("");
   const [peRatio, setPeRatio] = useState("");
+  const [showUSA, setShowUSA] = useState(true);
+  const [showCanada, setShowCanada] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -90,7 +88,6 @@ export const EnhancedStockScreener = () => {
 
       const apiKey = secrets[0].value;
       
-      // First search for symbols based on keywords
       const response = await fetch(
         `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(
           searchQuery
@@ -102,7 +99,6 @@ export const EnhancedStockScreener = () => {
       if (data.bestMatches) {
         const stockResults: ScreenerData[] = await Promise.all(
           data.bestMatches.map(async (match: any) => {
-            // Get additional company data using Overview endpoint
             const overviewResponse = await fetch(
               `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${encodeURIComponent(
                 match["1. symbol"]
@@ -129,14 +125,18 @@ export const EnhancedStockScreener = () => {
           })
         );
 
-        // Filter results based on selected criteria
         const filteredResults = stockResults.filter(stock => {
           const matchesSector = !selectedSector || stock.sector === selectedSector;
           const matchesCountry = !selectedCountry || stock.country === selectedCountry;
           const matchesMarketCap = !marketCap || (stock.market_cap && stock.market_cap >= parseFloat(marketCap) * 1e9);
           const matchesPE = !peRatio || (stock.pe_ratio && stock.pe_ratio <= parseFloat(peRatio));
+          const matchesExchange = (
+            (!showUSA && !showCanada) ||
+            (showUSA && stock.country === "United States") ||
+            (showCanada && stock.country === "Canada")
+          );
           
-          return matchesSector && matchesCountry && matchesMarketCap && matchesPE;
+          return matchesSector && matchesCountry && matchesMarketCap && matchesPE && matchesExchange;
         });
 
         setResults(filteredResults);
@@ -179,29 +179,16 @@ export const EnhancedStockScreener = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label>Search by Company Name or Symbol</Label>
-          <div className="flex gap-2 mt-2">
-            <Input
-              placeholder="Enter company name or symbol..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label>Market Cap (Minimum, in billions)</Label>
-          <Input
-            type="number"
-            placeholder="e.g., 10"
-            value={marketCap}
-            onChange={(e) => setMarketCap(e.target.value)}
-            className="mt-2"
-          />
-        </div>
-      </div>
+      <SearchSection
+        searchQuery={searchQuery}
+        loading={loading}
+        onSearchChange={setSearchQuery}
+        onSearch={searchStocks}
+        showUSA={showUSA}
+        showCanada={showCanada}
+        onShowUSAChange={setShowUSA}
+        onShowCanadaChange={setShowCanada}
+      />
 
       <div className="grid md:grid-cols-3 gap-4">
         <div>
@@ -284,26 +271,13 @@ export const EnhancedStockScreener = () => {
           </Popover>
         </div>
 
-        <div>
-          <Label>P/E Ratio (Maximum)</Label>
-          <Input
-            type="number"
-            placeholder="e.g., 20"
-            value={peRatio}
-            onChange={(e) => setPeRatio(e.target.value)}
-            className="mt-2"
-          />
-        </div>
+        <FilterSection
+          marketCap={marketCap}
+          peRatio={peRatio}
+          onMarketCapChange={setMarketCap}
+          onPeRatioChange={setPeRatio}
+        />
       </div>
-
-      <Button onClick={searchStocks} disabled={loading} className="w-full">
-        {loading ? (
-          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-        ) : (
-          <Search className="w-4 h-4 mr-2" />
-        )}
-        Search Stocks
-      </Button>
 
       {results.length > 0 && (
         <ResultsTable

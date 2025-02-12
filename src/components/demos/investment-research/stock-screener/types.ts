@@ -15,3 +15,8 @@ export interface ScreenerData {
   avg_volume: number | null;
   country: string | null;
 }
+
+export interface MetadataOption {
+  value: string;
+  label: string;
+}
