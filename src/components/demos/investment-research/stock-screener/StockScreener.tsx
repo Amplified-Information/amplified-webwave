@@ -139,10 +139,27 @@ export const StockScreener = () => {
 
       if (error) throw error;
 
-      setResults(data);
+      const stockResults: ScreenerData[] = data.map((stock: any) => ({
+        symbol: stock.symbol,
+        company_name: stock.company_name,
+        country: stock.country || "USA", // Default to USA for existing data
+        sector: stock.sector,
+        market_cap: stock.market_cap,
+        pe_ratio: stock.pe_ratio,
+        price_to_book: stock.price_to_book,
+        dividend_yield: stock.dividend_yield,
+        fifty_day_ma: stock.fifty_day_ma,
+        two_hundred_day_ma: stock.two_hundred_day_ma,
+        year_high: stock.year_high,
+        year_low: stock.year_low,
+        volume: stock.volume,
+        avg_volume: stock.avg_volume,
+      }));
+
+      setResults(stockResults);
       toast({
         title: "Screening Complete",
-        description: `Found ${data.length} stocks matching your criteria`,
+        description: `Found ${stockResults.length} stocks matching your criteria`,
       });
     } catch (error) {
       console.error("Error fetching stock data:", error);
