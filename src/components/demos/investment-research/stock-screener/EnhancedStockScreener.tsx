@@ -1,12 +1,10 @@
+
 import { useState, useEffect } from "react";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { SearchSection } from "./SearchSection";
 import { FilterSection } from "./FilterSection";
 import { ResultsTable } from "./ResultsTable";
@@ -18,10 +16,8 @@ export const EnhancedStockScreener = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sectors, setSectors] = useState<MetadataOption[]>([]);
   const [countries, setCountries] = useState<MetadataOption[]>([]);
-  const [selectedSector, setSelectedSector] = useState<string>("");
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [openSector, setOpenSector] = useState(false);
-  const [openCountry, setOpenCountry] = useState(false);
+  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [marketCap, setMarketCap] = useState("");
   const [peRatio, setPeRatio] = useState("");
   const [showUSA, setShowUSA] = useState(true);
@@ -64,7 +60,7 @@ export const EnhancedStockScreener = () => {
   }, [toast]);
 
   const searchStocks = async () => {
-    if (!searchQuery && !selectedSector && !selectedCountry) {
+    if (!searchQuery && selectedSectors.length === 0 && selectedCountries.length === 0) {
       toast({
         title: "Error",
         description: "Please enter a search term or select filters",
@@ -125,8 +121,8 @@ export const EnhancedStockScreener = () => {
         );
 
         const filteredResults = stockResults.filter(stock => {
-          const matchesSector = !selectedSector || stock.sector === selectedSector;
-          const matchesCountry = !selectedCountry || stock.country === selectedCountry;
+          const matchesSector = selectedSectors.length === 0 || (stock.sector && selectedSectors.includes(stock.sector));
+          const matchesCountry = selectedCountries.length === 0 || (stock.country && selectedCountries.includes(stock.country));
           const matchesMarketCap = !marketCap || (stock.market_cap && stock.market_cap >= parseFloat(marketCap) * 1e9);
           const matchesPE = !peRatio || (stock.pe_ratio && stock.pe_ratio <= parseFloat(peRatio));
           const matchesExchange = (
@@ -191,83 +187,57 @@ export const EnhancedStockScreener = () => {
 
       <div className="grid md:grid-cols-3 gap-4">
         <div>
-          <Label>Sector</Label>
-          <Popover open={openSector} onOpenChange={setOpenSector}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={openSector}
-                className="w-full justify-between mt-2"
-              >
-                {selectedSector || "Select sector..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-              <Command>
-                <CommandGroup>
-                  {(sectors ?? []).map((sector) => (
-                    <CommandItem
-                      key={sector.value}
-                      onSelect={() => {
-                        setSelectedSector(sector.value === selectedSector ? "" : sector.value);
-                        setOpenSector(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedSector === sector.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {sector.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <Label className="mb-3">Sectors</Label>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-md p-4">
+            {(sectors ?? []).map((sector) => (
+              <div key={sector.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`sector-${sector.value}`}
+                  checked={selectedSectors.includes(sector.value)}
+                  onCheckedChange={(checked) => {
+                    setSelectedSectors(prev =>
+                      checked
+                        ? [...prev, sector.value]
+                        : prev.filter(s => s !== sector.value)
+                    );
+                  }}
+                />
+                <label
+                  htmlFor={`sector-${sector.value}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {sector.label}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div>
-          <Label>Country</Label>
-          <Popover open={openCountry} onOpenChange={setOpenCountry}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={openCountry}
-                className="w-full justify-between mt-2"
-              >
-                {selectedCountry || "Select country..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-              <Command>
-                <CommandGroup>
-                  {(countries ?? []).map((country) => (
-                    <CommandItem
-                      key={country.value}
-                      onSelect={() => {
-                        setSelectedCountry(country.value === selectedCountry ? "" : country.value);
-                        setOpenCountry(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedCountry === country.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {country.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <Label className="mb-3">Countries</Label>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-md p-4">
+            {(countries ?? []).map((country) => (
+              <div key={country.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`country-${country.value}`}
+                  checked={selectedCountries.includes(country.value)}
+                  onCheckedChange={(checked) => {
+                    setSelectedCountries(prev =>
+                      checked
+                        ? [...prev, country.value]
+                        : prev.filter(c => c !== country.value)
+                    );
+                  }}
+                />
+                <label
+                  htmlFor={`country-${country.value}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {country.label}
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
 
         <FilterSection
