@@ -13,4 +13,5 @@ export interface ScreenerData {
   year_low: number | null;
   volume: number | null;
   avg_volume: number | null;
+  country: string | null;
 }

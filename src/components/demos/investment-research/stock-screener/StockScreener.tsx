@@ -70,21 +70,36 @@ export const StockScreener = () => {
       
       if (data.bestMatches) {
         const filteredMatches = filterByExchange(data.bestMatches);
-        const stockResults: ScreenerData[] = filteredMatches.map((match: any) => ({
-          symbol: match["1. symbol"],
-          company_name: match["2. name"],
-          sector: null,
-          market_cap: null,
-          pe_ratio: null,
-          price_to_book: null,
-          dividend_yield: null,
-          fifty_day_ma: null,
-          two_hundred_day_ma: null,
-          year_high: null,
-          year_low: null,
-          volume: null,
-          avg_volume: null,
-        }));
+        const stockResults: ScreenerData[] = filteredMatches.map((match: any) => {
+          let country = "N/A";
+          const region = match["4. region"];
+          const symbol = match["1. symbol"];
+          
+          if (region === "United States" || (!symbol.includes(".") && region.includes("United States"))) {
+            country = "USA";
+          } else if (region === "Toronto" || symbol.endsWith(".TRT") || region.includes("Canada")) {
+            country = "Canada";
+          } else {
+            country = region;
+          }
+
+          return {
+            symbol: match["1. symbol"],
+            company_name: match["2. name"],
+            country: country,
+            sector: null,
+            market_cap: null,
+            pe_ratio: null,
+            price_to_book: null,
+            dividend_yield: null,
+            fifty_day_ma: null,
+            two_hundred_day_ma: null,
+            year_high: null,
+            year_low: null,
+            volume: null,
+            avg_volume: null,
+          };
+        });
 
         setResults(stockResults);
         toast({

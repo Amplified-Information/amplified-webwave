@@ -23,6 +23,7 @@ export const ResultsTable = ({ results, formatMarketCap, formatNumber }: Results
           <TableRow>
             <TableHead>Symbol</TableHead>
             <TableHead>Company</TableHead>
+            <TableHead>Country</TableHead>
             <TableHead>Market Cap</TableHead>
             <TableHead>P/E Ratio</TableHead>
             <TableHead>Price/Book</TableHead>
@@ -34,6 +35,7 @@ export const ResultsTable = ({ results, formatMarketCap, formatNumber }: Results
             <TableRow key={stock.symbol}>
               <TableCell className="font-medium">{stock.symbol}</TableCell>
               <TableCell>{stock.company_name || "N/A"}</TableCell>
+              <TableCell>{stock.country || "N/A"}</TableCell>
               <TableCell>{formatMarketCap(stock.market_cap)}</TableCell>
               <TableCell>{formatNumber(stock.pe_ratio)}</TableCell>
               <TableCell>{formatNumber(stock.price_to_book)}</TableCell>
