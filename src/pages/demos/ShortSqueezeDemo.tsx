@@ -1,11 +1,10 @@
 
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, Info } from "lucide-react";
+import { DollarSign, Info, Database, Shield } from "lucide-react";
 import { ShortSqueezeAnalyzer } from "@/components/demos/investment-research/short-squeeze/ShortSqueezeAnalyzer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Database } from "lucide-react";
 
 const ShortSqueezeDemo = () => {
   return (
@@ -116,6 +115,30 @@ const ShortSqueezeDemo = () => {
                 <li>Rate limiting implementation for API stability</li>
                 <li>Data synchronization strategy for real-time updates</li>
               </ul>
+            </div>
+
+            <div className="mt-8 bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Shield className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold text-lg">Security Considerations for API Gateway</h3>
+              </div>
+              <p className="text-gray-600 mb-3">
+                When implementing a custom database API gateway, ensure these security measures are in place:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-gray-600">
+                <li>Use HTTPS for all API endpoints to encrypt data in transit</li>
+                <li>Implement JWT or API key authentication to secure endpoints</li>
+                <li>Use prepared statements to prevent SQL injection attacks</li>
+                <li>Set up appropriate CORS policies to restrict unauthorized domains</li>
+                <li>Configure rate limiting to prevent abuse and DoS attacks</li>
+                <li>Regularly update and patch your API server software</li>
+              </ul>
+              <Alert className="mt-4">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Remember to never expose database credentials directly in API responses or client-side code. All sensitive operations should be handled server-side.
+                </AlertDescription>
+              </Alert>
             </div>
           </CardContent>
         </Card>
