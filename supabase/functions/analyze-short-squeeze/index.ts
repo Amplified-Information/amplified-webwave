@@ -51,19 +51,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Example list of stock symbols to analyze
-    // In production, you might want to get this from a market scanner or database
-    const symbols = ['GME', 'AMC', 'BBBY', 'AAPL', 'TSLA', 'NVDA', 'AMD'];
+    // First, get stocks with high relative volume
+    const topVolUrl = `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_VANTAGE_API_KEY}`;
+    const volResponse = await fetch(topVolUrl);
+    const volData = await volResponse.json();
+    
     const candidates: StockData[] = [];
+    const processedSymbols = new Set();
 
-    for (const symbol of symbols) {
-      console.log(`Analyzing ${symbol}...`);
+    // Process most active stocks
+    const activeStocks = [...(volData.top_gainers || []), ...(volData.most_actively_traded || [])];
+    
+    for (const stock of activeStocks) {
+      if (processedSymbols.has(stock.ticker)) continue;
+      processedSymbols.add(stock.ticker);
+      
+      console.log(`Analyzing ${stock.ticker}...`);
       
       try {
         const [overviewResponse, quoteResponse, timeSeriesResponse] = await Promise.all([
-          fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`),
-          fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`),
-          fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`)
+          fetch(`https://www.alphavantage.co/query?function=OVERVIEW&symbol=${stock.ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`),
+          fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stock.ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`),
+          fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stock.ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`)
         ]);
 
         const [overviewData, quoteData, timeSeriesData] = await Promise.all([
@@ -73,7 +82,7 @@ serve(async (req) => {
         ]);
 
         if (!overviewData || !quoteData["Global Quote"] || !timeSeriesData["Time Series (Daily)"]) {
-          console.log(`Skipping ${symbol}: Incomplete data`);
+          console.log(`Skipping ${stock.ticker}: Incomplete data`);
           continue;
         }
 
@@ -109,7 +118,7 @@ serve(async (req) => {
         const volume_surge = avgTenDayVolume > 0 ? current_volume / avgTenDayVolume : null;
 
         const stockData: StockData = {
-          symbol,
+          symbol: stock.ticker,
           company_name: overviewData.Name || null,
           short_interest_ratio: parseFloat(overviewData.ShortPercentFloat) || null,
           relative_volume,
@@ -120,7 +129,7 @@ serve(async (req) => {
           volume_surge
         };
 
-        // Check if meets Phil Erlanger's criteria
+        // Check for short squeeze potential
         const hasHighShortInterest = stockData.short_interest_ratio && stockData.short_interest_ratio > 20;
         const hasHighDaysToCover = stockData.days_to_cover && stockData.days_to_cover > 5;
         const hasStrongMomentum = stockData.rsi && stockData.rsi > 70;
@@ -141,12 +150,12 @@ serve(async (req) => {
             });
 
           if (error) {
-            console.error(`Error storing data for ${symbol}:`, error);
+            console.error(`Error storing data for ${stock.ticker}:`, error);
           }
         }
 
       } catch (error) {
-        console.error(`Error processing ${symbol}:`, error);
+        console.error(`Error processing ${stock.ticker}:`, error);
       }
 
       // Respect Alpha Vantage's rate limit (5 requests per minute)
