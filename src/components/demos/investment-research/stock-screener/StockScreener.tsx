@@ -53,22 +53,26 @@ export const StockScreener = () => {
       console.log("Alpha Vantage response:", data);
       
       if (data.bestMatches) {
-        const symbols = data.bestMatches.map((match: any) => match["1. symbol"]);
-        console.log("Found symbols:", symbols);
-        
-        const { data: stockData, error } = await supabase
-          .from("stock_screener")
-          .select("*")
-          .in("symbol", symbols)
-          .order("market_cap", { ascending: false });
+        const stockResults: ScreenerData[] = data.bestMatches.map((match: any) => ({
+          symbol: match["1. symbol"],
+          company_name: match["2. name"],
+          sector: null,
+          market_cap: null,
+          pe_ratio: null,
+          price_to_book: null,
+          dividend_yield: null,
+          fifty_day_ma: null,
+          two_hundred_day_ma: null,
+          year_high: null,
+          year_low: null,
+          volume: null,
+          avg_volume: null,
+        }));
 
-        if (error) throw error;
-        console.log("Supabase stock data:", stockData);
-
-        setResults(stockData || []);
+        setResults(stockResults);
         toast({
           title: "Search Complete",
-          description: `Found ${stockData?.length || 0} stocks matching your search`,
+          description: `Found ${stockResults.length} stocks matching your search`,
         });
       } else {
         console.log("No matches found in Alpha Vantage response");
