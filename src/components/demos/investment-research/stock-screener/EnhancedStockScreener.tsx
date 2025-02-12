@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -74,7 +75,7 @@ export const EnhancedStockScreener = () => {
           directSymbol
         )}&apikey=${apiKey}`
       );
-      const overviewData = await overviewResponse.json();
+      let overviewData = await overviewResponse.json(); // Changed from const to let
       
       if (overviewData.Note) {
         toast({
