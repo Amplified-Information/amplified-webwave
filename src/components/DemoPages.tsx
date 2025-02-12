@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { CheckCircle, Wrench, Clock, FileSearch } from "lucide-react";
@@ -176,9 +175,6 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                       </CardTitle>
                       <CardDescription>{demo.description}</CardDescription>
                     </CardHeader>
-                    <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-orange-600">
-                      In Development
-                    </div>
                   </Card>
                 </Link>
               ))}
@@ -206,9 +202,6 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                       </CardTitle>
                       <CardDescription>{demo.description}</CardDescription>
                     </CardHeader>
-                    <div className="absolute bottom-4 left-0 right-0 text-center text-sm font-medium text-gray-500">
-                      Coming Soon
-                    </div>
                   </Card>
                 </Link>
               ))}
