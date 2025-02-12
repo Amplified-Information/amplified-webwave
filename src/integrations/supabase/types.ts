@@ -309,6 +309,30 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_metadata: {
+        Row: {
+          created_at: string | null
+          id: number
+          type: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          type: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          type?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       stock_screener: {
         Row: {
           avg_volume: number | null
