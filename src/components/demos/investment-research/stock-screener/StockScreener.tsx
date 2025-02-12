@@ -16,7 +16,23 @@ export const StockScreener = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [marketCap, setMarketCap] = useState("");
   const [peRatio, setPeRatio] = useState("");
+  const [showUSA, setShowUSA] = useState(true);
+  const [showCanada, setShowCanada] = useState(true);
   const { toast } = useToast();
+
+  const filterByExchange = (matches: any[]) => {
+    return matches.filter((match) => {
+      const symbol = match["1. symbol"];
+      const region = match["4. region"];
+      
+      if (!showUSA && !showCanada) return true; // Show all if none selected
+      
+      const isUSA = region === "United States" || (!symbol.includes(".") && region.includes("United States"));
+      const isCanada = region === "Toronto" || symbol.endsWith(".TRT") || region.includes("Canada");
+      
+      return (showUSA && isUSA) || (showCanada && isCanada);
+    });
+  };
 
   const searchStocks = async () => {
     if (!searchQuery) {
@@ -53,7 +69,8 @@ export const StockScreener = () => {
       console.log("Alpha Vantage response:", data);
       
       if (data.bestMatches) {
-        const stockResults: ScreenerData[] = data.bestMatches.map((match: any) => ({
+        const filteredMatches = filterByExchange(data.bestMatches);
+        const stockResults: ScreenerData[] = filteredMatches.map((match: any) => ({
           symbol: match["1. symbol"],
           company_name: match["2. name"],
           sector: null,
@@ -152,6 +169,10 @@ export const StockScreener = () => {
             loading={loading}
             onSearchChange={setSearchQuery}
             onSearch={searchStocks}
+            showUSA={showUSA}
+            showCanada={showCanada}
+            onShowUSAChange={setShowUSA}
+            onShowCanadaChange={setShowCanada}
           />
 
           <FilterSection
