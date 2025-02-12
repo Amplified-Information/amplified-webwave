@@ -10,12 +10,13 @@ import { Search, Loader2, Info } from "lucide-react";
 interface StockData {
   symbol: string;
   company_name: string | null;
-  short_interest_ratio: number | null;
-  short_interest_volume: number | null;
-  average_volume: number | null;
   current_price: number | null;
   previous_close: number | null;
-  days_to_cover: number | null;
+  volume: number | null;
+  avg_volume: number | null;
+  fifty_day_ma: number | null;
+  two_hundred_day_ma: number | null;
+  year_high: number | null;
 }
 
 export const ShortSqueezeAnalyzer = () => {
@@ -36,19 +37,56 @@ export const ShortSqueezeAnalyzer = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("stock_data")
-        .select("*")
-        .eq("symbol", symbol.toUpperCase())
+      // Get API key from Supabase secrets
+      const { data: secrets, error: secretError } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'ALPHA_VANTAGE_API_KEY')
         .single();
 
-      if (error) throw error;
+      if (secretError) throw secretError;
+      if (!secrets) throw new Error('API key not found');
 
-      setStockData(data);
-      toast({
-        title: "Analysis Complete",
-        description: `Retrieved data for ${symbol.toUpperCase()}`,
-      });
+      const apiKey = secrets.value;
+
+      // Fetch company overview data
+      const overviewResponse = await fetch(
+        `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`
+      );
+      const overviewData = await overviewResponse.json();
+
+      // Fetch global quote data for current price and volume
+      const quoteResponse = await fetch(
+        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`
+      );
+      const quoteData = await quoteResponse.json();
+
+      if (overviewData && quoteData["Global Quote"]) {
+        const quote = quoteData["Global Quote"];
+        const stockInfo: StockData = {
+          symbol: symbol.toUpperCase(),
+          company_name: overviewData.Name || null,
+          current_price: parseFloat(quote["05. price"]) || null,
+          previous_close: parseFloat(quote["08. previous close"]) || null,
+          volume: parseInt(quote["06. volume"]) || null,
+          avg_volume: parseInt(overviewData.AverageVolume) || null,
+          fifty_day_ma: parseFloat(overviewData["50DayMovingAverage"]) || null,
+          two_hundred_day_ma: parseFloat(overviewData["200DayMovingAverage"]) || null,
+          year_high: parseFloat(overviewData["52WeekHigh"]) || null,
+        };
+
+        setStockData(stockInfo);
+        toast({
+          title: "Analysis Complete",
+          description: `Retrieved data for ${symbol.toUpperCase()}`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "No data found for this symbol",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error("Error fetching stock data:", error);
       toast({
@@ -59,6 +97,35 @@ export const ShortSqueezeAnalyzer = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateBreakoutPotential = (data: StockData): string => {
+    if (!data.current_price || !data.fifty_day_ma || !data.two_hundred_day_ma || !data.year_high) {
+      return "Insufficient data";
+    }
+
+    const priceAbove50MA = data.current_price > data.fifty_day_ma;
+    const priceAbove200MA = data.current_price > data.two_hundred_day_ma;
+    const nearYearHigh = data.current_price >= data.year_high * 0.9; // Within 10% of year high
+
+    if (priceAbove50MA && priceAbove200MA && nearYearHigh) {
+      return "High";
+    } else if ((priceAbove50MA && priceAbove200MA) || nearYearHigh) {
+      return "Medium";
+    } else {
+      return "Low";
+    }
+  };
+
+  const calculateVolumeStrength = (data: StockData): string => {
+    if (!data.volume || !data.avg_volume) {
+      return "Insufficient data";
+    }
+
+    const volumeRatio = data.volume / data.avg_volume;
+    if (volumeRatio >= 2) return "High";
+    if (volumeRatio >= 1.2) return "Medium";
+    return "Low";
   };
 
   return (
@@ -126,14 +193,6 @@ export const ShortSqueezeAnalyzer = () => {
                 <h3 className="text-lg font-semibold mb-2">{stockData.company_name || stockData.symbol}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Short Interest Ratio</p>
-                    <p className="font-medium">{stockData.short_interest_ratio?.toFixed(2) || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Days to Cover</p>
-                    <p className="font-medium">{stockData.days_to_cover?.toFixed(2) || "N/A"}</p>
-                  </div>
-                  <div>
                     <p className="text-sm text-gray-500">Current Price</p>
                     <p className="font-medium">${stockData.current_price?.toFixed(2) || "N/A"}</p>
                   </div>
@@ -142,16 +201,28 @@ export const ShortSqueezeAnalyzer = () => {
                     <p className="font-medium">${stockData.previous_close?.toFixed(2) || "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Short Volume</p>
-                    <p className="font-medium">
-                      {stockData.short_interest_volume?.toLocaleString() || "N/A"}
-                    </p>
+                    <p className="text-sm text-gray-500">Volume</p>
+                    <p className="font-medium">{stockData.volume?.toLocaleString() || "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Average Volume</p>
-                    <p className="font-medium">
-                      {stockData.average_volume?.toLocaleString() || "N/A"}
-                    </p>
+                    <p className="text-sm text-gray-500">Avg Volume</p>
+                    <p className="font-medium">{stockData.avg_volume?.toLocaleString() || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">50-Day MA</p>
+                    <p className="font-medium">${stockData.fifty_day_ma?.toFixed(2) || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">200-Day MA</p>
+                    <p className="font-medium">${stockData.two_hundred_day_ma?.toFixed(2) || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Breakout Potential</p>
+                    <p className="font-medium">{calculateBreakoutPotential(stockData)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Volume Strength</p>
+                    <p className="font-medium">{calculateVolumeStrength(stockData)}</p>
                   </div>
                 </div>
               </div>
