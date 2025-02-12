@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,6 @@ export const EnhancedStockScreener = () => {
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        // Fetch sectors
         const { data: sectorData, error: sectorError } = await supabase
           .from('stock_metadata')
           .select('value')
@@ -174,28 +172,30 @@ export const EnhancedStockScreener = () => {
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <Label className="mb-3">Sectors</Label>
-          <div className="space-y-2 max-h-[300px] overflow-y-auto border rounded-md p-4">
-            {(sectors ?? []).map((sector) => (
-              <div key={sector.value} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`sector-${sector.value}`}
-                  checked={selectedSectors.includes(sector.value)}
-                  onCheckedChange={(checked) => {
-                    setSelectedSectors(prev =>
-                      checked
-                        ? [...prev, sector.value]
-                        : prev.filter(s => s !== sector.value)
-                    );
-                  }}
-                />
-                <label
-                  htmlFor={`sector-${sector.value}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {sector.label}
-                </label>
-              </div>
-            ))}
+          <div className="border rounded-md p-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 max-h-[300px] overflow-y-auto">
+              {(sectors ?? []).map((sector) => (
+                <div key={sector.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`sector-${sector.value}`}
+                    checked={selectedSectors.includes(sector.value)}
+                    onCheckedChange={(checked) => {
+                      setSelectedSectors(prev =>
+                        checked
+                          ? [...prev, sector.value]
+                          : prev.filter(s => s !== sector.value)
+                      );
+                    }}
+                  />
+                  <label
+                    htmlFor={`sector-${sector.value}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {sector.label}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
