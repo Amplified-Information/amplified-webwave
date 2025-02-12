@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DollarSign, Info } from "lucide-react";
 import { ShortSqueezeAnalyzer } from "@/components/demos/investment-research/short-squeeze/ShortSqueezeAnalyzer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 
 const ShortSqueezeDemo = () => {
   return (
@@ -32,6 +33,57 @@ const ShortSqueezeDemo = () => {
         <Card>
           <CardContent className="p-6">
             <ShortSqueezeAnalyzer />
+          </CardContent>
+        </Card>
+
+        <Card className="mt-12">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-semibold mb-4">API Capabilities Reference</h2>
+            <p className="text-gray-600 mb-6">
+              Alpha Vantage provides comprehensive market data that can be used for advanced stock screening:
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Core Stock Data</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                  <li>Time series data (daily, weekly, monthly)</li>
+                  <li>Real-time quotes</li>
+                  <li>Company fundamentals</li>
+                  <li>Market cap and P/E ratios</li>
+                  <li>Earnings and dividend data</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Technical Indicators</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-600">
+                  <li>RSI (Relative Strength Index)</li>
+                  <li>Moving averages (SMA, EMA)</li>
+                  <li>MACD</li>
+                  <li>Bollinger Bands</li>
+                  <li>Volume analysis</li>
+                </ul>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Screening Capabilities</h3>
+              <p className="text-gray-600 mb-4">
+                These APIs can be used to create comprehensive stock screeners with filters for:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-gray-600">
+                <li>Market capitalization ranges</li>
+                <li>Price-to-earnings ratios</li>
+                <li>Dividend yields</li>
+                <li>Short interest and days to cover</li>
+                <li>Volume trends and price momentum</li>
+                <li>Technical indicator thresholds</li>
+                <li>Fundamental metrics like profit margins and debt levels</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
       </div>
