@@ -222,6 +222,48 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_data: {
+        Row: {
+          average_volume: number | null
+          company_name: string | null
+          created_at: string | null
+          current_price: number | null
+          days_to_cover: number | null
+          id: string
+          last_updated: string | null
+          previous_close: number | null
+          short_interest_ratio: number | null
+          short_interest_volume: number | null
+          symbol: string
+        }
+        Insert: {
+          average_volume?: number | null
+          company_name?: string | null
+          created_at?: string | null
+          current_price?: number | null
+          days_to_cover?: number | null
+          id?: string
+          last_updated?: string | null
+          previous_close?: number | null
+          short_interest_ratio?: number | null
+          short_interest_volume?: number | null
+          symbol: string
+        }
+        Update: {
+          average_volume?: number | null
+          company_name?: string | null
+          created_at?: string | null
+          current_price?: number | null
+          days_to_cover?: number | null
+          id?: string
+          last_updated?: string | null
+          previous_close?: number | null
+          short_interest_ratio?: number | null
+          short_interest_volume?: number | null
+          symbol?: string
+        }
+        Relationships: []
+      }
       trade_data: {
         Row: {
           commodity_code: string
