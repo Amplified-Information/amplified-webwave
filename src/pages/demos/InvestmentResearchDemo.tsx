@@ -1,7 +1,7 @@
 
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileSearch, TrendingUp, ChartLine, DollarSign, AlertCircle } from "lucide-react";
+import { FileSearch, TrendingUp, ChartLine, DollarSign, AlertCircle, SlidersHorizontal } from "lucide-react";
 import { ShortSqueezeAnalyzer } from "@/components/demos/investment-research/short-squeeze/ShortSqueezeAnalyzer";
 import { StockScreener } from "@/components/demos/investment-research/stock-screener/StockScreener";
 import { Alert, AlertDescription } from "@/components/ui/alert";
