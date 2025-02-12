@@ -264,6 +264,63 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_screener: {
+        Row: {
+          avg_volume: number | null
+          company_name: string | null
+          dividend_yield: number | null
+          fifty_day_ma: number | null
+          id: string
+          industry: string | null
+          last_updated: string | null
+          market_cap: number | null
+          pe_ratio: number | null
+          price_to_book: number | null
+          sector: string | null
+          symbol: string
+          two_hundred_day_ma: number | null
+          volume: number | null
+          year_high: number | null
+          year_low: number | null
+        }
+        Insert: {
+          avg_volume?: number | null
+          company_name?: string | null
+          dividend_yield?: number | null
+          fifty_day_ma?: number | null
+          id?: string
+          industry?: string | null
+          last_updated?: string | null
+          market_cap?: number | null
+          pe_ratio?: number | null
+          price_to_book?: number | null
+          sector?: string | null
+          symbol: string
+          two_hundred_day_ma?: number | null
+          volume?: number | null
+          year_high?: number | null
+          year_low?: number | null
+        }
+        Update: {
+          avg_volume?: number | null
+          company_name?: string | null
+          dividend_yield?: number | null
+          fifty_day_ma?: number | null
+          id?: string
+          industry?: string | null
+          last_updated?: string | null
+          market_cap?: number | null
+          pe_ratio?: number | null
+          price_to_book?: number | null
+          sector?: string | null
+          symbol?: string
+          two_hundred_day_ma?: number | null
+          volume?: number | null
+          year_high?: number | null
+          year_low?: number | null
+        }
+        Relationships: []
+      }
       trade_data: {
         Row: {
           commodity_code: string

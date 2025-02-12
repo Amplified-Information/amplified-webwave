@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.analyze-article-with-ai]
 verify_jwt = false
+
+[functions.update-stock-data]
+verify_jwt = false

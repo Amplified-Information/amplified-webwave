@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileSearch, TrendingUp, ChartLine, DollarSign, AlertCircle } from "lucide-react";
 import { ShortSqueezeAnalyzer } from "@/components/demos/investment-research/short-squeeze/ShortSqueezeAnalyzer";
+import { StockScreener } from "@/components/demos/investment-research/stock-screener/StockScreener";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const InvestmentResearchDemo = () => {
@@ -59,6 +60,21 @@ const InvestmentResearchDemo = () => {
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Investment Opportunities</h2>
           <div className="grid gap-6">
+            {/* Stock Screener */}
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6 space-y-6">
+                <div className="flex items-center gap-3">
+                  <SlidersHorizontal className="w-6 h-6 text-orange-500" />
+                  <h3 className="text-xl font-semibold">Stock Screener</h3>
+                </div>
+                <p className="text-gray-600">
+                  Screen stocks based on fundamental metrics like market cap, P/E ratio, and more.
+                </p>
+                <StockScreener />
+              </CardContent>
+            </Card>
+
+            {/* Short Squeeze Analyzer */}
             <Card className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6 space-y-6">
                 <div className="flex items-center gap-3">
