@@ -20,7 +20,7 @@ import {
 import { useState, useEffect } from "react";
 import { findCompanionData } from "@/data/companionPlanting";
 import { hardinessZones } from "@/data/gardenVegetables";
-import { Plant, PlantCategory, fetchPlants, fetchPlantingDates, insertInitialPlantData } from "@/data/gardenPlants";
+import { Plant, PlantCategory, fetchPlants, fetchPlantingDates } from "@/data/gardenPlants";
 
 const categoryNames: Record<PlantCategory, string> = {
   root_vegetable: "Root Vegetables",
@@ -43,8 +43,6 @@ const DataIntegrationDemo = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      await insertInitialPlantData();
-      
       const plantsData = await fetchPlants();
       const datesData = await fetchPlantingDates();
       
@@ -61,7 +59,7 @@ const DataIntegrationDemo = () => {
 
       toast({
         title: "Data loaded",
-        description: "Initial plant data has been loaded successfully",
+        description: "Plant data has been loaded successfully",
       });
     };
     
