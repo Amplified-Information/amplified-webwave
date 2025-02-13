@@ -1,6 +1,6 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
@@ -18,14 +18,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { findCompanionData } from "@/data/companionPlanting";
-import { gardenVegetables, hardinessZones } from "@/data/gardenVegetables";
+import { hardinessZones } from "@/data/gardenVegetables";
+import { Plant, PlantCategory, fetchPlants, fetchPlantingDates } from "@/data/gardenPlants";
+
+const categoryNames: Record<PlantCategory, string> = {
+  root_vegetable: "Root Vegetables",
+  leafy_green: "Leafy Greens",
+  fruiting_vegetable: "Fruiting Vegetables",
+  brassica: "Brassicas",
+  legume: "Legumes",
+  allium: "Alliums",
+  herb: "Herbs",
+  fruit_bush: "Fruit Bushes",
+  climbing_vegetable: "Climbing Vegetables"
+};
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [selectedZone, setSelectedZone] = useState<string>("5");
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [plantingDates, setPlantingDates] = useState<Record<string, Record<string, string>>>({});
   const { toast } = useToast();
+
+  useEffect(() => {
+    const loadData = async () => {
+      const plantsData = await fetchPlants();
+      const datesData = await fetchPlantingDates();
+      
+      setPlants(plantsData);
+      
+      // Transform planting dates into a more usable format
+      const datesMap: Record<string, Record<string, string>> = {};
+      datesData.forEach(date => {
+        if (!datesMap[date.plant_id]) {
+          datesMap[date.plant_id] = {};
+        }
+        datesMap[date.plant_id][date.zone] = date.sowing_dates;
+      });
+      setPlantingDates(datesMap);
+    };
+    
+    loadData();
+  }, []);
 
   const handleVegetableSelection = (vegetableName: string) => {
     if (selectedVegetables.includes(vegetableName)) {
@@ -35,7 +71,7 @@ const DataIntegrationDemo = () => {
     } else {
       toast({
         title: "Selection limit reached",
-        description: "You can only select up to 20 vegetables",
+        description: "You can only select up to 20 plants",
       });
     }
   };
@@ -50,6 +86,15 @@ const DataIntegrationDemo = () => {
     if (data1.avoids.includes(plant2)) return "avoid";
     return "neutral";
   };
+
+  // Group plants by category
+  const plantsByCategory = plants.reduce((acc, plant) => {
+    if (!acc[plant.category]) {
+      acc[plant.category] = [];
+    }
+    acc[plant.category].push(plant);
+    return acc;
+  }, {} as Record<PlantCategory, Plant[]>);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -106,39 +151,46 @@ const DataIntegrationDemo = () => {
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="space-y-8">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]"></TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Scientific Name</TableHead>
-                      <TableHead>Sun Requirements</TableHead>
-                      <TableHead>Sowing Method</TableHead>
-                      <TableHead>Sowing Dates</TableHead>
-                      <TableHead>Height (cm)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {gardenVegetables.map((vegetable) => (
-                      <TableRow key={vegetable.id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedVegetables.includes(vegetable.name)}
-                            onCheckedChange={() => handleVegetableSelection(vegetable.name)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium capitalize">{vegetable.name}</TableCell>
-                        <TableCell>{vegetable.binomialName}</TableCell>
-                        <TableCell>{vegetable.sunRequirements}</TableCell>
-                        <TableCell>{vegetable.sowingMethod}</TableCell>
-                        <TableCell>{vegetable.sowingDates[selectedZone] || "Not recommended for this zone"}</TableCell>
-                        <TableCell>{vegetable.height || "N/A"}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              {Object.entries(plantsByCategory).map(([category, categoryPlants]) => (
+                <div key={category} className="space-y-4">
+                  <h3 className="text-xl font-semibold">{categoryNames[category as PlantCategory]}</h3>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[50px]"></TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Scientific Name</TableHead>
+                          <TableHead>Sun Requirements</TableHead>
+                          <TableHead>Sowing Method</TableHead>
+                          <TableHead>Sowing Dates</TableHead>
+                          <TableHead>Height (cm)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {categoryPlants.map((plant) => (
+                          <TableRow key={plant.id}>
+                            <TableCell>
+                              <Checkbox
+                                checked={selectedVegetables.includes(plant.name)}
+                                onCheckedChange={() => handleVegetableSelection(plant.name)}
+                              />
+                            </TableCell>
+                            <TableCell className="font-medium capitalize">{plant.name}</TableCell>
+                            <TableCell>{plant.binomialName}</TableCell>
+                            <TableCell>{plant.sunRequirements}</TableCell>
+                            <TableCell>{plant.sowingMethod}</TableCell>
+                            <TableCell>
+                              {plantingDates[plant.id]?.[selectedZone] || "Not recommended for this zone"}
+                            </TableCell>
+                            <TableCell>{plant.height || "N/A"}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ))}
 
               {selectedVegetables.length > 0 && (
                 <div className="space-y-4">
