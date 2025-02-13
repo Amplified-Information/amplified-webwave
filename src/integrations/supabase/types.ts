@@ -198,80 +198,6 @@ export type Database = {
         }
         Relationships: []
       }
-      planting_dates: {
-        Row: {
-          created_at: string
-          id: string
-          plant_id: string | null
-          sowing_dates: string
-          updated_at: string
-          zone: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          plant_id?: string | null
-          sowing_dates: string
-          updated_at?: string
-          zone: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          plant_id?: string | null
-          sowing_dates?: string
-          updated_at?: string
-          zone?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "planting_dates_plant_id_fkey"
-            columns: ["plant_id"]
-            isOneToOne: false
-            referencedRelation: "plants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      plants: {
-        Row: {
-          binomial_name: string
-          category: Database["public"]["Enums"]["plant_category"]
-          created_at: string
-          description: string
-          height: number | null
-          id: string
-          name: string
-          sowing_method: string
-          sun_requirements: string
-          updated_at: string
-        }
-        Insert: {
-          binomial_name: string
-          category: Database["public"]["Enums"]["plant_category"]
-          created_at?: string
-          description: string
-          height?: number | null
-          id?: string
-          name: string
-          sowing_method: string
-          sun_requirements: string
-          updated_at?: string
-        }
-        Update: {
-          binomial_name?: string
-          category?: Database["public"]["Enums"]["plant_category"]
-          created_at?: string
-          description?: string
-          height?: number | null
-          id?: string
-          name?: string
-          sowing_method?: string
-          sun_requirements?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       secrets: {
         Row: {
           created_at: string
@@ -556,16 +482,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      plant_category:
-        | "root_vegetable"
-        | "leafy_green"
-        | "fruiting_vegetable"
-        | "brassica"
-        | "legume"
-        | "allium"
-        | "herb"
-        | "fruit_bush"
-        | "climbing_vegetable"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
