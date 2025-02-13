@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -21,7 +20,7 @@ import {
 import { useState, useEffect } from "react";
 import { findCompanionData } from "@/data/companionPlanting";
 import { hardinessZones } from "@/data/gardenVegetables";
-import { Plant, PlantCategory, fetchPlants, fetchPlantingDates } from "@/data/gardenPlants";
+import { Plant, PlantCategory, fetchPlants, fetchPlantingDates, insertInitialPlantData } from "@/data/gardenPlants";
 
 const categoryNames: Record<PlantCategory, string> = {
   root_vegetable: "Root Vegetables",
@@ -44,12 +43,13 @@ const DataIntegrationDemo = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      await insertInitialPlantData();
+      
       const plantsData = await fetchPlants();
       const datesData = await fetchPlantingDates();
       
       setPlants(plantsData);
       
-      // Transform planting dates into a more usable format
       const datesMap: Record<string, Record<string, string>> = {};
       datesData.forEach(date => {
         if (!datesMap[date.plant_id]) {
@@ -58,10 +58,15 @@ const DataIntegrationDemo = () => {
         datesMap[date.plant_id][date.zone] = date.sowing_dates;
       });
       setPlantingDates(datesMap);
+
+      toast({
+        title: "Data loaded",
+        description: "Initial plant data has been loaded successfully",
+      });
     };
     
     loadData();
-  }, []);
+  }, [toast]);
 
   const handleVegetableSelection = (vegetableName: string) => {
     if (selectedVegetables.includes(vegetableName)) {
@@ -87,7 +92,6 @@ const DataIntegrationDemo = () => {
     return "neutral";
   };
 
-  // Group plants by category
   const plantsByCategory = plants.reduce((acc, plant) => {
     if (!acc[plant.category]) {
       acc[plant.category] = [];
