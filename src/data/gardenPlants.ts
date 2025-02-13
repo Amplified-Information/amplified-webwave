@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export type PlantCategory = 
@@ -24,9 +25,9 @@ export interface Plant {
 
 export interface PlantingDate {
   id: string;
-  plantId: string;
+  plant_id: string;
   zone: string;
-  sowingDates: string;
+  sowing_dates: string;
 }
 
 export const fetchPlants = async () => {
@@ -39,6 +40,8 @@ export const fetchPlants = async () => {
     console.error('Error fetching plants:', error);
     return [];
   }
+  
+  console.log('Fetched plants:', plants);
   
   return plants.map(plant => ({
     id: plant.id,
@@ -61,6 +64,8 @@ export const fetchPlantingDates = async () => {
     console.error('Error fetching planting dates:', error);
     return [];
   }
+  
+  console.log('Fetched planting dates:', plantingDates);
   
   return plantingDates;
 };
