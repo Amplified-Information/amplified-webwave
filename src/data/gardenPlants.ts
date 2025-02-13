@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export type PlantCategory = 
@@ -41,7 +40,16 @@ export const fetchPlants = async () => {
     return [];
   }
   
-  return plants;
+  return plants.map(plant => ({
+    id: plant.id,
+    name: plant.name,
+    binomialName: plant.binomial_name,
+    category: plant.category,
+    description: plant.description,
+    sunRequirements: plant.sun_requirements,
+    sowingMethod: plant.sowing_method,
+    height: plant.height
+  }));
 };
 
 export const fetchPlantingDates = async () => {
@@ -57,7 +65,6 @@ export const fetchPlantingDates = async () => {
   return plantingDates;
 };
 
-// Initial data insert function - should only be run once
 export const insertInitialPlantData = async () => {
   const { error } = await supabase.from('plants').insert([
     // Root Vegetables
