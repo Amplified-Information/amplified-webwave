@@ -26,6 +26,7 @@ const PlantTable = ({ plants, selectedVegetables, onVegetableSelect }: PlantTabl
           <TableHead>Scientific Name</TableHead>
           <TableHead>Genus</TableHead>
           <TableHead>Species</TableHead>
+          <TableHead>Variety</TableHead>
           <TableHead>Sun Requirements</TableHead>
           <TableHead>Sowing Method</TableHead>
           <TableHead>Height (cm)</TableHead>
@@ -44,6 +45,7 @@ const PlantTable = ({ plants, selectedVegetables, onVegetableSelect }: PlantTabl
             <TableCell><span className="italic">{plant.binomial_name}</span></TableCell>
             <TableCell>{plant.genus}</TableCell>
             <TableCell className="italic">{plant.species}</TableCell>
+            <TableCell className="italic">{plant.variety ? `var. ${plant.variety}` : ''}</TableCell>
             <TableCell>{plant.sun_requirements}</TableCell>
             <TableCell>{plant.sowing_method}</TableCell>
             <TableCell>{plant.height || "N/A"}</TableCell>

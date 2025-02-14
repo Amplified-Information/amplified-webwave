@@ -15,6 +15,7 @@ export interface Plant {
   botanical_family: BotanicalFamily | null;
   genus: string;
   species: string;
+  variety: string | null;
 }
 
 export interface PlantsByFamily {

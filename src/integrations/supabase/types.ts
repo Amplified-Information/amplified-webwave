@@ -272,6 +272,7 @@ export type Database = {
           species: string
           sun_requirements: string
           updated_at: string
+          variety: string | null
         }
         Insert: {
           binomial_name: string
@@ -287,6 +288,7 @@ export type Database = {
           species: string
           sun_requirements: string
           updated_at?: string
+          variety?: string | null
         }
         Update: {
           binomial_name?: string
@@ -302,6 +304,7 @@ export type Database = {
           species?: string
           sun_requirements?: string
           updated_at?: string
+          variety?: string | null
         }
         Relationships: [
           {
