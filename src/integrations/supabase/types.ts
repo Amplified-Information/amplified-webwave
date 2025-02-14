@@ -269,6 +269,7 @@ export type Database = {
           id: string
           name: string
           sowing_method: string
+          species: string
           sun_requirements: string
           updated_at: string
         }
@@ -283,6 +284,7 @@ export type Database = {
           id?: string
           name: string
           sowing_method: string
+          species: string
           sun_requirements: string
           updated_at?: string
         }
@@ -297,6 +299,7 @@ export type Database = {
           id?: string
           name?: string
           sowing_method?: string
+          species?: string
           sun_requirements?: string
           updated_at?: string
         }

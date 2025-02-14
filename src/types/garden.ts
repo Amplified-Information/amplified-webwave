@@ -14,8 +14,10 @@ export interface Plant {
   height: number | null;
   botanical_family: BotanicalFamily | null;
   genus: string;
+  species: string;
 }
 
 export interface PlantsByFamily {
   [familyName: string]: Plant[];
 }
+
