@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,12 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { hardinessZones } from "@/data/hardinessZones";
 import { supabase } from "@/integrations/supabase/client";
 import PlantTable from "@/components/garden/PlantTable";
 import CompanionPlantingMatrix from "@/components/garden/CompanionPlantingMatrix";
 import { PlantsByFamily } from "@/types/garden";
+import { Loader2 } from "lucide-react";
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
@@ -23,6 +24,8 @@ const DataIntegrationDemo = () => {
   const [gardenSize, setGardenSize] = useState<string>("");
   const [plants, setPlants] = useState<PlantsByFamily>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [report, setReport] = useState<string>("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,7 +45,6 @@ const DataIntegrationDemo = () => {
 
         console.log('Fetched plants data:', data);
 
-        // Group plants by family and sort within each family
         const groupedPlants = (data || []).reduce<PlantsByFamily>((acc, plant) => {
           const familyName = plant.botanical_family?.name || 'Uncategorized';
           if (!acc[familyName]) {
@@ -52,7 +54,6 @@ const DataIntegrationDemo = () => {
           return acc;
         }, {});
 
-        // Sort plants within each family by name
         Object.keys(groupedPlants).forEach(family => {
           groupedPlants[family].sort((a, b) => a.name.localeCompare(b.name));
         });
@@ -85,6 +86,50 @@ const DataIntegrationDemo = () => {
         title: "Selection limit reached",
         description: "You can only select up to 20 vegetables",
       });
+    }
+  };
+
+  const generateReport = async () => {
+    if (!gardenSize || selectedVegetables.length === 0) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter garden size and select at least one vegetable.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingReport(true);
+    try {
+      const response = await fetch('/api/generate-garden-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          hardinessZone: selectedZone,
+          gardenSize,
+          selectedPlants: selectedVegetables,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate report');
+
+      const data = await response.json();
+      setReport(data.report.report_content.full_report);
+      toast({
+        title: "Report Generated",
+        description: "Your garden planning report has been created successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating report:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate garden report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingReport(false);
     }
   };
 
@@ -186,7 +231,34 @@ const DataIntegrationDemo = () => {
               ))}
 
               {selectedVegetables.length > 0 && (
-                <CompanionPlantingMatrix selectedVegetables={selectedVegetables} />
+                <>
+                  <CompanionPlantingMatrix selectedVegetables={selectedVegetables} />
+                  <div className="mt-8">
+                    <Button
+                      onClick={generateReport}
+                      disabled={isGeneratingReport || !gardenSize || selectedVegetables.length === 0}
+                      className="w-full md:w-auto"
+                    >
+                      {isGeneratingReport ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Generating Report...
+                        </>
+                      ) : (
+                        'Generate Garden Planning Report'
+                      )}
+                    </Button>
+                  </div>
+
+                  {report && (
+                    <div className="mt-8 p-6 bg-white rounded-lg shadow">
+                      <h3 className="text-2xl font-bold mb-4">Your Garden Planning Report</h3>
+                      <div className="prose max-w-none whitespace-pre-wrap">
+                        {report}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </CardContent>

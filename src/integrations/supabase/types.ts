@@ -222,6 +222,36 @@ export type Database = {
         }
         Relationships: []
       }
+      garden_reports: {
+        Row: {
+          created_at: string | null
+          garden_size: number
+          hardiness_zone: string
+          id: string
+          report_content: Json
+          selected_plants: string[]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          garden_size: number
+          hardiness_zone: string
+          id?: string
+          report_content: Json
+          selected_plants: string[]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          garden_size?: number
+          hardiness_zone?: string
+          id?: string
+          report_content?: Json
+          selected_plants?: string[]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       planting_dates: {
         Row: {
           created_at: string
