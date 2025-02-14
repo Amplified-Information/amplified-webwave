@@ -1,17 +1,7 @@
 
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -20,27 +10,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
-import { findCompanionData } from "@/data/companionPlanting";
 import { hardinessZones } from "@/data/gardenVegetables";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Plant {
-  id: string;
-  name: string;
-  binomial_name: string;
-  description: string;
-  sun_requirements: string;
-  sowing_method: string;
-  height: number | null;
-  botanical_family: {
-    name: string;
-    description: string;
-  } | null;
-}
-
-interface PlantsByFamily {
-  [familyName: string]: Plant[];
-}
+import PlantTable from "@/components/garden/PlantTable";
+import CompanionPlantingMatrix from "@/components/garden/CompanionPlantingMatrix";
+import { PlantsByFamily } from "@/types/garden";
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
@@ -101,17 +75,6 @@ const DataIntegrationDemo = () => {
         description: "You can only select up to 20 vegetables",
       });
     }
-  };
-
-  const getCompanionStatus = (plant1: string, plant2: string) => {
-    const data1 = findCompanionData(plant1);
-    const data2 = findCompanionData(plant2);
-    
-    if (!data1 || !data2) return "unknown";
-    
-    if (data1.companions.includes(plant2)) return "companion";
-    if (data1.avoids.includes(plant2)) return "avoid";
-    return "neutral";
   };
 
   if (isLoading) {
@@ -184,100 +147,17 @@ const DataIntegrationDemo = () => {
                 <div key={familyName} className="space-y-4">
                   <h3 className="text-xl font-semibold text-gray-800">{familyName}</h3>
                   <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-[50px]"></TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Scientific Name</TableHead>
-                          <TableHead>Sun Requirements</TableHead>
-                          <TableHead>Sowing Method</TableHead>
-                          <TableHead>Height (cm)</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {familyPlants.map((plant) => (
-                          <TableRow key={plant.id}>
-                            <TableCell>
-                              <Checkbox
-                                checked={selectedVegetables.includes(plant.name)}
-                                onCheckedChange={() => handleVegetableSelection(plant.name)}
-                              />
-                            </TableCell>
-                            <TableCell className="font-medium capitalize">{plant.name}</TableCell>
-                            <TableCell>{plant.binomial_name}</TableCell>
-                            <TableCell>{plant.sun_requirements}</TableCell>
-                            <TableCell>{plant.sowing_method}</TableCell>
-                            <TableCell>{plant.height || "N/A"}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <PlantTable
+                      plants={familyPlants}
+                      selectedVegetables={selectedVegetables}
+                      onVegetableSelect={handleVegetableSelection}
+                    />
                   </div>
                 </div>
               ))}
 
               {selectedVegetables.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold">Companion Planting Analysis</h2>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead></TableHead>
-                          {selectedVegetables.map((vegetable) => (
-                            <TableHead key={vegetable} className="min-w-[100px] capitalize">
-                              {vegetable}
-                            </TableHead>
-                          ))}
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {selectedVegetables.map((plant1) => (
-                          <TableRow key={plant1}>
-                            <TableCell className="font-medium capitalize">{plant1}</TableCell>
-                            {selectedVegetables.map((plant2) => (
-                              <TableCell 
-                                key={`${plant1}-${plant2}`}
-                                className={
-                                  plant1 === plant2 
-                                    ? "bg-gray-100" 
-                                    : getCompanionStatus(plant1, plant2) === "companion"
-                                    ? "bg-green-100"
-                                    : getCompanionStatus(plant1, plant2) === "avoid"
-                                    ? "bg-red-100"
-                                    : ""
-                                }
-                              >
-                                {plant1 === plant2 
-                                  ? "-" 
-                                  : getCompanionStatus(plant1, plant2) === "companion"
-                                  ? "✓"
-                                  : getCompanionStatus(plant1, plant2) === "avoid"
-                                  ? "✗"
-                                  : "?"}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  <div className="flex gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-green-100"></div>
-                      <span>Companion plants</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-red-100"></div>
-                      <span>Avoid planting together</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-gray-100"></div>
-                      <span>Same plant</span>
-                    </div>
-                  </div>
-                </div>
+                <CompanionPlantingMatrix selectedVegetables={selectedVegetables} />
               )}
             </div>
           </CardContent>
