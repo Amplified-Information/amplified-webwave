@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,14 +19,76 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { findCompanionData } from "@/data/companionPlanting";
-import { gardenVegetables, hardinessZones } from "@/data/gardenVegetables";
+import { hardinessZones } from "@/data/gardenVegetables";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Plant {
+  id: string;
+  name: string;
+  binomial_name: string;
+  description: string;
+  sun_requirements: string;
+  sowing_method: string;
+  height: number | null;
+  botanical_family: {
+    name: string;
+    description: string;
+  } | null;
+}
+
+interface PlantsByFamily {
+  [familyName: string]: Plant[];
+}
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [selectedZone, setSelectedZone] = useState<string>("5");
+  const [plants, setPlants] = useState<PlantsByFamily>({});
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchPlants = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('plants')
+          .select(`
+            *,
+            botanical_family:botanical_family_id(
+              name,
+              description
+            )
+          `);
+
+        if (error) throw error;
+
+        // Group plants by family
+        const groupedPlants = (data || []).reduce<PlantsByFamily>((acc, plant) => {
+          const familyName = plant.botanical_family?.name || 'Uncategorized';
+          if (!acc[familyName]) {
+            acc[familyName] = [];
+          }
+          acc[familyName].push(plant);
+          return acc;
+        }, {});
+
+        setPlants(groupedPlants);
+      } catch (error) {
+        console.error('Error fetching plants:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load plant data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlants();
+  }, [toast]);
 
   const handleVegetableSelection = (vegetableName: string) => {
     if (selectedVegetables.includes(vegetableName)) {
@@ -51,6 +114,17 @@ const DataIntegrationDemo = () => {
     return "neutral";
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="container mx-auto px-6 py-20">
+          <p className="text-center">Loading plant data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -65,20 +139,20 @@ const DataIntegrationDemo = () => {
             <div className="bg-blue-50 p-6 rounded-lg text-left">
               <h2 className="text-xl font-semibold mb-2">How This Tool Works:</h2>
               <p className="mb-2">
-                This garden planning tool uses a comprehensive static database to help you make informed decisions about your garden layout. The data is sourced from established gardening resources and agricultural research:
+                This garden planning tool uses a comprehensive database to help you make informed decisions about your garden layout. Plants are organized by botanical families to help you understand their relationships and growing requirements:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  <strong>Vegetable Database:</strong> Contains detailed information about common garden vegetables, including scientific names, growing requirements, and planting dates. This data is maintained in a static TypeScript file (gardenVegetables.ts) and is based on USDA guidelines and agricultural extension services recommendations.
+                  <strong>Botanical Families:</strong> Plants are grouped by their botanical families, showing related species that often have similar needs and growing patterns.
                 </li>
                 <li>
-                  <strong>Companion Planting Matrix:</strong> Uses pre-defined relationships between plants to show which vegetables grow well together and which should be kept apart. These relationships are documented in our companionPlanting.ts file and are derived from traditional gardening wisdom and modern agricultural research.
+                  <strong>Companion Planting Matrix:</strong> Uses pre-defined relationships between plants to show which vegetables grow well together and which should be kept apart.
                 </li>
                 <li>
-                  <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on your selected USDA hardiness zone to optimize planting times. The dates are aligned with USDA recommendations for each hardiness zone.
+                  <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on your selected USDA hardiness zone to optimize planting times.
                 </li>
                 <li>
-                  <strong>Selection System:</strong> Allows you to choose up to 20 vegetables at once to analyze their compatibility and generate a personalized planting guide. The analysis is performed in real-time using our integrated companion planting database.
+                  <strong>Selection System:</strong> Choose up to 20 vegetables to analyze their compatibility and generate a personalized planting guide.
                 </li>
               </ul>
             </div>
@@ -106,39 +180,42 @@ const DataIntegrationDemo = () => {
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="space-y-8">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]"></TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Scientific Name</TableHead>
-                      <TableHead>Sun Requirements</TableHead>
-                      <TableHead>Sowing Method</TableHead>
-                      <TableHead>Sowing Dates</TableHead>
-                      <TableHead>Height (cm)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {gardenVegetables.map((vegetable) => (
-                      <TableRow key={vegetable.id}>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedVegetables.includes(vegetable.name)}
-                            onCheckedChange={() => handleVegetableSelection(vegetable.name)}
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium capitalize">{vegetable.name}</TableCell>
-                        <TableCell>{vegetable.binomialName}</TableCell>
-                        <TableCell>{vegetable.sunRequirements}</TableCell>
-                        <TableCell>{vegetable.sowingMethod}</TableCell>
-                        <TableCell>{vegetable.sowingDates[selectedZone] || "Not recommended for this zone"}</TableCell>
-                        <TableCell>{vegetable.height || "N/A"}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              {Object.entries(plants).map(([familyName, familyPlants]) => (
+                <div key={familyName} className="space-y-4">
+                  <h3 className="text-xl font-semibold text-gray-800">{familyName}</h3>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[50px]"></TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Scientific Name</TableHead>
+                          <TableHead>Sun Requirements</TableHead>
+                          <TableHead>Sowing Method</TableHead>
+                          <TableHead>Height (cm)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {familyPlants.map((plant) => (
+                          <TableRow key={plant.id}>
+                            <TableCell>
+                              <Checkbox
+                                checked={selectedVegetables.includes(plant.name)}
+                                onCheckedChange={() => handleVegetableSelection(plant.name)}
+                              />
+                            </TableCell>
+                            <TableCell className="font-medium capitalize">{plant.name}</TableCell>
+                            <TableCell>{plant.binomial_name}</TableCell>
+                            <TableCell>{plant.sun_requirements}</TableCell>
+                            <TableCell>{plant.sowing_method}</TableCell>
+                            <TableCell>{plant.height || "N/A"}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ))}
 
               {selectedVegetables.length > 0 && (
                 <div className="space-y-4">

@@ -114,6 +114,30 @@ export type Database = {
         }
         Relationships: []
       }
+      botanical_families: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cloud_provider_metrics: {
         Row: {
           availability: Json | null
@@ -236,6 +260,7 @@ export type Database = {
       plants: {
         Row: {
           binomial_name: string
+          botanical_family_id: string | null
           category: Database["public"]["Enums"]["plant_category"]
           created_at: string
           description: string
@@ -248,6 +273,7 @@ export type Database = {
         }
         Insert: {
           binomial_name: string
+          botanical_family_id?: string | null
           category: Database["public"]["Enums"]["plant_category"]
           created_at?: string
           description: string
@@ -260,6 +286,7 @@ export type Database = {
         }
         Update: {
           binomial_name?: string
+          botanical_family_id?: string | null
           category?: Database["public"]["Enums"]["plant_category"]
           created_at?: string
           description?: string
@@ -270,7 +297,15 @@ export type Database = {
           sun_requirements?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "plants_botanical_family_id_fkey"
+            columns: ["botanical_family_id"]
+            isOneToOne: false
+            referencedRelation: "botanical_families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       secrets: {
         Row: {
