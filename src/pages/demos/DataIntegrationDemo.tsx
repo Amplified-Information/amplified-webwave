@@ -101,21 +101,16 @@ const DataIntegrationDemo = () => {
 
     setIsGeneratingReport(true);
     try {
-      const response = await fetch('/api/generate-garden-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('generate-garden-report', {
+        body: {
           hardinessZone: selectedZone,
           gardenSize,
           selectedPlants: selectedVegetables,
-        }),
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to generate report');
+      if (error) throw error;
 
-      const data = await response.json();
       setReport(data.report.report_content.full_report);
       toast({
         title: "Report Generated",
