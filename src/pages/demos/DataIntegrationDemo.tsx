@@ -18,6 +18,8 @@ import { PlantsByFamily } from "@/types/garden";
 import { Loader2 } from "lucide-react";
 import { ProcessDiagram } from "@/components/ProcessDiagram";
 import { AIAgentsDescription } from "@/components/demos/machine-learning/AIAgentsDescription";
+import { GardenProcessDiagram } from "@/components/garden/GardenProcessDiagram";
+import { GardenAIAgentsDescription } from "@/components/garden/GardenAIAgentsDescription";
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
@@ -152,16 +154,16 @@ const DataIntegrationDemo = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Process Overview</h3>
-                  <ProcessDiagram />
+                  <GardenProcessDiagram />
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">AI Analysis Team</h3>
+                  <h3 className="font-semibold text-lg mb-2">Garden Planning AI Team</h3>
                   <p className="mb-4">
-                    Our garden planning system uses a team of specialized AI agents, each with unique expertise
-                    in different aspects of gardening and plant compatibility analysis:
+                    Our garden planning system uses a team of specialized AI agents, each bringing unique expertise
+                    to help create your optimal garden plan:
                   </p>
-                  <AIAgentsDescription />
+                  <GardenAIAgentsDescription />
                 </div>
 
                 <div>
