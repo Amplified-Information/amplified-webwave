@@ -24,6 +24,7 @@ const PlantTable = ({ plants, selectedVegetables, onVegetableSelect }: PlantTabl
           <TableHead className="w-[50px]"></TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Scientific Name</TableHead>
+          <TableHead>Genus</TableHead>
           <TableHead>Sun Requirements</TableHead>
           <TableHead>Sowing Method</TableHead>
           <TableHead>Height (cm)</TableHead>
@@ -40,6 +41,7 @@ const PlantTable = ({ plants, selectedVegetables, onVegetableSelect }: PlantTabl
             </TableCell>
             <TableCell className="font-medium capitalize">{plant.name}</TableCell>
             <TableCell>{plant.binomial_name}</TableCell>
+            <TableCell>{plant.genus}</TableCell>
             <TableCell>{plant.sun_requirements}</TableCell>
             <TableCell>{plant.sowing_method}</TableCell>
             <TableCell>{plant.height || "N/A"}</TableCell>

@@ -264,6 +264,7 @@ export type Database = {
           category: Database["public"]["Enums"]["plant_category"]
           created_at: string
           description: string
+          genus: string
           height: number | null
           id: string
           name: string
@@ -277,6 +278,7 @@ export type Database = {
           category: Database["public"]["Enums"]["plant_category"]
           created_at?: string
           description: string
+          genus: string
           height?: number | null
           id?: string
           name: string
@@ -290,6 +292,7 @@ export type Database = {
           category?: Database["public"]["Enums"]["plant_category"]
           created_at?: string
           description?: string
+          genus?: string
           height?: number | null
           id?: string
           name?: string

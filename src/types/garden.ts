@@ -13,6 +13,7 @@ export interface Plant {
   sowing_method: string;
   height: number | null;
   botanical_family: BotanicalFamily | null;
+  genus: string;
 }
 
 export interface PlantsByFamily {
