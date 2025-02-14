@@ -38,9 +38,9 @@ const DataIntegrationDemo = () => {
 
         if (error) throw error;
 
-        console.log('Fetched plants data:', data); // Add this line for debugging
+        console.log('Fetched plants data:', data);
 
-        // Group plants by family
+        // Group plants by family and sort within each family
         const groupedPlants = (data || []).reduce<PlantsByFamily>((acc, plant) => {
           const familyName = plant.botanical_family?.name || 'Uncategorized';
           if (!acc[familyName]) {
@@ -50,7 +50,12 @@ const DataIntegrationDemo = () => {
           return acc;
         }, {});
 
-        console.log('Grouped plants:', groupedPlants); // Add this line for debugging
+        // Sort plants within each family by name
+        Object.keys(groupedPlants).forEach(family => {
+          groupedPlants[family].sort((a, b) => a.name.localeCompare(b.name));
+        });
+
+        console.log('Grouped and sorted plants:', groupedPlants);
 
         setPlants(groupedPlants);
       } catch (error) {
