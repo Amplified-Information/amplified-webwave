@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -37,6 +38,8 @@ const DataIntegrationDemo = () => {
 
         if (error) throw error;
 
+        console.log('Fetched plants data:', data); // Add this line for debugging
+
         // Group plants by family
         const groupedPlants = (data || []).reduce<PlantsByFamily>((acc, plant) => {
           const familyName = plant.botanical_family?.name || 'Uncategorized';
@@ -46,6 +49,8 @@ const DataIntegrationDemo = () => {
           acc[familyName].push(plant);
           return acc;
         }, {});
+
+        console.log('Grouped plants:', groupedPlants); // Add this line for debugging
 
         setPlants(groupedPlants);
       } catch (error) {
