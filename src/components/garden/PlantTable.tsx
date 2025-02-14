@@ -23,7 +23,6 @@ const PlantTable = ({ plants, selectedVegetables, onVegetableSelect }: PlantTabl
         <TableRow>
           <TableHead className="w-[50px]"></TableHead>
           <TableHead>Name</TableHead>
-          <TableHead>Scientific Name</TableHead>
           <TableHead>Genus</TableHead>
           <TableHead>Species</TableHead>
           <TableHead>Variety</TableHead>
@@ -42,7 +41,6 @@ const PlantTable = ({ plants, selectedVegetables, onVegetableSelect }: PlantTabl
               />
             </TableCell>
             <TableCell className="font-medium capitalize">{plant.name}</TableCell>
-            <TableCell><span className="italic">{plant.binomial_name}</span></TableCell>
             <TableCell>{plant.genus}</TableCell>
             <TableCell className="italic">{plant.species}</TableCell>
             <TableCell className="italic">{plant.variety ? `var. ${plant.variety}` : ''}</TableCell>
