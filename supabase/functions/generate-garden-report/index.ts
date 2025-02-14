@@ -18,6 +18,43 @@ serve(async (req) => {
   try {
     const { hardinessZone, gardenSize, selectedPlants } = await req.json();
 
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Fetch detailed plant information for all selected plants
+    const { data: plantDetails, error: plantError } = await supabaseClient
+      .from('plants')
+      .select(`
+        *,
+        botanical_family:botanical_family_id(
+          name,
+          description
+        ),
+        planting_dates(
+          zone,
+          sowing_dates
+        )
+      `)
+      .in('name', selectedPlants);
+
+    if (plantError) throw plantError;
+
+    // Format plant details for the prompt
+    const plantDetailsForPrompt = plantDetails.map(plant => ({
+      name: plant.name,
+      botanical_family: plant.botanical_family?.name,
+      species: plant.species,
+      binomial_name: plant.binomial_name,
+      description: plant.description,
+      sun_requirements: plant.sun_requirements,
+      sowing_method: plant.sowing_method,
+      height: plant.height,
+      planting_dates: plant.planting_dates?.find(d => d.zone === hardinessZone)?.sowing_dates || 'Dates not available for this zone'
+    }));
+
     // Generate the report using GPT-4
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -26,7 +63,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4',
         messages: [
           {
             role: 'system',
@@ -37,21 +74,52 @@ serve(async (req) => {
             content: `Please create a detailed garden report with the following information:
             Hardiness Zone: ${hardinessZone}
             Garden Size: ${gardenSize} sq ft
-            Selected Plants: ${selectedPlants.join(', ')}
+            
+            Selected Plants Details:
+            ${JSON.stringify(plantDetailsForPrompt, null, 2)}
 
             Include the following sections:
-            1. Location & Hardiness Zone (including frost dates)
-            2. Garden Size & Layout (including recommendations)
-            3. Plant Selection Analysis (including companion planting)
-            4. Seasonal Planting Schedule
-            5. Garden Maintenance Plan
-            6. Special Considerations
+            1. Location & Hardiness Zone Analysis
+               - Include typical frost dates and growing season length
+               - Zone-specific considerations
+            
+            2. Garden Size & Layout Recommendations
+               - Space allocation for each plant
+               - Suggested bed layouts
+               - Consider height and sun requirements
+            
+            3. Detailed Plant Analysis
+               - Individual analysis for each selected plant
+               - Scientific name and family information
+               - Growing requirements
+               - Optimal planting dates for the zone
+            
+            4. Companion Planting Strategy
+               - Beneficial plant combinations
+               - Plants to keep separated
+               - Reasons for the recommendations
+            
+            5. Seasonal Planting Schedule
+               - When to start seeds indoors (if applicable)
+               - When to transplant or direct sow
+               - Succession planting opportunities
+            
+            6. Care & Maintenance Guidelines
+               - Watering requirements
+               - Fertilization needs
+               - Common issues to watch for
+            
+            7. Special Considerations
+               - Soil preparation recommendations
+               - Season extension opportunities
+               - Crop rotation planning for future seasons
 
-            Please provide specific, actionable advice based on the selected plants and conditions.`
+            Please provide specific, actionable advice based on the selected plants and conditions.
+            Format the report with clear headings and bullet points for easy reading.`
           }
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 2500
       }),
     });
 
@@ -59,11 +127,6 @@ serve(async (req) => {
     const reportContent = data.choices[0].message.content;
 
     // Store the report in the database
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     const { data: report, error } = await supabaseClient
       .from('garden_reports')
       .insert({
@@ -72,6 +135,7 @@ serve(async (req) => {
         selected_plants: selectedPlants,
         report_content: {
           full_report: reportContent,
+          plant_details: plantDetailsForPrompt,
           generated_at: new Date().toISOString()
         }
       })
@@ -85,6 +149,7 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
+    console.error('Error generating report:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
