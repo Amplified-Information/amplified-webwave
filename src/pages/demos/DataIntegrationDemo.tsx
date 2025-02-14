@@ -163,6 +163,8 @@ const DataIntegrationDemo = () => {
               value={gardenSize}
               onChange={(e) => setGardenSize(e.target.value)}
               className="w-full"
+              step="100"
+              min="0"
             />
           </div>
         </div>
