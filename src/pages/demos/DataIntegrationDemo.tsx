@@ -15,7 +15,6 @@ import { useState, useEffect } from "react";
 import { hardinessZones } from "@/data/hardinessZones";
 import { supabase } from "@/integrations/supabase/client";
 import PlantTable from "@/components/garden/PlantTable";
-import CompanionPlantingMatrix from "@/components/garden/CompanionPlantingMatrix";
 import { PlantsByFamily } from "@/types/garden";
 import { Loader2 } from "lucide-react";
 
@@ -80,13 +79,8 @@ const DataIntegrationDemo = () => {
   const handleVegetableSelection = (vegetableName: string) => {
     if (selectedVegetables.includes(vegetableName)) {
       setSelectedVegetables(selectedVegetables.filter(v => v !== vegetableName));
-    } else if (selectedVegetables.length < 20) {
-      setSelectedVegetables([...selectedVegetables, vegetableName]);
     } else {
-      toast({
-        title: "Selection limit reached",
-        description: "You can only select up to 20 vegetables",
-      });
+      setSelectedVegetables([...selectedVegetables, vegetableName]);
     }
   };
 
@@ -161,13 +155,10 @@ const DataIntegrationDemo = () => {
                   <strong>Botanical Families:</strong> Plants are grouped by their botanical families, showing related species that often have similar needs and growing patterns.
                 </li>
                 <li>
-                  <strong>Companion Planting Matrix:</strong> Uses pre-defined relationships between plants to show which vegetables grow well together and which should be kept apart.
+                  <strong>Personalized Report:</strong> Includes detailed companion planting analysis, optimal layout suggestions, and specific growing recommendations.
                 </li>
                 <li>
                   <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on your selected USDA hardiness zone to optimize planting times.
-                </li>
-                <li>
-                  <strong>Selection System:</strong> Choose up to 20 vegetables to analyze their compatibility and generate a personalized planting guide.
                 </li>
               </ul>
             </div>
@@ -228,7 +219,6 @@ const DataIntegrationDemo = () => {
 
               {selectedVegetables.length > 0 && (
                 <>
-                  <CompanionPlantingMatrix selectedVegetables={selectedVegetables} />
                   <div className="mt-8">
                     <Button
                       onClick={generateReport}
