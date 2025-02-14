@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { hardinessZones } from "@/data/hardinessZones";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ import { PlantsByFamily } from "@/types/garden";
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [selectedZone, setSelectedZone] = useState<string>("5");
+  const [gardenSize, setGardenSize] = useState<string>("");
   const [plants, setPlants] = useState<PlantsByFamily>({});
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -131,22 +133,38 @@ const DataIntegrationDemo = () => {
           </div>
         </div>
 
-        <div className="mb-8">
-          <label htmlFor="zone-select" className="block text-sm font-medium text-gray-700 mb-2">
-            Select Your Hardiness Zone
-          </label>
-          <Select value={selectedZone} onValueChange={setSelectedZone}>
-            <SelectTrigger className="w-full md:w-[300px]">
-              <SelectValue placeholder="Select your zone" />
-            </SelectTrigger>
-            <SelectContent>
-              {hardinessZones.map((zone) => (
-                <SelectItem key={zone.value} value={zone.value}>
-                  {zone.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="zone-select" className="block text-sm font-medium text-gray-700 mb-2">
+              Select Your Hardiness Zone
+            </label>
+            <Select value={selectedZone} onValueChange={setSelectedZone}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select your zone" />
+              </SelectTrigger>
+              <SelectContent>
+                {hardinessZones.map((zone) => (
+                  <SelectItem key={zone.value} value={zone.value}>
+                    {zone.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label htmlFor="garden-size" className="block text-sm font-medium text-gray-700 mb-2">
+              Garden Size (sq ft)
+            </label>
+            <Input
+              id="garden-size"
+              type="number"
+              placeholder="Enter garden size"
+              value={gardenSize}
+              onChange={(e) => setGardenSize(e.target.value)}
+              className="w-full"
+            />
+          </div>
         </div>
 
         <Card className="mb-8">
