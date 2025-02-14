@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
-import { hardinessZones } from "@/data/gardenVegetables";
+import { hardinessZones } from "@/data/hardinessZones";
 import { supabase } from "@/integrations/supabase/client";
 import PlantTable from "@/components/garden/PlantTable";
 import CompanionPlantingMatrix from "@/components/garden/CompanionPlantingMatrix";
