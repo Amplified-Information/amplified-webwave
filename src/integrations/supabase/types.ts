@@ -226,6 +226,7 @@ export type Database = {
         Row: {
           created_at: string | null
           garden_size: number
+          growing_spaces: Json | null
           hardiness_zone: string
           id: string
           report_content: Json
@@ -235,6 +236,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           garden_size: number
+          growing_spaces?: Json | null
           hardiness_zone: string
           id?: string
           report_content: Json
@@ -244,6 +246,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           garden_size?: number
+          growing_spaces?: Json | null
           hardiness_zone?: string
           id?: string
           report_content?: Json

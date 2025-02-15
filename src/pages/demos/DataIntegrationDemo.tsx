@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { hardinessZones } from "@/data/hardinessZones";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,12 @@ const DataIntegrationDemo = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [report, setReport] = useState<string>("");
+  const [growingSpaces, setGrowingSpaces] = useState({
+    heated_seed_starting: false,
+    heated_greenhouse: false,
+    unheated_polytunnel: false,
+    hydroponics: false,
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -105,6 +112,7 @@ const DataIntegrationDemo = () => {
           hardinessZone: selectedZone,
           gardenSize,
           selectedPlants: selectedVegetables,
+          growingSpaces,
         },
       });
 
@@ -235,40 +243,112 @@ Planting_Dates Table
           </div>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="zone-select" className="block text-sm font-medium text-gray-700 mb-2">
-              Select Your Hardiness Zone
-            </label>
-            <Select value={selectedZone} onValueChange={setSelectedZone}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select your zone" />
-              </SelectTrigger>
-              <SelectContent>
-                {hardinessZones.map((zone) => (
-                  <SelectItem key={zone.value} value={zone.value}>
-                    {zone.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="mb-8 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="zone-select" className="block text-sm font-medium text-gray-700 mb-2">
+                Select Your Hardiness Zone
+              </label>
+              <Select value={selectedZone} onValueChange={setSelectedZone}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your zone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {hardinessZones.map((zone) => (
+                    <SelectItem key={zone.value} value={zone.value}>
+                      {zone.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label htmlFor="garden-size" className="block text-sm font-medium text-gray-700 mb-2">
+                Garden Size (sq ft)
+              </label>
+              <Input
+                id="garden-size"
+                type="number"
+                placeholder="Enter garden size"
+                value={gardenSize}
+                onChange={(e) => setGardenSize(e.target.value)}
+                className="w-full"
+                step="100"
+                min="0"
+              />
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="garden-size" className="block text-sm font-medium text-gray-700 mb-2">
-              Garden Size (sq ft)
-            </label>
-            <Input
-              id="garden-size"
-              type="number"
-              placeholder="Enter garden size"
-              value={gardenSize}
-              onChange={(e) => setGardenSize(e.target.value)}
-              className="w-full"
-              step="100"
-              min="0"
-            />
-          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-gray-700">Growing Spaces Available</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="heated-seed-starting"
+                      checked={growingSpaces.heated_seed_starting}
+                      onCheckedChange={(checked) =>
+                        setGrowingSpaces(prev => ({ ...prev, heated_seed_starting: checked === true }))
+                      }
+                    />
+                    <label
+                      htmlFor="heated-seed-starting"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Heated Seed Starting Space
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="heated-greenhouse"
+                      checked={growingSpaces.heated_greenhouse}
+                      onCheckedChange={(checked) =>
+                        setGrowingSpaces(prev => ({ ...prev, heated_greenhouse: checked === true }))
+                      }
+                    />
+                    <label
+                      htmlFor="heated-greenhouse"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Heated Greenhouse Space
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="unheated-polytunnel"
+                      checked={growingSpaces.unheated_polytunnel}
+                      onCheckedChange={(checked) =>
+                        setGrowingSpaces(prev => ({ ...prev, unheated_polytunnel: checked === true }))
+                      }
+                    />
+                    <label
+                      htmlFor="unheated-polytunnel"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Unheated Poly-tunnel Space
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hydroponics"
+                      checked={growingSpaces.hydroponics}
+                      onCheckedChange={(checked) =>
+                        setGrowingSpaces(prev => ({ ...prev, hydroponics: checked === true }))
+                      }
+                    />
+                    <label
+                      htmlFor="hydroponics"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Hydroponics
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <Card className="mb-8">
