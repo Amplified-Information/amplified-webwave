@@ -1,3 +1,4 @@
+
 import { CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -5,7 +6,7 @@ const reasons = [
   "20+ years of industry experience",
   <div className="flex items-center gap-3">
     <img 
-      src="/lovable-uploads/f50a8f6c-1a61-46ac-8e5f-bda51fdb2300.png" 
+      src="/uploads/f50a8f6c-1a61-46ac-8e5f-bda51fdb2300.png" 
       alt="CBIP Logo" 
       className="h-6 w-auto"
     />
