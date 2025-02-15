@@ -1,3 +1,4 @@
+
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -7,7 +8,7 @@ export const Hero = () => {
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-[#F2FCE2] via-white to-[#F2FCE2] text-black">
       <div className="container mx-auto px-6 py-16 text-center">
         <img 
-          src="/lovable-uploads/f8f959e3-530e-46d3-8306-1cc3ad3cebee.png" 
+          src="/uploads/f8f959e3-530e-46d3-8306-1cc3ad3cebee.png" 
           alt="Amplified Information" 
           className="mx-auto mb-8 w-[400px] max-w-full object-contain" 
         />

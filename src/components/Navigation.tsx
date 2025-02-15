@@ -32,7 +32,7 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/f8f959e3-530e-46d3-8306-1cc3ad3cebee.png" 
+              src="/uploads/f8f959e3-530e-46d3-8306-1cc3ad3cebee.png" 
               alt="Amplified Information" 
               className="h-8 object-contain" 
             />

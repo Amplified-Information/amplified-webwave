@@ -99,7 +99,7 @@ const ApiIntegrationDemo = () => {
               className="block mb-8 hover:opacity-95 transition-opacity"
             >
               <img
-                src="/lovable-uploads/87c4bef0-cf92-4982-8c47-e07cce2a7334.png"
+                src="/uploads/87c4bef0-cf92-4982-8c47-e07cce2a7334.png"
                 alt="West Coast Cutting Edge Mortgage Banner"
                 className="w-full rounded-lg shadow-md"
               />
