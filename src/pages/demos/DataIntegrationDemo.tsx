@@ -1,27 +1,15 @@
+
 import { Navigation } from "@/components/Navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
-import { hardinessZones } from "@/data/hardinessZones";
 import { supabase } from "@/integrations/supabase/client";
 import PlantTable from "@/components/garden/PlantTable";
 import { PlantsByFamily } from "@/types/garden";
-import { Loader2 } from "lucide-react";
-import { ProcessDiagram } from "@/components/ProcessDiagram";
-import { AIAgentsDescription } from "@/components/demos/machine-learning/AIAgentsDescription";
-import { GardenProcessDiagram } from "@/components/garden/GardenProcessDiagram";
-import { GardenAIAgentsDescription } from "@/components/garden/GardenAIAgentsDescription";
+import { GardenZoneSelector } from "@/components/garden/GardenZoneSelector";
+import { GardenSizeInput } from "@/components/garden/GardenSizeInput";
+import { GrowingSpacesSelector } from "@/components/garden/GrowingSpacesSelector";
+import { GardenInfoSection } from "@/components/garden/GardenInfoSection";
+import { GardenReport } from "@/components/garden/GardenReport";
 
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
@@ -88,11 +76,11 @@ const DataIntegrationDemo = () => {
   }, [toast]);
 
   const handleVegetableSelection = (vegetableName: string) => {
-    if (selectedVegetables.includes(vegetableName)) {
-      setSelectedVegetables(selectedVegetables.filter(v => v !== vegetableName));
-    } else {
-      setSelectedVegetables([...selectedVegetables, vegetableName]);
-    }
+    setSelectedVegetables(prev => 
+      prev.includes(vegetableName)
+        ? prev.filter(v => v !== vegetableName)
+        : [...prev, vegetableName]
+    );
   };
 
   const generateReport = async () => {
@@ -157,248 +145,51 @@ const DataIntegrationDemo = () => {
               Select vegetables from the list below to analyze their compatibility
               and create an optimal garden layout.
             </p>
-            
-            <div className="bg-blue-50 p-6 rounded-lg text-left space-y-6">
-              <h2 className="text-xl font-semibold">How This Tool Works:</h2>
-              <div className="space-y-4">
-                <Tabs defaultValue="process" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="process">Process Flow</TabsTrigger>
-                    <TabsTrigger value="data-model">Data Model</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="process" className="mt-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Process Overview</h3>
-                      <GardenProcessDiagram />
-                    </div>
-                    
-                    <div className="mt-6">
-                      <h3 className="font-semibold text-lg mb-2">Garden Planning AI Team</h3>
-                      <p className="mb-4">
-                        Our garden planning system uses a team of specialized AI agents, each bringing unique expertise
-                        to help create your optimal garden plan:
-                      </p>
-                      <GardenAIAgentsDescription />
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="data-model" className="mt-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Database Schema</h3>
-                      <div className="bg-white p-4 rounded shadow-sm">
-                        <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
-{`Plants Table
-├── id (UUID)
-├── name (VARCHAR)
-├── botanical_family_id (UUID) → References Botanical_Families
-├── species (VARCHAR)
-├── binomial_name (VARCHAR)
-├── description (TEXT)
-├── category (ENUM)
-└── growing_requirements (JSON)
-
-Botanical_Families Table
-├── id (UUID)
-├── name (VARCHAR)
-└── description (TEXT)
-
-Garden_Reports Table
-├── id (UUID)
-├── hardiness_zone (TEXT)
-├── garden_size (INTEGER)
-├── selected_plants (TEXT[])
-└── report_content (JSON)
-
-Planting_Dates Table
-├── id (UUID)
-├── plant_id (UUID) → References Plants
-├── zone (VARCHAR)
-└── sowing_dates (VARCHAR)`}
-                        </pre>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">Key Features</h3>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>
-                      <strong>Botanical Families:</strong> Plants are grouped by their botanical families,
-                      showing related species that often have similar needs and growing patterns.
-                    </li>
-                    <li>
-                      <strong>Personalized Report:</strong> Includes detailed companion planting analysis,
-                      optimal layout suggestions, and specific growing recommendations.
-                    </li>
-                    <li>
-                      <strong>Zone-Based Planting Dates:</strong> Provides specific sowing dates based on
-                      your selected USDA hardiness zone to optimize planting times.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+            <GardenInfoSection />
           </div>
         </div>
 
         <div className="mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="zone-select" className="block text-sm font-medium text-gray-700 mb-2">
-                Select Your Hardiness Zone
-              </label>
-              <Select value={selectedZone} onValueChange={setSelectedZone}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select your zone" />
-                </SelectTrigger>
-                <SelectContent>
-                  {hardinessZones.map((zone) => (
-                    <SelectItem key={zone.value} value={zone.value}>
-                      {zone.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label htmlFor="garden-size" className="block text-sm font-medium text-gray-700 mb-2">
-                Garden Size (sq ft)
-              </label>
-              <Input
-                id="garden-size"
-                type="number"
-                placeholder="Enter garden size"
-                value={gardenSize}
-                onChange={(e) => setGardenSize(e.target.value)}
-                className="w-full"
-                step="100"
-                min="0"
-              />
-            </div>
+            <GardenZoneSelector
+              selectedZone={selectedZone}
+              onZoneChange={setSelectedZone}
+            />
+            <GardenSizeInput
+              gardenSize={gardenSize}
+              onSizeChange={setGardenSize}
+            />
           </div>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-700">Growing Spaces Available</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="heated-seed-starting"
-                      checked={growingSpaces.heated_seed_starting}
-                      onCheckedChange={(checked) =>
-                        setGrowingSpaces(prev => ({ ...prev, heated_seed_starting: checked === true }))
-                      }
-                    />
-                    <label
-                      htmlFor="heated-seed-starting"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Heated Seed Starting Space
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="heated-greenhouse"
-                      checked={growingSpaces.heated_greenhouse}
-                      onCheckedChange={(checked) =>
-                        setGrowingSpaces(prev => ({ ...prev, heated_greenhouse: checked === true }))
-                      }
-                    />
-                    <label
-                      htmlFor="heated-greenhouse"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Heated Greenhouse Space
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="unheated-polytunnel"
-                      checked={growingSpaces.unheated_polytunnel}
-                      onCheckedChange={(checked) =>
-                        setGrowingSpaces(prev => ({ ...prev, unheated_polytunnel: checked === true }))
-                      }
-                    />
-                    <label
-                      htmlFor="unheated-polytunnel"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Unheated Poly-tunnel Space
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="hydroponics"
-                      checked={growingSpaces.hydroponics}
-                      onCheckedChange={(checked) =>
-                        setGrowingSpaces(prev => ({ ...prev, hydroponics: checked === true }))
-                      }
-                    />
-                    <label
-                      htmlFor="hydroponics"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Hydroponics
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <GrowingSpacesSelector
+            growingSpaces={growingSpaces}
+            onGrowingSpacesChange={setGrowingSpaces}
+          />
         </div>
 
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="space-y-8">
-              {Object.entries(plants).map(([familyName, familyPlants]) => (
-                <div key={familyName} className="space-y-4">
-                  <h3 className="text-xl font-semibold text-gray-800">{familyName}</h3>
-                  <div className="overflow-x-auto">
-                    <PlantTable
-                      plants={familyPlants}
-                      selectedVegetables={selectedVegetables}
-                      onVegetableSelect={handleVegetableSelection}
-                    />
-                  </div>
-                </div>
-              ))}
-
-              {selectedVegetables.length > 0 && (
-                <>
-                  <div className="mt-8">
-                    <Button
-                      onClick={generateReport}
-                      disabled={isGeneratingReport || !gardenSize || selectedVegetables.length === 0}
-                      className="w-full md:w-auto"
-                    >
-                      {isGeneratingReport ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Generating Report...
-                        </>
-                      ) : (
-                        'Generate Garden Planning Report'
-                      )}
-                    </Button>
-                  </div>
-
-                  {report && (
-                    <div className="mt-8 p-6 bg-white rounded-lg shadow">
-                      <h3 className="text-2xl font-bold mb-4">Your Garden Planning Report</h3>
-                      <div className="prose max-w-none whitespace-pre-wrap">
-                        {report}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
+        <div className="space-y-8">
+          {Object.entries(plants).map(([familyName, familyPlants]) => (
+            <div key={familyName} className="space-y-4">
+              <h3 className="text-xl font-semibold text-gray-800">{familyName}</h3>
+              <div className="overflow-x-auto">
+                <PlantTable
+                  plants={familyPlants}
+                  selectedVegetables={selectedVegetables}
+                  onVegetableSelect={handleVegetableSelection}
+                />
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          ))}
+
+          {selectedVegetables.length > 0 && (
+            <GardenReport
+              isGenerating={isGeneratingReport}
+              report={report}
+              onGenerate={generateReport}
+              disabled={!gardenSize || selectedVegetables.length === 0}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
