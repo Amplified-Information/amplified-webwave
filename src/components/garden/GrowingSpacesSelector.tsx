@@ -7,6 +7,8 @@ interface GrowingSpaces {
   heated_greenhouse: boolean;
   unheated_polytunnel: boolean;
   hydroponics: boolean;
+  outdoor_garden_irrigated: boolean;
+  outdoor_garden_no_irrigation: boolean;
 }
 
 interface GrowingSpacesSelectorProps {
@@ -94,6 +96,42 @@ export const GrowingSpacesSelector = ({
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Hydroponics
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="outdoor-garden-irrigated"
+                checked={growingSpaces.outdoor_garden_irrigated}
+                onCheckedChange={(checked) =>
+                  onGrowingSpacesChange({
+                    ...growingSpaces,
+                    outdoor_garden_irrigated: checked === true,
+                  })
+                }
+              />
+              <label
+                htmlFor="outdoor-garden-irrigated"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Outdoor Garden with Irrigation
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="outdoor-garden-no-irrigation"
+                checked={growingSpaces.outdoor_garden_no_irrigation}
+                onCheckedChange={(checked) =>
+                  onGrowingSpacesChange({
+                    ...growingSpaces,
+                    outdoor_garden_no_irrigation: checked === true,
+                  })
+                }
+              />
+              <label
+                htmlFor="outdoor-garden-no-irrigation"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Outdoor Garden without Irrigation
               </label>
             </div>
           </div>

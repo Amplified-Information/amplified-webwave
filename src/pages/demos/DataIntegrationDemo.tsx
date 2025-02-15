@@ -24,6 +24,8 @@ const DataIntegrationDemo = () => {
     heated_greenhouse: false,
     unheated_polytunnel: false,
     hydroponics: false,
+    outdoor_garden_irrigated: false,
+    outdoor_garden_no_irrigation: false,
   });
   const { toast } = useToast();
 
