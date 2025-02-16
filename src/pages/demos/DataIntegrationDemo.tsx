@@ -27,14 +27,21 @@ const DataIntegrationDemo = () => {
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [report, setReport] = useState<string>("");
   const [growingSpaces, setGrowingSpaces] = useState({
-    heated_seed_starting: false,
-    heated_greenhouse: false,
-    unheated_polytunnel: false,
-    hydroponics: false,
-    outdoor_garden_irrigated: false,
-    outdoor_garden_no_irrigation: false,
+    heated_seed_starting: true,
+    heated_greenhouse: true,
+    unheated_polytunnel: true,
+    hydroponics: true,
+    outdoor_garden_irrigated: true,
+    outdoor_garden_no_irrigation: true,
   });
-  const [spaceSizes, setSpaceSizes] = useState<SpaceSizes>({});
+  const [spaceSizes, setSpaceSizes] = useState<SpaceSizes>({
+    heated_seed_starting: 0,
+    heated_greenhouse: 0,
+    unheated_polytunnel: 0,
+    hydroponics: 0,
+    outdoor_garden_irrigated: 0,
+    outdoor_garden_no_irrigation: 0,
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -90,7 +97,6 @@ const DataIntegrationDemo = () => {
   };
 
   const generateReport = async () => {
-    // Calculate total garden size from individual spaces
     const totalGardenSize = Object.values(spaceSizes).reduce((sum, size) => sum + (size || 0), 0);
     
     if (totalGardenSize === 0 || selectedVegetables.length === 0) {
@@ -112,7 +118,7 @@ const DataIntegrationDemo = () => {
           growingSpaces: Object.fromEntries(
             Object.entries(growingSpaces).map(([key, value]) => [
               key,
-              value ? { enabled: true, size: spaceSizes[key as keyof SpaceSizes] || 0 } : { enabled: false, size: 0 }
+              { enabled: true, size: spaceSizes[key as keyof SpaceSizes] || 0 }
             ])
           ),
         },
