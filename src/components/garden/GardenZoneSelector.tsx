@@ -27,7 +27,7 @@ export const GardenZoneSelector = ({
       <div className="flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
           <label htmlFor="country-select" className="block text-sm font-medium text-gray-700 mb-2">
-            Select Your Country
+            Select Your Country or Your Neighbour's Country
           </label>
           <Select value={selectedCountry} onValueChange={onCountryChange}>
             <SelectTrigger className="w-full">
