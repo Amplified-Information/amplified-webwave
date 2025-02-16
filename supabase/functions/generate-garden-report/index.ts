@@ -10,6 +10,31 @@ const corsHeaders = {
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
+// Define beneficial flowers and their purposes
+const beneficialFlowers = {
+  pollinators: [
+    { name: "Marigold", benefits: "Attracts bees and butterflies, deters harmful nematodes" },
+    { name: "Zinnia", benefits: "Attracts butterflies, bees, and beneficial wasps" },
+    { name: "Cosmos", benefits: "Attracts pollinators, beneficial insects" },
+    { name: "Borage", benefits: "Attracts bees, excellent companion for tomatoes and squash" },
+    { name: "Lavender", benefits: "Attracts pollinators, repels pests, drought-resistant" }
+  ],
+  pestControl: [
+    { name: "Nasturtium", benefits: "Trap crop for aphids, attracts pollinators" },
+    { name: "Calendula", benefits: "Attracts beneficial insects, repels tomato hornworms" },
+    { name: "Tansy", benefits: "Repels flying pests, ants, and cucumber beetles" },
+    { name: "Chrysanthemum", benefits: "Natural pesticide, deters root nematodes" },
+    { name: "Yarrow", benefits: "Attracts predatory wasps and ladybugs" }
+  ],
+  beneficialInsects: [
+    { name: "Dill", benefits: "Attracts ladybugs, parasitic wasps, and butterflies" },
+    { name: "Fennel", benefits: "Attracts beneficial wasps and ladybugs" },
+    { name: "Alyssum", benefits: "Attracts hover flies and parasitic wasps" },
+    { name: "Cilantro", benefits: "Attracts beneficial insects when allowed to flower" },
+    { name: "Chamomile", benefits: "Attracts beneficial wasps and hoverflies" }
+  ]
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -94,6 +119,7 @@ serve(async (req) => {
             4. Soil Scientist - Specialist in soil requirements and amendments
             5. Irrigation Expert - Specialist in water management
             6. Pest Management Specialist - Expert in organic and conventional pest control
+            7. Pollinator Expert - Specialist in beneficial insects and flowers
             
             Work together to create a comprehensive garden plan that covers all aspects of garden planning and maintenance.`
           },
@@ -114,24 +140,41 @@ serve(async (req) => {
             3. Plant Selection Analysis for:
             ${JSON.stringify(plantDetailsForPrompt, null, 2)}
             
-            4. Seasonal Planting Schedule
+            4. Beneficial Flowers and Insects Integration
+            Consider these beneficial plants and their purposes:
+            ${JSON.stringify(beneficialFlowers, null, 2)}
+            
+            Provide recommendations for:
+            - Pollinator-friendly flower placement
+            - Natural pest control through companion flowers
+            - Season-long bloom succession for continuous beneficial insect habitat
+            - Integration with vegetable plantings
+            - Specific flower recommendations for the selected vegetables
+            
+            5. Seasonal Planting Schedule
             - Create a detailed calendar based on frost dates
             - Include succession planting opportunities
             - Plan crop rotation
+            - Include flowering plant schedule for continuous blooms
             
-            5. Garden Maintenance Plan
+            6. Garden Maintenance Plan
             - Create monthly maintenance schedules
             - Include soil amendment timing
             - Detail pest management strategies
+            - Pollinator and beneficial insect habitat maintenance
             
-            6. Special Considerations
+            7. Special Considerations
             - Analyze each growing space type and provide specific recommendations
             - Suggest season extension techniques
             - Include companion planting strategies
+            - Beneficial insect attraction and habitat creation
+            - Natural pest management through biodiversity
             
             Format the report with clear sections, bullet points, and tables where appropriate. Make specific recommendations based on the growing spaces available and selected plants.
             
-            For each plant, provide detailed growing instructions considering the specific growing spaces available. If a plant requires special care in any of the available growing spaces, highlight those requirements.`
+            For each plant, provide detailed growing instructions considering the specific growing spaces available. If a plant requires special care in any of the available growing spaces, highlight those requirements.
+            
+            Include specific flower combinations that will benefit the selected vegetables through improved pollination and pest management.`
           }
         ],
         temperature: 0.7,
@@ -154,6 +197,7 @@ serve(async (req) => {
           full_report: reportContent,
           plant_details: plantDetailsForPrompt,
           companion_planting: companionPlantingDetails,
+          beneficial_flowers: beneficialFlowers,
           generated_at: new Date().toISOString()
         }
       })
