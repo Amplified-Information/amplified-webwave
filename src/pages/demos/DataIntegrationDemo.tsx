@@ -22,6 +22,7 @@ interface SpaceSizes {
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [selectedZone, setSelectedZone] = useState<string>("5");
+  const [selectedCountry, setSelectedCountry] = useState<string>("us");
   const [plants, setPlants] = useState<PlantsByFamily>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -173,6 +174,8 @@ const DataIntegrationDemo = () => {
           <GardenZoneSelector
             selectedZone={selectedZone}
             onZoneChange={setSelectedZone}
+            selectedCountry={selectedCountry}
+            onCountryChange={setSelectedCountry}
           />
 
           <GrowingSpacesSelector
