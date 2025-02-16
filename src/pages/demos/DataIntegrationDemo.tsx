@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import PlantTable from "@/components/garden/PlantTable";
 import { PlantsByFamily } from "@/types/garden";
 import { GardenZoneSelector } from "@/components/garden/GardenZoneSelector";
-import { GardenSizeInput } from "@/components/garden/GardenSizeInput";
 import { GrowingSpacesSelector } from "@/components/garden/GrowingSpacesSelector";
 import { GardenInfoSection } from "@/components/garden/GardenInfoSection";
 import { GardenReport } from "@/components/garden/GardenReport";
@@ -14,7 +13,6 @@ import { GardenReport } from "@/components/garden/GardenReport";
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [selectedZone, setSelectedZone] = useState<string>("5");
-  const [gardenSize, setGardenSize] = useState<string>("");
   const [plants, setPlants] = useState<PlantsByFamily>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -27,6 +25,7 @@ const DataIntegrationDemo = () => {
     outdoor_garden_irrigated: false,
     outdoor_garden_no_irrigation: false,
   });
+  const [spaceSizes, setSpaceSizes] = useState({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -44,8 +43,6 @@ const DataIntegrationDemo = () => {
 
         if (error) throw error;
 
-        console.log('Fetched plants data:', data);
-
         const groupedPlants = (data || []).reduce<PlantsByFamily>((acc, plant) => {
           const familyName = plant.botanical_family?.name || 'Uncategorized';
           if (!acc[familyName]) {
@@ -58,8 +55,6 @@ const DataIntegrationDemo = () => {
         Object.keys(groupedPlants).forEach(family => {
           groupedPlants[family].sort((a, b) => a.name.localeCompare(b.name));
         });
-
-        console.log('Grouped and sorted plants:', groupedPlants);
 
         setPlants(groupedPlants);
       } catch (error) {
@@ -86,10 +81,13 @@ const DataIntegrationDemo = () => {
   };
 
   const generateReport = async () => {
-    if (!gardenSize || selectedVegetables.length === 0) {
+    // Calculate total garden size from individual spaces
+    const totalGardenSize = Object.values(spaceSizes).reduce((sum, size) => sum + (size || 0), 0);
+    
+    if (totalGardenSize === 0 || selectedVegetables.length === 0) {
       toast({
         title: "Missing Information",
-        description: "Please enter garden size and select at least one vegetable.",
+        description: "Please enter space sizes and select at least one vegetable.",
         variant: "destructive",
       });
       return;
@@ -100,9 +98,14 @@ const DataIntegrationDemo = () => {
       const { data, error } = await supabase.functions.invoke('generate-garden-report', {
         body: {
           hardinessZone: selectedZone,
-          gardenSize,
+          gardenSize: totalGardenSize,
           selectedPlants: selectedVegetables,
-          growingSpaces,
+          growingSpaces: Object.fromEntries(
+            Object.entries(growingSpaces).map(([key, value]) => [
+              key,
+              value ? { enabled: true, size: spaceSizes[key] || 0 } : { enabled: false, size: 0 }
+            ])
+          ),
         },
       });
 
@@ -152,20 +155,16 @@ const DataIntegrationDemo = () => {
         </div>
 
         <div className="mb-8 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <GardenZoneSelector
-              selectedZone={selectedZone}
-              onZoneChange={setSelectedZone}
-            />
-            <GardenSizeInput
-              gardenSize={gardenSize}
-              onSizeChange={setGardenSize}
-            />
-          </div>
+          <GardenZoneSelector
+            selectedZone={selectedZone}
+            onZoneChange={setSelectedZone}
+          />
 
           <GrowingSpacesSelector
             growingSpaces={growingSpaces}
+            spaceSizes={spaceSizes}
             onGrowingSpacesChange={setGrowingSpaces}
+            onSpaceSizesChange={setSpaceSizes}
           />
         </div>
 
@@ -188,7 +187,7 @@ const DataIntegrationDemo = () => {
               isGenerating={isGeneratingReport}
               report={report}
               onGenerate={generateReport}
-              disabled={!gardenSize || selectedVegetables.length === 0}
+              disabled={!Object.values(spaceSizes).some(size => size > 0) || selectedVegetables.length === 0}
             />
           )}
         </div>
