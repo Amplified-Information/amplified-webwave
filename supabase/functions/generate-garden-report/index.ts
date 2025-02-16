@@ -2,7 +2,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { findCompanionData } from '@/data/companionPlanting';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { hardinessZone, gardenSize, selectedPlants, growingSpaces } = await req.json();
+    const { hardinessZone, selectedPlants, growingSpaces } = await req.json();
 
     // Initialize Supabase client
     const supabaseClient = createClient(
@@ -45,14 +44,23 @@ serve(async (req) => {
 
     // Get companion planting data for each plant
     const companionPlantingDetails = selectedPlants.map(plant => {
-      const companionData = findCompanionData(plant);
       return {
         plant,
-        companions: companionData?.companions || [],
-        avoids: companionData?.avoids || [],
-        benefits: companionData?.benefits || ''
+        companions: [], // This would be populated from your companion planting data
+        avoids: [],    // This would be populated from your companion planting data
       };
     });
+
+    // Fetch frost dates and climate data based on hardiness zone
+    const zoneData = {
+      '3': { lastFrost: 'May 15-31', firstFrost: 'September 1-15' },
+      '4': { lastFrost: 'May 1-15', firstFrost: 'September 15-30' },
+      '5': { lastFrost: 'April 15-30', firstFrost: 'October 1-15' },
+      '6': { lastFrost: 'April 1-15', firstFrost: 'October 15-31' },
+      '7': { lastFrost: 'March 15-31', firstFrost: 'November 1-15' },
+      '8': { lastFrost: 'March 1-15', firstFrost: 'November 15-30' },
+      '9': { lastFrost: 'February 15-28', firstFrost: 'December 1-15' }
+    };
 
     // Format plant details for the prompt
     const plantDetailsForPrompt = plantDetails.map(plant => ({
@@ -75,80 +83,55 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'system',
-            content: `You are a skilled garden planning team consisting of multiple experts:
-            1. Master Gardener - Expert in plant care and cultivation
-            2. Soil Scientist - Specialist in soil requirements and fertilization
+            content: `You are a team of gardening experts:
+            1. Climate Specialist - Expert in zone-specific growing conditions and frost dates
+            2. Master Gardener - Expert in plant care and cultivation
             3. Garden Layout Designer - Expert in spatial planning and companion planting
-            4. Climate Specialist - Expert in zone-specific growing conditions
+            4. Soil Scientist - Specialist in soil requirements and amendments
+            5. Irrigation Expert - Specialist in water management
+            6. Pest Management Specialist - Expert in organic and conventional pest control
             
-            Work together to create a comprehensive garden plan that maximizes success for the gardener.`
+            Work together to create a comprehensive garden plan that covers all aspects of garden planning and maintenance.`
           },
           {
             role: 'user',
-            content: `Create a detailed garden report with the following information:
-            Hardiness Zone: ${hardinessZone}
-            Garden Size: ${gardenSize} sq ft
-            Growing Spaces Available:
+            content: `Create a detailed garden report with the following structure:
+
+            1. Location & Hardiness Zone
+            - USDA Zone ${hardinessZone}
+            - Frost dates: ${JSON.stringify(zoneData[hardinessZone])}
+            - Analyze appropriate sunlight exposure needs
+            
+            2. Growing Spaces Available (analyze each space type and provide specific recommendations)
             ${Object.entries(growingSpaces)
-              .filter(([_, value]) => value)
-              .map(([key]) => `- ${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`)
+              .map(([key, value]) => `- ${key.replace(/_/g, ' ')}: ${value.size} sq ft`)
               .join('\n')}
             
-            Selected Plants Details:
+            3. Plant Selection Analysis for:
             ${JSON.stringify(plantDetailsForPrompt, null, 2)}
             
-            Companion Planting Information:
-            ${JSON.stringify(companionPlantingDetails, null, 2)}
-
-            Please provide a comprehensive report with these sections:
-
-            1. Garden Overview
-            - Summary of available growing spaces and their best uses
-            - General climate considerations for Zone ${hardinessZone}
-            - Total space requirements and allocation recommendations
+            4. Seasonal Planting Schedule
+            - Create a detailed calendar based on frost dates
+            - Include succession planting opportunities
+            - Plan crop rotation
             
-            2. Individual Plant Analysis (for each selected plant):
-            - Detailed growing requirements
-            - Specific fertilization needs and schedule
-            - Optimal growing space allocation (from available spaces)
-            - Special care instructions
-            - Disease prevention tips
+            5. Garden Maintenance Plan
+            - Create monthly maintenance schedules
+            - Include soil amendment timing
+            - Detail pest management strategies
             
-            3. Companion Planting Strategy
-            - Detailed interplanting opportunities
-            - Specific combinations to avoid
-            - Scientific reasoning for recommendations
-            - Space-sharing strategies
+            6. Special Considerations
+            - Analyze each growing space type and provide specific recommendations
+            - Suggest season extension techniques
+            - Include companion planting strategies
             
-            4. Season-by-Season Planting Schedule
-            - When to start seeds (if applicable)
-            - Optimal transplanting times
-            - Succession planting opportunities
-            - Expected harvest periods
+            Format the report with clear sections, bullet points, and tables where appropriate. Make specific recommendations based on the growing spaces available and selected plants.
             
-            5. Soil Preparation and Maintenance
-            - Specific soil amendments needed for each plant
-            - pH requirements and adjustments
-            - Organic matter recommendations
-            - Mulching strategies
-            
-            6. Irrigation and Water Management
-            - Water requirements for each plant
-            - Irrigation scheduling
-            - Drought tolerance considerations
-            - Water conservation strategies
-            
-            7. Space Optimization Recommendations
-            - Vertical growing opportunities
-            - Intercropping strategies
-            - Season extension techniques
-            - Crop rotation planning
-            
-            Format each section with clear headings and bullet points. Provide specific, actionable advice based on the selected plants, growing conditions, and available spaces.`
+            For each plant, provide detailed growing instructions considering the specific growing spaces available. If a plant requires special care in any of the available growing spaces, highlight those requirements.`
           }
         ],
         temperature: 0.7,
@@ -164,7 +147,7 @@ serve(async (req) => {
       .from('garden_reports')
       .insert({
         hardiness_zone: hardinessZone,
-        garden_size: parseInt(gardenSize),
+        garden_size: Object.values(growingSpaces).reduce((sum, space) => sum + space.size, 0),
         selected_plants: selectedPlants,
         growing_spaces: growingSpaces,
         report_content: {
