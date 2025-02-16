@@ -10,6 +10,15 @@ import { GrowingSpacesSelector } from "@/components/garden/GrowingSpacesSelector
 import { GardenInfoSection } from "@/components/garden/GardenInfoSection";
 import { GardenReport } from "@/components/garden/GardenReport";
 
+interface SpaceSizes {
+  heated_seed_starting?: number;
+  heated_greenhouse?: number;
+  unheated_polytunnel?: number;
+  hydroponics?: number;
+  outdoor_garden_irrigated?: number;
+  outdoor_garden_no_irrigation?: number;
+}
+
 const DataIntegrationDemo = () => {
   const [selectedVegetables, setSelectedVegetables] = useState<string[]>([]);
   const [selectedZone, setSelectedZone] = useState<string>("5");
@@ -25,7 +34,7 @@ const DataIntegrationDemo = () => {
     outdoor_garden_irrigated: false,
     outdoor_garden_no_irrigation: false,
   });
-  const [spaceSizes, setSpaceSizes] = useState({});
+  const [spaceSizes, setSpaceSizes] = useState<SpaceSizes>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -103,7 +112,7 @@ const DataIntegrationDemo = () => {
           growingSpaces: Object.fromEntries(
             Object.entries(growingSpaces).map(([key, value]) => [
               key,
-              value ? { enabled: true, size: spaceSizes[key] || 0 } : { enabled: false, size: 0 }
+              value ? { enabled: true, size: spaceSizes[key as keyof SpaceSizes] || 0 } : { enabled: false, size: 0 }
             ])
           ),
         },
@@ -187,7 +196,7 @@ const DataIntegrationDemo = () => {
               isGenerating={isGeneratingReport}
               report={report}
               onGenerate={generateReport}
-              disabled={!Object.values(spaceSizes).some(size => size > 0) || selectedVegetables.length === 0}
+              disabled={!Object.values(spaceSizes).some(size => (size || 0) > 0) || selectedVegetables.length === 0}
             />
           )}
         </div>
