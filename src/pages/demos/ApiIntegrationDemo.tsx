@@ -45,27 +45,35 @@ const ApiIntegrationDemo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
+      console.log("Fetching API key from Supabase...");
       // Get the API key from Supabase
-      const { data, error } = await supabase
+      const { data: secretData, error: secretError } = await supabase
         .from('secrets')
         .select('value')
         .eq('name', 'MORTGAGE_API_KEY')
         .single();
 
-      if (error) {
-        throw new Error("Failed to get API key");
+      if (secretError) {
+        console.error("Secret fetch error:", secretError);
+        throw new Error("Failed to get API key from Supabase");
       }
 
-      if (!data?.value) {
-        throw new Error("API key not found");
+      if (!secretData?.value) {
+        console.error("No API key found in Supabase");
+        throw new Error("API key not found in Supabase");
       }
 
+      console.log("Making API request with key...");
       const response = await fetch(
-        `https://secure.dominionintranet.ca/rest/rates?apikey=${data.value}`
+        `https://secure.dominionintranet.ca/rest/rates?apikey=${secretData.value}`
       );
+
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorText = await response.text();
+        console.error("API Response error:", errorText);
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
       }
+
       const responseData: RatesResponse = await response.json();
       return responseData;
     },
