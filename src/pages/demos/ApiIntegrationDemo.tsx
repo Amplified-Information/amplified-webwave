@@ -46,23 +46,28 @@ const ApiIntegrationDemo = () => {
     queryKey: ["rates"],
     queryFn: async () => {
       // Get the API key from Supabase
-      const { data: { MORTGAGE_API_KEY }, error } = await supabase
+      const { data, error } = await supabase
         .from('secrets')
-        .select('MORTGAGE_API_KEY')
+        .select('value')
+        .eq('name', 'MORTGAGE_API_KEY')
         .single();
 
       if (error) {
         throw new Error("Failed to get API key");
       }
 
+      if (!data?.value) {
+        throw new Error("API key not found");
+      }
+
       const response = await fetch(
-        `https://secure.dominionintranet.ca/rest/rates?apikey=${MORTGAGE_API_KEY}`
+        `https://secure.dominionintranet.ca/rest/rates?apikey=${data.value}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      const data: RatesResponse = await response.json();
-      return data;
+      const responseData: RatesResponse = await response.json();
+      return responseData;
     },
   });
 
