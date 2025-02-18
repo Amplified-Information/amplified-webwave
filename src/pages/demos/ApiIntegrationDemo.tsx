@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -11,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Rate {
   id: string;
@@ -45,37 +43,14 @@ const ApiIntegrationDemo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
-      console.log("Fetching API key from Supabase...");
-      // Get the API key from Supabase
-      const { data: secretData, error: secretError } = await supabase
-        .from('secrets')
-        .select('value')
-        .eq('name', 'MORTGAGE_API_KEY')
-        .single();
-
-      if (secretError) {
-        console.error("Secret fetch error:", secretError);
-        throw new Error("Failed to get API key from Supabase");
-      }
-
-      if (!secretData?.value) {
-        console.error("No API key found in Supabase");
-        throw new Error("API key not found in Supabase");
-      }
-
-      console.log("Making API request with key...");
       const response = await fetch(
-        `https://secure.dominionintranet.ca/rest/rates?apikey=${secretData.value}`
+        "https://secure.dominionintranet.ca/rest/rates?apikey=ec13af76-366f-11e7-bb05-000c297aee86"
       );
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API Response error:", errorText);
-        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+        throw new Error("Network response was not ok");
       }
-
-      const responseData: RatesResponse = await response.json();
-      return responseData;
+      const data: RatesResponse = await response.json();
+      return data;
     },
   });
 
