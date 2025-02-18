@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Rate {
   id: string;
@@ -43,12 +45,30 @@ const ApiIntegrationDemo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
+      // First, get the API key from Supabase secrets
+      const { data: secretData, error: secretError } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'MORTGAGE_API_KEY')
+        .single();
+
+      if (secretError) {
+        throw new Error("Failed to fetch API key from Supabase");
+      }
+
+      if (!secretData?.value) {
+        throw new Error("API key not found");
+      }
+
+      // Use the retrieved API key for the mortgage rates API call
       const response = await fetch(
-        "https://secure.dominionintranet.ca/rest/rates?apikey=ec13af76-366f-11e7-bb05-000c297aee86"
+        `https://secure.dominionintranet.ca/rest/rates?apikey=${secretData.value}`
       );
+      
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
+      
       const data: RatesResponse = await response.json();
       return data;
     },
