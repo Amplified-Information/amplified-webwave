@@ -1,3 +1,4 @@
+
 import { StrictMode, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -26,7 +27,7 @@ const SecurityFeaturesDemo = lazy(() => import("./pages/demos/SecurityFeaturesDe
 const CloudInfrastructureDemo = lazy(() => import("./pages/demos/CloudInfrastructureDemo"));
 const MachineLearningDemo = lazy(() => import("./pages/demos/MachineLearningDemo"));
 const DataVisualizationDemo = lazy(() => import("./pages/demos/DataVisualizationDemo"));
-const ApiIntegrationDemo = lazy(() => import("./pages/demos/ApiIntegrationDemo"));
+const MortgageApiDemo = lazy(() => import("./pages/demos/MortgageApiDemo"));
 const AutomatedWorkflowsDemo = lazy(() => import("./pages/demos/AutomatedWorkflowsDemo"));
 const TradeDataDemo = lazy(() => import("./pages/demos/TradeDataDemo"));
 const SupplyChainDemo = lazy(() => import("./pages/demos/SupplyChainDemo"));
@@ -76,7 +77,7 @@ const App = () => (
                   <Route path="cloud-infrastructure" element={<CloudInfrastructureDemo />} />
                   <Route path="machine-learning" element={<MachineLearningDemo />} />
                   <Route path="data-visualization" element={<DataVisualizationDemo />} />
-                  <Route path="api-integration" element={<ApiIntegrationDemo />} />
+                  <Route path="mortgage-api" element={<MortgageApiDemo />} />
                   <Route path="automated-workflows" element={<AutomatedWorkflowsDemo />} />
                   <Route path="trade-data" element={<TradeDataDemo />} />
                   <Route path="supply-chain" element={<SupplyChainDemo />} />
