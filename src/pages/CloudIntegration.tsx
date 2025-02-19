@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Cloud, CloudUpload, CloudDownload, Server } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
@@ -19,6 +20,12 @@ const CloudIntegration = () => {
                     Develop and execute comprehensive cloud migration strategies tailored to your
                     business needs and objectives.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li><strong>Assessment</strong> – Comprehensive evaluation of existing infrastructure and applications</li>
+                    <li><strong>Planning</strong> – Detailed roadmap development with clear milestones and success criteria</li>
+                    <li><strong>Risk Management</strong> – Identification and mitigation of potential migration risks</li>
+                    <li><strong>Cost Optimization</strong> – Strategic resource allocation to maximize ROI</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -34,6 +41,12 @@ const CloudIntegration = () => {
                     Seamlessly transfer your data to cloud platforms while ensuring data integrity
                     and minimal business disruption.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li><strong>Data Security</strong> – Encrypted transfer and storage of sensitive information</li>
+                    <li><strong>Data Validation</strong> – Comprehensive checking of data accuracy and completeness</li>
+                    <li><strong>Performance Optimization</strong> – Efficient transfer mechanisms for large datasets</li>
+                    <li><strong>Rollback Planning</strong> – Contingency measures for unexpected issues</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -49,6 +62,12 @@ const CloudIntegration = () => {
                     Design and implement solutions that leverage cloud-native services for
                     maximum efficiency and scalability.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li><strong>Containerization</strong> – Deployment of applications in portable, scalable containers</li>
+                    <li><strong>Microservices</strong> – Building modular, independently deployable services</li>
+                    <li><strong>Auto-scaling</strong> – Dynamic resource allocation based on demand</li>
+                    <li><strong>Service Mesh</strong> – Advanced service-to-service communication and monitoring</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -64,6 +83,12 @@ const CloudIntegration = () => {
                     Create flexible hybrid cloud solutions that combine the best of on-premises
                     and cloud infrastructure.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li><strong>Resource Distribution</strong> – Optimal workload placement across environments</li>
+                    <li><strong>Network Integration</strong> – Seamless connectivity between cloud and on-premises systems</li>
+                    <li><strong>Identity Management</strong> – Unified access control across hybrid environments</li>
+                    <li><strong>Disaster Recovery</strong> – Cross-platform backup and recovery solutions</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
