@@ -1,8 +1,8 @@
+
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartBar } from "lucide-react";
 import CanadianCitiesWeather from "@/components/CanadianCitiesWeather";
-import CanadianWeatherMap from "@/components/CanadianWeatherMap";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { WeatherData } from "@/types/weather";
@@ -55,12 +55,6 @@ const RealTimeAnalyticsDemo = () => {
             </AlertDescription>
           </Alert>
         )}
-
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            {!isLoading && weatherData && <CanadianWeatherMap weatherData={weatherData} />}
-          </CardContent>
-        </Card>
 
         <Card className="mb-8">
           <CardContent className="p-6">
