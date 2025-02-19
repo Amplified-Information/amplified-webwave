@@ -1,5 +1,6 @@
+
 import { Card, CardContent } from "@/components/ui/card";
-import { Database, Server, Network, CircuitBoard } from "lucide-react";
+import { Database, Server, Network, CircuitBoard, FileJson } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 
 const DataArchitecture = () => {
@@ -49,6 +50,26 @@ const DataArchitecture = () => {
                     Seamlessly connect different data sources and systems to create a unified
                     data ecosystem that drives business value.
                   </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <FileJson className="w-8 h-8 text-primary shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-semibold mb-2">Open Data Standards</h2>
+                  <p className="text-muted-foreground">
+                    Key characteristics of open data standards include:
+                  </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li>Interoperability – Ensuring data can be seamlessly exchanged and integrated across diverse systems and applications.</li>
+                    <li>Transparency – Providing clear documentation and open access to data structures and methodologies.</li>
+                    <li>Accessibility – Enabling public access to data without proprietary restrictions.</li>
+                    <li>Reusability – Allowing data to be reused for multiple purposes without requiring significant transformation.</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
