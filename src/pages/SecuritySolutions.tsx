@@ -9,6 +9,12 @@ const SecuritySolutions = () => {
       <Navigation />
       <div className="container mx-auto px-6 py-20">
         <h1 className="text-4xl font-bold text-center mb-12 text-primary">Security Solutions</h1>
+        <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
+          Protect your digital assets with our comprehensive security solutions. 
+          We provide robust, multi-layered security measures that safeguard your data, 
+          systems, and infrastructure while ensuring compliance with industry standards 
+          and regulations.
+        </p>
         <div className="max-w-3xl mx-auto">
           <Card className="mb-8">
             <CardContent className="pt-6">

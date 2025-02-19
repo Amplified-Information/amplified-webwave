@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Cloud, CloudUpload, CloudDownload, Server, Shield } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
@@ -8,6 +9,11 @@ const CloudIntegration = () => {
       <Navigation />
       <div className="container mx-auto px-6 py-20">
         <h1 className="text-4xl font-bold text-center mb-12 text-primary">Cloud Integration</h1>
+        <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
+          Accelerate your digital transformation with our cloud integration services. 
+          We help organizations seamlessly migrate to the cloud, optimize their infrastructure, 
+          and leverage cloud-native capabilities to drive innovation and scalability.
+        </p>
         <div className="max-w-3xl mx-auto">
           <Card className="mb-8">
             <CardContent className="pt-6">

@@ -9,6 +9,11 @@ const AnalyticsInsights = () => {
       <Navigation />
       <div className="container mx-auto px-6 py-20">
         <h1 className="text-4xl font-bold text-center mb-12 text-primary">Analytics & Insights</h1>
+        <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
+          Transform your data into actionable insights with our comprehensive analytics solutions. 
+          Our cutting-edge tools and expertise help businesses make data-driven decisions, 
+          identify trends, and gain competitive advantages through advanced analytics capabilities.
+        </p>
         <div className="max-w-3xl mx-auto">
           <Card className="mb-8">
             <CardContent className="pt-6">
