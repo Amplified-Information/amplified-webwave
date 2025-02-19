@@ -1,6 +1,5 @@
-
 import { Card, CardContent } from "@/components/ui/card";
-import { Cloud, CloudUpload, CloudDownload, Server } from "lucide-react";
+import { Cloud, CloudUpload, CloudDownload, Server, Shield } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 
 const CloudIntegration = () => {
@@ -88,6 +87,27 @@ const CloudIntegration = () => {
                     <li><strong>Network Integration</strong> – Seamless connectivity between cloud and on-premises systems</li>
                     <li><strong>Identity Management</strong> – Unified access control across hybrid environments</li>
                     <li><strong>Disaster Recovery</strong> – Cross-platform backup and recovery solutions</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-8">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <Shield className="w-8 h-8 text-primary shrink-0" />
+                <div>
+                  <h2 className="text-2xl font-semibold mb-2">Continuity of Service</h2>
+                  <p className="text-muted-foreground">
+                    Ensure uninterrupted business operations with robust service continuity 
+                    strategies and implementation.
+                  </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li><strong>High Availability</strong> – Multi-region deployment for continuous service uptime</li>
+                    <li><strong>Failover Systems</strong> – Automated backup systems for critical services</li>
+                    <li><strong>Load Distribution</strong> – Geographic distribution of workloads for optimal performance</li>
+                    <li><strong>Monitoring Solutions</strong> – Real-time tracking of service health and performance</li>
                   </ul>
                 </div>
               </div>
