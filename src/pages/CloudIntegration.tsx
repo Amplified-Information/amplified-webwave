@@ -72,7 +72,7 @@ const CloudIntegration = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="mb-8">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <Server className="w-8 h-8 text-primary shrink-0" />
@@ -93,7 +93,7 @@ const CloudIntegration = () => {
             </CardContent>
           </Card>
 
-          <Card className="mb-8">
+          <Card>
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <Shield className="w-8 h-8 text-primary shrink-0" />
