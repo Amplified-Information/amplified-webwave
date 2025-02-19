@@ -14,6 +14,7 @@ interface CanadianWeatherMapProps {
 }
 
 const fetchMapboxToken = async () => {
+  console.log('Fetching Mapbox token from Supabase...');
   const { data, error } = await supabase
     .from('secrets')
     .select('value')
@@ -30,6 +31,7 @@ const fetchMapboxToken = async () => {
     throw new Error('Please add your Mapbox token to Supabase secrets with name MAPBOX_PUBLIC_TOKEN');
   }
 
+  console.log('Successfully retrieved Mapbox token');
   return data.value;
 };
 
@@ -46,13 +48,16 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     queryFn: fetchMapboxToken,
     retry: 1,
     meta: {
-      onSettled: (_, error) => {
+      onSettled: (data, error) => {
         if (error) {
+          console.error('Error in useQuery:', error);
           toast({
             variant: "destructive",
             title: "Error loading map",
             description: error instanceof Error ? error.message : 'Failed to initialize map'
           });
+        } else {
+          console.log('Token retrieved successfully:', data ? 'Token present' : 'No token');
         }
       }
     }
@@ -60,7 +65,14 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || map.current) return;
+    if (!mapContainer.current || !mapboxToken || map.current) {
+      console.log('Map initialization conditions not met:', {
+        containerExists: !!mapContainer.current,
+        tokenExists: !!mapboxToken,
+        mapExists: !!map.current
+      });
+      return;
+    }
 
     try {
       console.log('Initializing map with token:', mapboxToken.slice(0, 10) + '...');
@@ -84,6 +96,10 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       newMap.on('load', () => {
         console.log('Map loaded successfully');
         setMapInitialized(true);
+      });
+
+      newMap.on('error', (e) => {
+        console.error('Mapbox map error:', e);
       });
 
       map.current = newMap;
@@ -111,7 +127,14 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
   // Add markers
   useEffect(() => {
-    if (!map.current || !mapInitialized || !weatherData.length) return;
+    if (!map.current || !mapInitialized || !weatherData.length) {
+      console.log('Markers conditions not met:', {
+        mapExists: !!map.current,
+        isInitialized: mapInitialized,
+        hasWeatherData: weatherData.length > 0
+      });
+      return;
+    }
 
     console.log('Adding markers to map:', weatherData.length);
     
