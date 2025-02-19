@@ -21,10 +21,10 @@ const DataArchitecture = () => {
                     ensuring seamless scalability and optimal performance.
                   </p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
-                    <li>Horizontal Scalability – Ability to add more nodes to distribute load</li>
-                    <li>High Availability – Ensuring continuous system operation with minimal downtime</li>
-                    <li>Fault Tolerance – Graceful handling of system failures and data recovery</li>
-                    <li>Load Balancing – Efficient distribution of workloads across resources</li>
+                    <li><strong>Horizontal Scalability</strong> – Ability to add more nodes to distribute load</li>
+                    <li><strong>High Availability</strong> – Ensuring continuous system operation with minimal downtime</li>
+                    <li><strong>Fault Tolerance</strong> – Graceful handling of system failures and data recovery</li>
+                    <li><strong>Load Balancing</strong> – Efficient distribution of workloads across resources</li>
                   </ul>
                 </div>
               </div>
@@ -42,10 +42,10 @@ const DataArchitecture = () => {
                     and support your analytical needs.
                   </p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
-                    <li>Normalization – Organizing data to reduce redundancy and improve integrity</li>
-                    <li>Entity Relationships – Clear definition of connections between data entities</li>
-                    <li>Data Consistency – Maintaining uniform data representation across systems</li>
-                    <li>Extensibility – Allowing for future additions without major restructuring</li>
+                    <li><strong>Normalization</strong> – Organizing data to reduce redundancy and improve integrity</li>
+                    <li><strong>Entity Relationships</strong> – Clear definition of connections between data entities</li>
+                    <li><strong>Data Consistency</strong> – Maintaining uniform data representation across systems</li>
+                    <li><strong>Extensibility</strong> – Allowing for future additions without major restructuring</li>
                   </ul>
                 </div>
               </div>
@@ -63,10 +63,10 @@ const DataArchitecture = () => {
                     data ecosystem that drives business value.
                   </p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
-                    <li>API Management – Standardized interfaces for system communication</li>
-                    <li>Data Synchronization – Maintaining consistency across integrated systems</li>
-                    <li>Error Handling – Robust mechanisms for handling integration failures</li>
-                    <li>Monitoring – Real-time visibility into integration performance</li>
+                    <li><strong>API Management</strong> – Standardized interfaces for system communication</li>
+                    <li><strong>Data Synchronization</strong> – Maintaining consistency across integrated systems</li>
+                    <li><strong>Error Handling</strong> – Robust mechanisms for handling integration failures</li>
+                    <li><strong>Monitoring</strong> – Real-time visibility into integration performance</li>
                   </ul>
                 </div>
               </div>
@@ -83,10 +83,10 @@ const DataArchitecture = () => {
                     Key characteristics of open data standards include:
                   </p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
-                    <li>Interoperability – Ensuring data can be seamlessly exchanged and integrated across diverse systems and applications.</li>
-                    <li>Transparency – Providing clear documentation and open access to data structures and methodologies.</li>
-                    <li>Accessibility – Enabling public access to data without proprietary restrictions.</li>
-                    <li>Reusability – Allowing data to be reused for multiple purposes without requiring significant transformation.</li>
+                    <li><strong>Interoperability</strong> – Ensuring data can be seamlessly exchanged and integrated across diverse systems and applications.</li>
+                    <li><strong>Transparency</strong> – Providing clear documentation and open access to data structures and methodologies.</li>
+                    <li><strong>Accessibility</strong> – Enabling public access to data without proprietary restrictions.</li>
+                    <li><strong>Reusability</strong> – Allowing data to be reused for multiple purposes without requiring significant transformation.</li>
                   </ul>
                 </div>
               </div>
@@ -104,10 +104,10 @@ const DataArchitecture = () => {
                     ensuring fast and reliable data access.
                   </p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
-                    <li>Query Optimization – Efficient data retrieval and processing</li>
-                    <li>Caching Strategies – Smart data caching to reduce latency</li>
-                    <li>Resource Management – Optimal allocation of computing resources</li>
-                    <li>Performance Monitoring – Continuous tracking of system metrics</li>
+                    <li><strong>Query Optimization</strong> – Efficient data retrieval and processing</li>
+                    <li><strong>Caching Strategies</strong> – Smart data caching to reduce latency</li>
+                    <li><strong>Resource Management</strong> – Optimal allocation of computing resources</li>
+                    <li><strong>Performance Monitoring</strong> – Continuous tracking of system metrics</li>
                   </ul>
                 </div>
               </div>
