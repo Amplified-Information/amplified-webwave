@@ -92,21 +92,25 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           ]
         });
 
+        map.current = newMap;
+
+        // Set initialized immediately and add controls after
+        setMapInitialized(true);
+
         newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         newMap.on('load', () => {
           console.log('Map loaded successfully');
-          setMapInitialized(true);
         });
 
         newMap.on('error', (e) => {
           console.error('Mapbox map error:', e);
+          setMapInitialized(false);
         });
-
-        map.current = newMap;
 
       } catch (err) {
         console.error('Error initializing map:', err);
+        setMapInitialized(false);
         toast({
           variant: "destructive",
           title: "Map Error",
