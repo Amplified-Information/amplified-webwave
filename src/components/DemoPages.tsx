@@ -150,7 +150,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                   <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-[#F2FCE2]">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
                         {demo.title}
                       </CardTitle>
                       <CardDescription>{demo.description}</CardDescription>
@@ -177,7 +177,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                   <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-orange-50">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Wrench className="w-5 h-5 text-orange-500" />
+                        <Wrench className="w-5 h-5 text-orange-500 shrink-0" />
                         {demo.title}
                       </CardTitle>
                       <CardDescription>{demo.description}</CardDescription>
@@ -204,7 +204,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
                   <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-primary/10">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-gray-500" />
+                        <Clock className="w-5 h-5 text-gray-500 shrink-0" />
                         {demo.title}
                       </CardTitle>
                       <CardDescription>{demo.description}</CardDescription>
