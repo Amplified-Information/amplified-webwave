@@ -20,6 +20,12 @@ const DataArchitecture = () => {
                     We design and implement robust data architectures that grow with your business,
                     ensuring seamless scalability and optimal performance.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li>Horizontal Scalability – Ability to add more nodes to distribute load</li>
+                    <li>High Availability – Ensuring continuous system operation with minimal downtime</li>
+                    <li>Fault Tolerance – Graceful handling of system failures and data recovery</li>
+                    <li>Load Balancing – Efficient distribution of workloads across resources</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -35,6 +41,12 @@ const DataArchitecture = () => {
                     Create efficient data models that accurately represent your business domain
                     and support your analytical needs.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li>Normalization – Organizing data to reduce redundancy and improve integrity</li>
+                    <li>Entity Relationships – Clear definition of connections between data entities</li>
+                    <li>Data Consistency – Maintaining uniform data representation across systems</li>
+                    <li>Extensibility – Allowing for future additions without major restructuring</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -50,6 +62,12 @@ const DataArchitecture = () => {
                     Seamlessly connect different data sources and systems to create a unified
                     data ecosystem that drives business value.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li>API Management – Standardized interfaces for system communication</li>
+                    <li>Data Synchronization – Maintaining consistency across integrated systems</li>
+                    <li>Error Handling – Robust mechanisms for handling integration failures</li>
+                    <li>Monitoring – Real-time visibility into integration performance</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
@@ -85,6 +103,12 @@ const DataArchitecture = () => {
                     Optimize your data infrastructure for maximum efficiency and minimal latency,
                     ensuring fast and reliable data access.
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-1">
+                    <li>Query Optimization – Efficient data retrieval and processing</li>
+                    <li>Caching Strategies – Smart data caching to reduce latency</li>
+                    <li>Resource Management – Optimal allocation of computing resources</li>
+                    <li>Performance Monitoring – Continuous tracking of system metrics</li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
