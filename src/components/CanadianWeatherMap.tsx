@@ -63,9 +63,9 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     }
   });
 
-  // Initialize map
+  // Initialize map only after container and token are available
   useEffect(() => {
-    const initializeMap = () => {
+    const initializeMap = async () => {
       if (!mapContainer.current || !mapboxToken || map.current) {
         console.log('Map initialization conditions not met:', {
           containerExists: !!mapContainer.current,
@@ -92,16 +92,17 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
           ]
         });
 
-        map.current = newMap;
-
-        // Set initialized immediately and add controls after
-        setMapInitialized(true);
-
-        newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-        newMap.on('load', () => {
-          console.log('Map loaded successfully');
+        // Wait for map to load before setting as initialized
+        await new Promise<void>((resolve) => {
+          newMap.on('load', () => {
+            console.log('Map loaded successfully');
+            resolve();
+          });
         });
+
+        map.current = newMap;
+        newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        setMapInitialized(true);
 
         newMap.on('error', (e) => {
           console.error('Mapbox map error:', e);
@@ -119,7 +120,6 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       }
     };
 
-    // Try to initialize map
     initializeMap();
 
     return () => {
@@ -134,7 +134,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     };
   }, [mapboxToken, toast]);
 
-  // Add markers
+  // Add markers only after map is fully initialized
   useEffect(() => {
     if (!map.current || !mapInitialized || !weatherData.length) {
       console.log('Markers conditions not met:', {
