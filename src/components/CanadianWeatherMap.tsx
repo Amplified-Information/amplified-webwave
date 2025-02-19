@@ -65,53 +65,58 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || map.current) {
-      console.log('Map initialization conditions not met:', {
-        containerExists: !!mapContainer.current,
-        tokenExists: !!mapboxToken,
-        mapExists: !!map.current
-      });
-      return;
-    }
+    const initializeMap = () => {
+      if (!mapContainer.current || !mapboxToken || map.current) {
+        console.log('Map initialization conditions not met:', {
+          containerExists: !!mapContainer.current,
+          tokenExists: !!mapboxToken,
+          mapExists: !!map.current
+        });
+        return;
+      }
 
-    try {
-      console.log('Initializing map with token:', mapboxToken.slice(0, 10) + '...');
-      mapboxgl.accessToken = mapboxToken;
+      try {
+        console.log('Initializing map with token:', mapboxToken.slice(0, 10) + '...');
+        mapboxgl.accessToken = mapboxToken;
 
-      const newMap = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [-98.0, 56.0], // Center on Canada
-        zoom: 3,
-        minZoom: 2,
-        maxZoom: 9,
-        bounds: [
-          [-141, 41.7], // Southwest coordinates
-          [-52, 83.3]   // Northeast coordinates
-        ]
-      });
+        const newMap = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/light-v11',
+          center: [-98.0, 56.0], // Center on Canada
+          zoom: 3,
+          minZoom: 2,
+          maxZoom: 9,
+          bounds: [
+            [-141, 41.7], // Southwest coordinates
+            [-52, 83.3]   // Northeast coordinates
+          ]
+        });
 
-      newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      newMap.on('load', () => {
-        console.log('Map loaded successfully');
-        setMapInitialized(true);
-      });
+        newMap.on('load', () => {
+          console.log('Map loaded successfully');
+          setMapInitialized(true);
+        });
 
-      newMap.on('error', (e) => {
-        console.error('Mapbox map error:', e);
-      });
+        newMap.on('error', (e) => {
+          console.error('Mapbox map error:', e);
+        });
 
-      map.current = newMap;
+        map.current = newMap;
 
-    } catch (err) {
-      console.error('Error initializing map:', err);
-      toast({
-        variant: "destructive",
-        title: "Map Error",
-        description: err instanceof Error ? err.message : 'Failed to initialize map'
-      });
-    }
+      } catch (err) {
+        console.error('Error initializing map:', err);
+        toast({
+          variant: "destructive",
+          title: "Map Error",
+          description: err instanceof Error ? err.message : 'Failed to initialize map'
+        });
+      }
+    };
+
+    // Try to initialize map
+    initializeMap();
 
     return () => {
       if (map.current) {
@@ -199,7 +204,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
   }
 
   return (
-    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+    <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
       <div ref={mapContainer} className="absolute inset-0" />
     </div>
   );
