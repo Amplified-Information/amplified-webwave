@@ -27,7 +27,7 @@ const fetchMapboxToken = async () => {
 
   if (!data?.value) {
     console.error('Mapbox token not found in Supabase secrets');
-    throw new Error('Mapbox token not found in database');
+    throw new Error('Please add your Mapbox token to Supabase secrets with name MAPBOX_PUBLIC_TOKEN');
   }
 
   return data.value;
@@ -58,28 +58,24 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     }
   });
 
-  // Initialize map only once
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || map.current) return;
 
     try {
-      console.log('Initializing map with token');
+      console.log('Initializing map with token:', mapboxToken.slice(0, 10) + '...');
       mapboxgl.accessToken = mapboxToken;
 
       const newMap = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/outdoors-v12',
-        center: [-93.2650, 44.9778], // Minneapolis coordinates
-        zoom: 3.5,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-98.0, 56.0], // Center on Canada
+        zoom: 3,
         minZoom: 2,
         maxZoom: 9,
         bounds: [
-          [-141, 41.7],
-          [-52, 83.3]
-        ],
-        maxBounds: [
-          [-180, 30],
-          [-30, 90]
+          [-141, 41.7], // Southwest coordinates
+          [-52, 83.3]   // Northeast coordinates
         ]
       });
 
@@ -101,7 +97,6 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
       });
     }
 
-    // Cleanup function
     return () => {
       if (map.current) {
         console.log('Cleaning up map instance');
@@ -114,7 +109,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     };
   }, [mapboxToken, toast]);
 
-  // Add markers when weather data changes
+  // Add markers
   useEffect(() => {
     if (!map.current || !mapInitialized || !weatherData.length) return;
 
@@ -157,8 +152,6 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
         popups.current.push(popup);
       }
     });
-
-    // No cleanup needed here as it's handled in the map initialization effect
   }, [weatherData, mapInitialized]);
 
   if (error) {
