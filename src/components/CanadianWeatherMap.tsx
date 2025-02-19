@@ -47,6 +47,7 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     queryKey: ['mapbox-token'],
     queryFn: fetchMapboxToken,
     retry: 1,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     meta: {
       onSettled: (data, error) => {
         if (error) {
@@ -63,64 +64,68 @@ const CanadianWeatherMap = ({ weatherData }: CanadianWeatherMapProps) => {
     }
   });
 
-  // Initialize map only after container and token are available
+  // Render map container first
   useEffect(() => {
-    const initializeMap = async () => {
-      if (!mapContainer.current || !mapboxToken || map.current) {
-        console.log('Map initialization conditions not met:', {
-          containerExists: !!mapContainer.current,
-          tokenExists: !!mapboxToken,
-          mapExists: !!map.current
-        });
-        return;
-      }
+    if (mapContainer.current) {
+      console.log('Map container is ready');
+    }
+  }, []);
 
-      try {
-        console.log('Initializing map with token:', mapboxToken.slice(0, 10) + '...');
-        mapboxgl.accessToken = mapboxToken;
+  // Initialize map only after container and token are confirmed ready
+  useEffect(() => {
+    if (!mapboxToken || !mapContainer.current || map.current) {
+      console.log('Map initialization conditions not met:', {
+        containerExists: !!mapContainer.current,
+        tokenExists: !!mapboxToken,
+        mapExists: !!map.current
+      });
+      return;
+    }
 
-        const newMap = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/light-v11',
-          center: [-98.0, 56.0], // Center on Canada
-          zoom: 3,
-          minZoom: 2,
-          maxZoom: 9,
-          bounds: [
-            [-141, 41.7], // Southwest coordinates
-            [-52, 83.3]   // Northeast coordinates
-          ]
-        });
+    console.log('All conditions met, initializing map...');
 
-        // Wait for map to load before setting as initialized
-        await new Promise<void>((resolve) => {
-          newMap.on('load', () => {
-            console.log('Map loaded successfully');
-            resolve();
-          });
-        });
+    try {
+      mapboxgl.accessToken = mapboxToken;
+      
+      const newMap = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-98.0, 56.0],
+        zoom: 3,
+        minZoom: 2,
+        maxZoom: 9,
+        bounds: [
+          [-141, 41.7],
+          [-52, 83.3]
+        ]
+      });
 
+      newMap.on('load', () => {
+        console.log('Map loaded successfully');
         map.current = newMap;
         newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
         setMapInitialized(true);
+      });
 
-        newMap.on('error', (e) => {
-          console.error('Mapbox map error:', e);
-          setMapInitialized(false);
-        });
-
-      } catch (err) {
-        console.error('Error initializing map:', err);
+      newMap.on('error', (e) => {
+        console.error('Mapbox map error:', e);
         setMapInitialized(false);
         toast({
           variant: "destructive",
           title: "Map Error",
-          description: err instanceof Error ? err.message : 'Failed to initialize map'
+          description: "Failed to initialize map"
         });
-      }
-    };
+      });
 
-    initializeMap();
+    } catch (err) {
+      console.error('Error initializing map:', err);
+      setMapInitialized(false);
+      toast({
+        variant: "destructive",
+        title: "Map Error",
+        description: err instanceof Error ? err.message : 'Failed to initialize map'
+      });
+    }
 
     return () => {
       if (map.current) {
