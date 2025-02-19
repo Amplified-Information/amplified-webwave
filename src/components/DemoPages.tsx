@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { CheckCircle, Wrench, Clock, FileSearch } from "lucide-react";
@@ -35,7 +36,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
       isActive: true
     },
     {
-      title: "Find A Mortgage That Saves You Money",
+      title: "Find a Mortgage That Saves You Money (with this API)",
       description: "Connect with external services through our API platform",
       path: "/demo/mortgage-api",
       isActive: true
