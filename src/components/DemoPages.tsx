@@ -1,7 +1,8 @@
 
-import { Link } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { CheckCircle, Wrench, Clock, FileSearch } from "lucide-react";
+import { CheckCircle, Wrench, Clock } from "lucide-react";
+import { DemoSection } from "./demos/DemoSection";
+import { AboutSection } from "./demos/AboutSection";
+import type { Demo } from "./demos/types";
 
 interface DemoPagesProps {
   showHeader?: boolean;
@@ -10,7 +11,7 @@ interface DemoPagesProps {
 
 export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps) => {
   // Active demos
-  const activeDemos = [
+  const activeDemos: Demo[] = [
     {
       title: "Smart Garden Planning",
       description: "Plan and optimize your garden with AI-powered companion planting",
@@ -25,7 +26,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     },
     {
       title: "News Article Analysis with AI",
-      description: "Analyze news articles with AI for key insights and summaries",
+      description: "Analyze news articles for key insights and summaries",
       path: "/demo/machine-learning",
       isActive: true
     },
@@ -44,7 +45,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
   ];
 
   // In development demos
-  const inDevelopmentDemos = [
+  const inDevelopmentDemos: Demo[] = [
     {
       title: "Canadian Bond Yields",
       description: "Track and analyze Canadian government bond yields and market trends",
@@ -84,7 +85,7 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
   ];
 
   // Coming soon demos
-  const comingSoonDemos = [
+  const comingSoonDemos: Demo[] = [
     {
       title: "Cloud Infrastructure",
       description: "Scale your infrastructure with cloud-native solutions",
@@ -124,105 +125,34 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
           </div>
         )}
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>About This Site</CardTitle>
-            <CardDescription>Welcome to our interactive demonstration platform</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600">
-              This demo section showcases our various capabilities and solutions through hands-on, interactive examples. 
-              Each demo is carefully crafted to demonstrate specific features and functionalities of our platform. 
-              From AI-powered garden planning to real-time analytics and financial tools, you can explore and 
-              experience our technology firsthand. Select any demo below to get started.
-            </p>
-          </CardContent>
-        </Card>
+        <AboutSection />
 
         <div className="space-y-12">
-          {/* Active Demos Section */}
-          <div>
-            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-green-500" />
-              Active Demos
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeDemos.map((demo) => (
-                <Link 
-                  to={demo.path}
-                  key={demo.path} 
-                  className="group relative"
-                >
-                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-[#F2FCE2]">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
-                        {demo.title}
-                      </CardTitle>
-                      <CardDescription>{demo.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <DemoSection
+            title="Active Demos"
+            icon={<CheckCircle className="w-6 h-6 text-green-500" />}
+            demos={activeDemos}
+            iconClassName="text-green-500"
+            hoverClassName="hover:bg-[#F2FCE2]"
+          />
 
-          {/* In Development Section */}
-          <div>
-            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Wrench className="w-6 h-6 text-orange-500" />
-              In Development
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {inDevelopmentDemos.map((demo) => (
-                <Link 
-                  to={demo.path}
-                  key={demo.path} 
-                  className="group relative"
-                >
-                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-orange-50">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Wrench className="w-5 h-5 text-orange-500 shrink-0" />
-                        {demo.title}
-                      </CardTitle>
-                      <CardDescription>{demo.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <DemoSection
+            title="In Development"
+            icon={<Wrench className="w-6 h-6 text-orange-500" />}
+            demos={inDevelopmentDemos}
+            iconClassName="text-orange-500"
+            hoverClassName="hover:bg-orange-50"
+          />
 
-          {/* Coming Soon Section */}
-          <div>
-            <h3 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-              <Clock className="w-6 h-6 text-gray-500" />
-              Coming Soon
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {comingSoonDemos.map((demo) => (
-                <Link 
-                  to={demo.path}
-                  key={demo.path} 
-                  className="group relative"
-                >
-                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:bg-primary/10">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-gray-500 shrink-0" />
-                        {demo.title}
-                      </CardTitle>
-                      <CardDescription>{demo.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <DemoSection
+            title="Coming Soon"
+            icon={<Clock className="w-6 h-6 text-gray-500" />}
+            demos={comingSoonDemos}
+            iconClassName="text-gray-500"
+            hoverClassName="hover:bg-primary/10"
+          />
         </div>
       </div>
     </section>
   );
 };
-
