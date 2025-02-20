@@ -47,3 +47,4 @@ verify_jwt = false
 
 [functions.update-bond-data]
 verify_jwt = false
+

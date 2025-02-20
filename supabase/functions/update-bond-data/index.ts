@@ -7,16 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface BondYieldResponse {
-  observations: Array<{
-    d: string;  // date
-    V36683: number; // 2-year
-    V36684: number; // 5-year
-    V36685: number; // 10-year
-    V36686: number; // 30-year
-  }>;
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -25,44 +15,41 @@ serve(async (req) => {
 
   try {
     console.log('Starting bond data update process...');
-    
-    // Initialize Supabase client with explicit error handling
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase credentials');
-    }
 
-    const supabaseClient = createClient(supabaseUrl, supabaseKey);
-
-    // Fetch data from Bank of Canada API
+    // Test Bank of Canada API first
     const endDate = new Date().toISOString().split('T')[0];
     const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 10))
       .toISOString().split('T')[0];
 
     console.log(`Fetching data from ${startDate} to ${endDate}`);
 
-    const response = await fetch(
+    // Step 1: Fetch from Bank of Canada
+    const bankResponse = await fetch(
       `https://www.bankofcanada.ca/valet/observations/group/bond_yields/json?start_date=${startDate}&end_date=${endDate}`
     );
 
-    if (!response.ok) {
-      throw new Error(`Bank of Canada API failed: ${response.statusText}`);
+    if (!bankResponse.ok) {
+      throw new Error(`Bank of Canada API failed with status ${bankResponse.status}: ${bankResponse.statusText}`);
     }
 
-    const data: BondYieldResponse = await response.json();
-    
-    if (!data.observations || !Array.isArray(data.observations)) {
+    const rawData = await bankResponse.json();
+    console.log('Successfully fetched data from Bank of Canada');
+
+    if (!rawData.observations || !Array.isArray(rawData.observations)) {
+      console.error('Unexpected API response format:', rawData);
       throw new Error('Invalid response format from Bank of Canada API');
     }
 
-    console.log(`Retrieved ${data.observations.length} observations`);
-
-    // Transform and store the data
+    // Step 2: Transform the data
     const now = new Date().toISOString();
-    const bondYields = data.observations
-      .filter(obs => obs.V36683 && obs.V36684 && obs.V36685 && obs.V36686) // Filter out incomplete data
+    const bondYields = rawData.observations
+      .filter(obs => 
+        obs.d && 
+        typeof obs.V36683 === 'number' && 
+        typeof obs.V36684 === 'number' && 
+        typeof obs.V36685 === 'number' && 
+        typeof obs.V36686 === 'number'
+      )
       .map(obs => ({
         date: obs.d,
         yield_2yr: Number(obs.V36683),
@@ -72,27 +59,38 @@ serve(async (req) => {
         last_update: now
       }));
 
-    console.log(`Processing ${bondYields.length} valid records`);
+    console.log(`Processed ${bondYields.length} valid records`);
 
-    // Batch insert/update the data
+    if (bondYields.length === 0) {
+      throw new Error('No valid bond yield data found in the response');
+    }
+
+    // Step 3: Store in Supabase
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
+
+    console.log('Inserting data into Supabase...');
+
     const { error: upsertError } = await supabaseClient
       .from('bond_yields')
       .upsert(bondYields, {
-        onConflict: 'date',
-        ignoreDuplicates: false
+        onConflict: 'date'
       });
 
     if (upsertError) {
-      console.error('Database upsert error:', upsertError);
-      throw upsertError;
+      console.error('Database error:', upsertError);
+      throw new Error(`Failed to store data: ${upsertError.message}`);
     }
 
-    console.log('Successfully updated bond yield data');
+    console.log(`Successfully stored ${bondYields.length} records`);
 
     return new Response(
       JSON.stringify({ 
+        success: true,
         message: 'Bond yield data updated successfully',
-        records: bondYields.length 
+        recordsProcessed: bondYields.length 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -101,12 +99,13 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in update-bond-data function:', error);
+    console.error('Function error:', error);
     
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
-        details: error
+        details: error instanceof Error ? error.stack : undefined
       }),
       { 
         status: 500,
