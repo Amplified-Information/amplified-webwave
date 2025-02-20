@@ -1,0 +1,32 @@
+
+import { Navigation } from "@/components/Navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { TrendingUp } from "lucide-react";
+import { BondYieldsChart } from "@/components/demos/bond-yields/BondYieldsChart";
+import { BondSelector } from "@/components/demos/bond-yields/BondSelector";
+
+const BondYieldsDemo = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      <Navigation />
+      <div className="container mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <TrendingUp className="w-12 h-12 mx-auto mb-4 text-primary" />
+          <h1 className="text-4xl font-bold mb-4">Canadian Bond Yields</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Track and analyze historical yields of Canadian government bonds
+          </p>
+        </div>
+
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <BondSelector />
+            <BondYieldsChart />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default BondYieldsDemo;
