@@ -23,7 +23,7 @@ serve(async (req) => {
     console.log(`Making test request for date range: ${testStartDate} to ${testEndDate}`);
     
     const testResponse = await fetch(
-      `https://www.bankofcanada.ca/valet/observations/group/bond_yields/json?start_date=${testStartDate}&end_date=${testEndDate}`
+      `https://www.bankofcanada.ca/valet/observations/group/SELECTED_BOND_YIELDS/json?start_date=${testStartDate}&end_date=${testEndDate}`
     );
 
     if (!testResponse.ok) {
@@ -41,7 +41,7 @@ serve(async (req) => {
     console.log(`Fetching full dataset from ${startDate} to ${endDate}`);
 
     const response = await fetch(
-      `https://www.bankofcanada.ca/valet/observations/group/bond_yields/json?start_date=${startDate}&end_date=${endDate}`
+      `https://www.bankofcanada.ca/valet/observations/group/SELECTED_BOND_YIELDS/json?start_date=${startDate}&end_date=${endDate}`
     );
 
     if (!response.ok) {
@@ -61,10 +61,10 @@ serve(async (req) => {
     const bondYields = data.observations
       .filter(obs => {
         const isValid = obs.d && 
-          obs.V36683 !== undefined && 
-          obs.V36684 !== undefined && 
-          obs.V36685 !== undefined && 
-          obs.V36686 !== undefined;
+          obs.V122543 !== undefined && // 2-year
+          obs.V122544 !== undefined && // 5-year
+          obs.V122548 !== undefined && // 10-year
+          obs.V122553 !== undefined;   // 30-year (long-term)
         
         if (!isValid) {
           console.log('Filtered out invalid observation:', obs);
@@ -72,10 +72,10 @@ serve(async (req) => {
         return isValid;
       })
       .map(obs => {
-        const yield_2yr = Number(obs.V36683);
-        const yield_5yr = Number(obs.V36684);
-        const yield_10yr = Number(obs.V36685);
-        const yield_30yr = Number(obs.V36686);
+        const yield_2yr = Number(obs.V122543);
+        const yield_5yr = Number(obs.V122544);
+        const yield_10yr = Number(obs.V122548);
+        const yield_30yr = Number(obs.V122553);
         
         // Log any potential parsing issues
         if (isNaN(yield_2yr) || isNaN(yield_5yr) || isNaN(yield_10yr) || isNaN(yield_30yr)) {
