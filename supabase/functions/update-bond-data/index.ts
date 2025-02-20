@@ -16,62 +16,96 @@ serve(async (req) => {
   try {
     console.log('Starting bond data update process...');
 
-    // Test Bank of Canada API first
-    const endDate = new Date().toISOString().split('T')[0];
-    const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 10))
+    // Step 1: Make a test request to the Bank of Canada API
+    const testEndDate = new Date().toISOString().split('T')[0];
+    const testStartDate = '2024-01-01';
+    
+    console.log(`Making test request for date range: ${testStartDate} to ${testEndDate}`);
+    
+    const testResponse = await fetch(
+      `https://www.bankofcanada.ca/valet/observations/group/bond_yields/json?start_date=${testStartDate}&end_date=${testEndDate}`
+    );
+
+    if (!testResponse.ok) {
+      throw new Error(`Test request failed: ${testResponse.status} ${testResponse.statusText}`);
+    }
+
+    const testData = await testResponse.json();
+    console.log('Raw API Response:', JSON.stringify(testData, null, 2));
+
+    // Step 2: Fetch full dataset
+    const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5))
       .toISOString().split('T')[0];
+    const endDate = new Date().toISOString().split('T')[0];
 
-    console.log(`Fetching data from ${startDate} to ${endDate}`);
+    console.log(`Fetching full dataset from ${startDate} to ${endDate}`);
 
-    // Step 1: Fetch from Bank of Canada
-    const bankResponse = await fetch(
+    const response = await fetch(
       `https://www.bankofcanada.ca/valet/observations/group/bond_yields/json?start_date=${startDate}&end_date=${endDate}`
     );
 
-    if (!bankResponse.ok) {
-      throw new Error(`Bank of Canada API failed with status ${bankResponse.status}: ${bankResponse.statusText}`);
+    if (!response.ok) {
+      throw new Error(`Bank of Canada API failed: ${response.status} ${response.statusText}`);
     }
 
-    const rawData = await bankResponse.json();
-    console.log('Successfully fetched data from Bank of Canada');
-
-    if (!rawData.observations || !Array.isArray(rawData.observations)) {
-      console.error('Unexpected API response format:', rawData);
-      throw new Error('Invalid response format from Bank of Canada API');
+    const data = await response.json();
+    
+    if (!data.observations || !Array.isArray(data.observations)) {
+      console.error('Unexpected data structure:', data);
+      throw new Error('Invalid API response format');
     }
 
-    // Step 2: Transform the data
-    const now = new Date().toISOString();
-    const bondYields = rawData.observations
-      .filter(obs => 
-        obs.d && 
-        typeof obs.V36683 === 'number' && 
-        typeof obs.V36684 === 'number' && 
-        typeof obs.V36685 === 'number' && 
-        typeof obs.V36686 === 'number'
-      )
-      .map(obs => ({
-        date: obs.d,
-        yield_2yr: Number(obs.V36683),
-        yield_5yr: Number(obs.V36684),
-        yield_10yr: Number(obs.V36685),
-        yield_30yr: Number(obs.V36686),
-        last_update: now
-      }));
+    // Step 3: Transform the data
+    console.log('Sample observation:', data.observations[0]);
+    
+    const bondYields = data.observations
+      .filter(obs => {
+        const isValid = obs.d && 
+          obs.V36683 !== undefined && 
+          obs.V36684 !== undefined && 
+          obs.V36685 !== undefined && 
+          obs.V36686 !== undefined;
+        
+        if (!isValid) {
+          console.log('Filtered out invalid observation:', obs);
+        }
+        return isValid;
+      })
+      .map(obs => {
+        const yield_2yr = Number(obs.V36683);
+        const yield_5yr = Number(obs.V36684);
+        const yield_10yr = Number(obs.V36685);
+        const yield_30yr = Number(obs.V36686);
+        
+        // Log any potential parsing issues
+        if (isNaN(yield_2yr) || isNaN(yield_5yr) || isNaN(yield_10yr) || isNaN(yield_30yr)) {
+          console.log('Warning: NaN values in observation:', obs);
+        }
+        
+        return {
+          date: obs.d,
+          yield_2yr,
+          yield_5yr,
+          yield_10yr,
+          yield_30yr,
+          last_update: new Date().toISOString()
+        };
+      });
 
-    console.log(`Processed ${bondYields.length} valid records`);
+    console.log(`Processed ${bondYields.length} records`);
+    console.log('Sample processed record:', bondYields[0]);
 
     if (bondYields.length === 0) {
-      throw new Error('No valid bond yield data found in the response');
+      throw new Error('No valid records found in API response');
     }
 
-    // Step 3: Store in Supabase
+    // Step 4: Store in Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('Inserting data into Supabase...');
+    console.log('Attempting to store data in Supabase...');
 
     const { error: upsertError } = await supabaseClient
       .from('bond_yields')
@@ -87,14 +121,14 @@ serve(async (req) => {
     console.log(`Successfully stored ${bondYields.length} records`);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         message: 'Bond yield data updated successfully',
-        recordsProcessed: bondYields.length 
+        recordsProcessed: bondYields.length
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 200
       }
     );
 
@@ -107,7 +141,7 @@ serve(async (req) => {
         error: error instanceof Error ? error.message : 'Unknown error occurred',
         details: error instanceof Error ? error.stack : undefined
       }),
-      { 
+      {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
