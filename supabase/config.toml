@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.analyze-short-squeeze]
 verify_jwt = false
+
+[functions.update-bond-data]
+verify_jwt = false
