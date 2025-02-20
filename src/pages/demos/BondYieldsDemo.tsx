@@ -18,9 +18,8 @@ const BondYieldsDemo = () => {
           </p>
         </div>
 
-        <Card className="mb-8">
+        <Card>
           <CardContent className="p-6">
-            <BondSelector />
             <BondYieldsChart />
           </CardContent>
         </Card>

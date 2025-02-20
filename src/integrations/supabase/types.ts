@@ -114,6 +114,39 @@ export type Database = {
         }
         Relationships: []
       }
+      bond_yields: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          updated_at: string | null
+          yield_10yr: number | null
+          yield_2yr: number | null
+          yield_30yr: number | null
+          yield_5yr: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          updated_at?: string | null
+          yield_10yr?: number | null
+          yield_2yr?: number | null
+          yield_30yr?: number | null
+          yield_5yr?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          updated_at?: string | null
+          yield_10yr?: number | null
+          yield_2yr?: number | null
+          yield_30yr?: number | null
+          yield_5yr?: number | null
+        }
+        Relationships: []
+      }
       botanical_families: {
         Row: {
           created_at: string

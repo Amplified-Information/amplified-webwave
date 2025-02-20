@@ -1,44 +1,67 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { BondData, DateRange } from "./types";
 
-// Mock data generator for demo purposes
-const generateMockData = () => {
-  const startDate = new Date(2019, 0, 1);
-  const endDate = new Date();
-  const data = [];
+const calculateWeeklyAverage = (data: BondData[]) => {
+  const weeklyData: { [key: string]: BondData[] } = {};
   
-  let current2yr = 2;
-  let current5yr = 2.5;
-  let current10yr = 3;
-  let current30yr = 3.5;
+  data.forEach(entry => {
+    const date = new Date(entry.date);
+    const weekStart = new Date(date.setDate(date.getDate() - date.getDay())).toISOString().split('T')[0];
+    
+    if (!weeklyData[weekStart]) {
+      weeklyData[weekStart] = [];
+    }
+    weeklyData[weekStart].push(entry);
+  });
 
-  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-    // Add some random variation to simulate market movements
-    current2yr += (Math.random() - 0.5) * 0.1;
-    current5yr += (Math.random() - 0.5) * 0.1;
-    current10yr += (Math.random() - 0.5) * 0.1;
-    current30yr += (Math.random() - 0.5) * 0.1;
-
-    data.push({
-      date: d.toISOString().split('T')[0],
-      "2yr": Number(current2yr.toFixed(2)),
-      "5yr": Number(current5yr.toFixed(2)),
-      "10yr": Number(current10yr.toFixed(2)),
-      "30yr": Number(current30yr.toFixed(2)),
-    });
-  }
-
-  return data;
+  return Object.entries(weeklyData).map(([weekStart, entries]) => ({
+    date: weekStart,
+    yield_2yr: Number((entries.reduce((sum, e) => sum + e.yield_2yr, 0) / entries.length).toFixed(2)),
+    yield_5yr: Number((entries.reduce((sum, e) => sum + e.yield_5yr, 0) / entries.length).toFixed(2)),
+    yield_10yr: Number((entries.reduce((sum, e) => sum + e.yield_10yr, 0) / entries.length).toFixed(2)),
+    yield_30yr: Number((entries.reduce((sum, e) => sum + e.yield_30yr, 0) / entries.length).toFixed(2)),
+  }));
 };
 
-export const useBondData = () => {
+export const useBondData = (
+  dateRange: DateRange,
+  showWeeklyAverage: boolean,
+) => {
   return useQuery({
-    queryKey: ['bondYields'],
+    queryKey: ['bondYields', dateRange, showWeeklyAverage],
     queryFn: async () => {
-      // In a real application, we would fetch this data from an API or database
-      // For now, we'll use mock data
-      return generateMockData();
+      const { data, error } = await supabase
+        .from('bond_yields')
+        .select('*')
+        .gte('date', dateRange.start.toISOString().split('T')[0])
+        .lte('date', dateRange.end.toISOString().split('T')[0])
+        .order('date', { ascending: true });
+
+      if (error) throw error;
+      if (!data) return [];
+
+      const bondData = data as BondData[];
+      return showWeeklyAverage ? calculateWeeklyAverage(bondData) : bondData;
     },
   });
+};
+
+export const exportToCSV = (data: BondData[]) => {
+  const headers = ['Date', '2 Year Yield', '5 Year Yield', '10 Year Yield', '30 Year Yield'];
+  const csvData = data.map(row => 
+    [row.date, row.yield_2yr, row.yield_5yr, row.yield_10yr, row.yield_30yr].join(',')
+  );
+  
+  const csv = [headers.join(','), ...csvData].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bond-yields-${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 };
