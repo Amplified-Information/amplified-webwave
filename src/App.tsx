@@ -37,6 +37,7 @@ const EnergyManagementDemo = lazy(() => import("./pages/demos/EnergyManagementDe
 const ArticleExtractorDemo = lazy(() => import("./pages/demos/ArticleExtractorDemo"));
 const InvestmentResearchDemo = lazy(() => import("./pages/demos/InvestmentResearchDemo"));
 const ShortSqueezeDemo = lazy(() => import("./pages/demos/ShortSqueezeDemo"));
+const BondYieldsDemo = lazy(() => import("./pages/demos/BondYieldsDemo"));
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
                   <Route path="article-extractor" element={<ArticleExtractorDemo />} />
                   <Route path="investment-research" element={<InvestmentResearchDemo />} />
                   <Route path="short-squeeze" element={<ShortSqueezeDemo />} />
+                  <Route path="bond-yields" element={<BondYieldsDemo />} />
                 </Routes>
               </Suspense>
             } />
