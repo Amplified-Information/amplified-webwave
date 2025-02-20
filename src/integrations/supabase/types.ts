@@ -119,6 +119,7 @@ export type Database = {
           created_at: string | null
           date: string
           id: string
+          last_update: string | null
           updated_at: string | null
           yield_10yr: number | null
           yield_2yr: number | null
@@ -129,6 +130,7 @@ export type Database = {
           created_at?: string | null
           date: string
           id?: string
+          last_update?: string | null
           updated_at?: string | null
           yield_10yr?: number | null
           yield_2yr?: number | null
@@ -139,6 +141,7 @@ export type Database = {
           created_at?: string | null
           date?: string
           id?: string
+          last_update?: string | null
           updated_at?: string | null
           yield_10yr?: number | null
           yield_2yr?: number | null

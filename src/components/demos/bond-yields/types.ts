@@ -5,10 +5,11 @@ export interface BondData {
   yield_5yr: number;
   yield_10yr: number;
   yield_30yr: number;
+  last_update?: string;
 }
 
 export interface BondSeries {
-  id: keyof Omit<BondData, 'date'>;
+  id: keyof Omit<BondData, 'date' | 'last_update'>;
   name: string;
   color: string;
   visible: boolean;

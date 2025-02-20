@@ -30,7 +30,6 @@ serve(async (req) => {
     );
 
     // Fetch data from Bank of Canada API
-    // We'll fetch the last 10 years of data
     const endDate = new Date().toISOString().split('T')[0];
     const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 10))
       .toISOString().split('T')[0];
@@ -46,12 +45,14 @@ serve(async (req) => {
     const data: BondYieldResponse = await response.json();
     
     // Transform and store the data
+    const now = new Date().toISOString();
     const bondYields = data.observations.map(obs => ({
       date: obs.d,
       yield_2yr: obs.V36683,
       yield_5yr: obs.V36684,
       yield_10yr: obs.V36685,
-      yield_30yr: obs.V36686
+      yield_30yr: obs.V36686,
+      last_update: now
     }));
 
     // Batch insert/update the data
