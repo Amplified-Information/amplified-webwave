@@ -46,6 +46,12 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
   // In development demos
   const inDevelopmentDemos = [
     {
+      title: "Canadian Bond Yields",
+      description: "Track and analyze Canadian government bond yields and market trends",
+      path: "/demo/bond-yields",
+      status: "in development"
+    },
+    {
       title: "Trade Data Analysis",
       description: "Explore international trade flows and patterns",
       path: "/demo/trade-data",
@@ -219,3 +225,4 @@ export const DemoPages = ({ showHeader = true, className = "" }: DemoPagesProps)
     </section>
   );
 };
+
