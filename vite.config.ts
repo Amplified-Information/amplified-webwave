@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Add history API fallback to the dev server
+    historyApiFallback: true,
   },
   plugins: [
     react(),
@@ -19,10 +21,6 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  // Add this configuration for proper SPA routing
-  preview: {
-    historyApiFallback: true,
   },
 }));
 
