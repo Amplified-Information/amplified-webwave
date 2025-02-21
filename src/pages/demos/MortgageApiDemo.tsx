@@ -142,6 +142,19 @@ const ApiIntegrationDemo = () => {
 
         <Card className="mt-8">
           <CardContent className="p-6">
+            <a 
+              href="https://cuttingedgemortgage.ca/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block mb-8 hover:opacity-95 transition-opacity"
+            >
+              <img
+                src="/uploads/87c4bef0-cf92-4982-8c47-e07cce2a7334.png"
+                alt="West Coast Cutting Edge Mortgage Banner"
+                className="w-full rounded-lg shadow-md"
+              />
+            </a>
+
             <div className="bg-primary/5 rounded-lg p-6 mb-8">
               <div className="flex flex-col md:flex-row gap-8 items-center">
                 <div className="flex-1">
@@ -160,7 +173,7 @@ const ApiIntegrationDemo = () => {
                     Download App
                   </Button>
                 </div>
-                <div className="flex-1 max-w-sm">
+                <div className="flex-1 max-w-[200px]">
                   <img
                     src="/lovable-uploads/645e0339-4570-4293-a9f9-626ada77c9e3.png"
                     alt="Mortgage Toolbox App Pre-qualification Screenshot"
@@ -192,19 +205,6 @@ const ApiIntegrationDemo = () => {
                 </Button>
               </form>
             </div>
-
-            <a 
-              href="https://cuttingedgemortgage.ca/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block mb-8 hover:opacity-95 transition-opacity"
-            >
-              <img
-                src="/uploads/87c4bef0-cf92-4982-8c47-e07cce2a7334.png"
-                alt="West Coast Cutting Edge Mortgage Banner"
-                className="w-full rounded-lg shadow-md"
-              />
-            </a>
 
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-gray-800">
