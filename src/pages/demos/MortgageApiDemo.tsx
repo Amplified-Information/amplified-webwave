@@ -160,10 +160,10 @@ const ApiIntegrationDemo = () => {
                     Download App
                   </Button>
                 </div>
-                <div className="flex-1 max-w-md">
+                <div className="flex-1 max-w-sm">
                   <img
-                    src="/lovable-uploads/3cdd9614-3eae-4bce-bf90-4fad5fc31fda.png"
-                    alt="Mortgage Toolbox App Screenshot"
+                    src="/lovable-uploads/645e0339-4570-4293-a9f9-626ada77c9e3.png"
+                    alt="Mortgage Toolbox App Pre-qualification Screenshot"
                     className="w-full h-auto rounded-lg shadow-lg"
                   />
                 </div>
