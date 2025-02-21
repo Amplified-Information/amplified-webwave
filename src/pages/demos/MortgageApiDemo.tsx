@@ -12,6 +12,10 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Code } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Rate {
   id: string;
@@ -42,6 +46,9 @@ const formatMoney = (value: string) => {
 };
 
 const ApiIntegrationDemo = () => {
+  const [email, setEmail] = useState("");
+  const { toast } = useToast();
+  
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
@@ -73,6 +80,33 @@ const ApiIntegrationDemo = () => {
       return data;
     },
   });
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error: subscribeError } = await supabase.functions.invoke('send-contact-email', {
+        body: {
+          email,
+          name: "Mortgage Report Subscriber",
+          message: "Request for BC Mortgage Trends Report"
+        }
+      });
+
+      if (subscribeError) throw subscribeError;
+
+      toast({
+        title: "Thank you for subscribing!",
+        description: "We'll send your complimentary BC mortgage trends report shortly.",
+      });
+      setEmail("");
+    } catch (error) {
+      toast({
+        title: "Subscription failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filteredRates = data?.Rates.filter((rate) => parseInt(rate.id) <= 8) || [];
 
@@ -112,6 +146,29 @@ const ApiIntegrationDemo = () => {
 
         <Card className="mt-8">
           <CardContent className="p-6">
+            <div className="bg-primary/5 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold text-primary mb-4">
+                Get Your Free BC Mortgage Trends Report
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Subscribe to receive a complimentary report on current mortgage trends in British Columbia, 
+                including market analysis and rate predictions.
+              </p>
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="max-w-md"
+                />
+                <Button type="submit">
+                  Get Free Report
+                </Button>
+              </form>
+            </div>
+
             <a 
               href="https://cuttingedgemortgage.ca/" 
               target="_blank" 
@@ -190,3 +247,4 @@ const ApiIntegrationDemo = () => {
 };
 
 export default ApiIntegrationDemo;
+
