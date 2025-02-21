@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -9,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Code } from "lucide-react";
+import { Code, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -163,6 +164,23 @@ const ApiIntegrationDemo = () => {
                   Get Free Report
                 </Button>
               </form>
+            </div>
+
+            <div className="bg-primary/5 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold text-primary mb-4 flex items-center gap-2">
+                <Download className="w-5 h-5" />
+                Download My Mortgage Toolbox App
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Get instant access to mortgage calculators, rate comparisons, and expert advice right on your mobile device.
+              </p>
+              <Button 
+                onClick={() => window.open('https://dlcapp.ca/app/beata-wojtalik', '_blank')}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download App
+              </Button>
             </div>
 
             <a 
