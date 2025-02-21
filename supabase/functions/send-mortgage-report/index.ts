@@ -69,10 +69,10 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    // Send notification to admin
+    // Send notification to admins
     await resend.emails.send({
       from: "BC Mortgage Trends <mortgage@amplified.info>",
-      to: ["mark@amplified.info"],
+      to: ["BeataG@DominionLending.ca", "EthanS@DominionLending.ca"],
       subject: "New BC Mortgage Trends Report Request",
       html: `
         <!DOCTYPE html>
