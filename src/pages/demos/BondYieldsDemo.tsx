@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, RefreshCw } from "lucide-react";
 import { BondYieldsChart } from "@/components/demos/bond-yields/BondYieldsChart";
+import { BondMarketAnalysis } from "@/components/demos/bond-yields/BondMarketAnalysis";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -95,7 +96,9 @@ const BondYieldsDemo = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <BondMarketAnalysis />
+
+        <Card className="mt-8">
           <CardContent className="p-6">
             <h2 className="text-xl font-semibold mb-4">Recent Bond Yields</h2>
             {isLoading ? (
