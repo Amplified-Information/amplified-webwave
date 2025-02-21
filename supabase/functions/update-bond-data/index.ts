@@ -22,8 +22,9 @@ serve(async (req) => {
     
     console.log(`Making test request for date range: ${testStartDate} to ${testEndDate}`);
     
+    // Try a different endpoint format
     const testResponse = await fetch(
-      `https://www.bankofcanada.ca/valet/observations/group/GOVERNMENT_BOND_YIELDS/json?start_date=${testStartDate}&end_date=${testEndDate}`
+      `https://www.bankofcanada.ca/valet/observations/V122531,V122533,V122539,V122543/json?start_date=${testStartDate}&end_date=${testEndDate}`
     );
 
     if (!testResponse.ok) {
@@ -41,7 +42,7 @@ serve(async (req) => {
     console.log(`Fetching full dataset from ${startDate} to ${endDate}`);
 
     const response = await fetch(
-      `https://www.bankofcanada.ca/valet/observations/group/GOVERNMENT_BOND_YIELDS/json?start_date=${startDate}&end_date=${endDate}`
+      `https://www.bankofcanada.ca/valet/observations/V122531,V122533,V122539,V122543/json?start_date=${startDate}&end_date=${endDate}`
     );
 
     if (!response.ok) {
@@ -61,10 +62,10 @@ serve(async (req) => {
     const bondYields = data.observations
       .filter(obs => {
         const isValid = obs.d && 
-          obs["2YR.1300"] !== undefined && // 2-year
-          obs["5YR.1300"] !== undefined && // 5-year
-          obs["10YR.1300"] !== undefined && // 10-year
-          obs["30YR.1300"] !== undefined;   // 30-year (long-term)
+          obs.V122531 !== undefined && // 2-year
+          obs.V122533 !== undefined && // 5-year
+          obs.V122539 !== undefined && // 10-year
+          obs.V122543 !== undefined;   // 30-year
         
         if (!isValid) {
           console.log('Filtered out invalid observation:', obs);
@@ -72,10 +73,10 @@ serve(async (req) => {
         return isValid;
       })
       .map(obs => {
-        const yield_2yr = Number(obs["2YR.1300"].v);
-        const yield_5yr = Number(obs["5YR.1300"].v);
-        const yield_10yr = Number(obs["10YR.1300"].v);
-        const yield_30yr = Number(obs["30YR.1300"].v);
+        const yield_2yr = Number(obs.V122531.v);
+        const yield_5yr = Number(obs.V122533.v);
+        const yield_10yr = Number(obs.V122539.v);
+        const yield_30yr = Number(obs.V122543.v);
         
         // Log any potential parsing issues
         if (isNaN(yield_2yr) || isNaN(yield_5yr) || isNaN(yield_10yr) || isNaN(yield_30yr)) {
