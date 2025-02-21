@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -52,7 +51,6 @@ const ApiIntegrationDemo = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["rates"],
     queryFn: async () => {
-      // First, get the API key from Supabase secrets
       const { data: secretData, error: secretError } = await supabase
         .from('secrets')
         .select('value')
@@ -67,7 +65,6 @@ const ApiIntegrationDemo = () => {
         throw new Error("API key not found");
       }
 
-      // Use the retrieved API key for the mortgage rates API call
       const response = await fetch(
         `https://secure.dominionintranet.ca/rest/rates?apikey=${secretData.value}`
       );
@@ -84,11 +81,10 @@ const ApiIntegrationDemo = () => {
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error: subscribeError } = await supabase.functions.invoke('send-contact-email', {
+      const { error: subscribeError } = await supabase.functions.invoke('send-mortgage-report', {
         body: {
           email,
-          name: "Mortgage Report Subscriber",
-          message: "Request for BC Mortgage Trends Report"
+          name: "Mortgage Report Subscriber"
         }
       });
 
@@ -247,4 +243,3 @@ const ApiIntegrationDemo = () => {
 };
 
 export default ApiIntegrationDemo;
-
