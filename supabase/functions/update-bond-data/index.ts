@@ -15,32 +15,56 @@ serve(async (req) => {
 
   try {
     console.log('Starting bond data update process...');
-
-    // Step 1: Make a test request to the Bank of Canada API
-    const testEndDate = new Date().toISOString().split('T')[0];
-    const testStartDate = '2024-01-01';
     
-    console.log(`Making test request for date range: ${testStartDate} to ${testEndDate}`);
-    
-    // Try a different endpoint format
-    const testResponse = await fetch(
-      `https://www.bankofcanada.ca/valet/observations/V122531,V122533,V122539,V122543/json?start_date=${testStartDate}&end_date=${testEndDate}`
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    if (!testResponse.ok) {
-      throw new Error(`Test request failed: ${testResponse.status} ${testResponse.statusText}`);
+    // Check for existing data
+    const { data: existingData, error: existingDataError } = await supabaseClient
+      .from('bond_yields')
+      .select('date')
+      .order('date', { ascending: false })
+      .limit(1);
+
+    if (existingDataError) {
+      throw new Error(`Failed to check existing data: ${existingDataError.message}`);
     }
 
-    const testData = await testResponse.json();
-    console.log('Raw API Response:', JSON.stringify(testData, null, 2));
-
-    // Step 2: Fetch full dataset
-    const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5))
-      .toISOString().split('T')[0];
     const endDate = new Date().toISOString().split('T')[0];
+    let startDate;
 
-    console.log(`Fetching full dataset from ${startDate} to ${endDate}`);
+    if (!existingData || existingData.length === 0) {
+      // No existing data - fetch last 5 years
+      console.log('No existing data found. Fetching historical data...');
+      startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 5))
+        .toISOString().split('T')[0];
+    } else {
+      // Fetch only new data since last record
+      startDate = new Date(existingData[0].date);
+      startDate.setDate(startDate.getDate() + 1); // Start from next day
+      startDate = startDate.toISOString().split('T')[0];
+      
+      if (startDate > endDate) {
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: 'Data is already up to date',
+            recordsProcessed: 0 
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
+          }
+        );
+      }
+    }
 
+    console.log(`Fetching data from ${startDate} to ${endDate}`);
+
+    // Fetch data from Bank of Canada API
     const response = await fetch(
       `https://www.bankofcanada.ca/valet/observations/V122531,V122533,V122539,V122543/json?start_date=${startDate}&end_date=${endDate}`
     );
@@ -56,9 +80,7 @@ serve(async (req) => {
       throw new Error('Invalid API response format');
     }
 
-    // Step 3: Transform the data
-    console.log('Sample observation:', data.observations[0]);
-    
+    // Transform the data
     const bondYields = data.observations
       .filter(obs => {
         const isValid = obs.d && 
@@ -72,42 +94,32 @@ serve(async (req) => {
         }
         return isValid;
       })
-      .map(obs => {
-        const yield_2yr = Number(obs.V122531.v);
-        const yield_5yr = Number(obs.V122533.v);
-        const yield_10yr = Number(obs.V122539.v);
-        const yield_30yr = Number(obs.V122543.v);
-        
-        // Log any potential parsing issues
-        if (isNaN(yield_2yr) || isNaN(yield_5yr) || isNaN(yield_10yr) || isNaN(yield_30yr)) {
-          console.log('Warning: NaN values in observation:', obs);
-        }
-        
-        return {
-          date: obs.d,
-          yield_2yr,
-          yield_5yr,
-          yield_10yr,
-          yield_30yr,
-          last_update: new Date().toISOString()
-        };
-      });
+      .map(obs => ({
+        date: obs.d,
+        yield_2yr: Number(obs.V122531.v),
+        yield_5yr: Number(obs.V122533.v),
+        yield_10yr: Number(obs.V122539.v),
+        yield_30yr: Number(obs.V122543.v),
+        last_update: new Date().toISOString()
+      }));
 
-    console.log(`Processed ${bondYields.length} records`);
-    console.log('Sample processed record:', bondYields[0]);
+    console.log(`Processing ${bondYields.length} records`);
 
     if (bondYields.length === 0) {
-      throw new Error('No valid records found in API response');
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'No new data available',
+          recordsProcessed: 0
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        }
+      );
     }
 
-    // Step 4: Store in Supabase
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
-    console.log('Attempting to store data in Supabase...');
-
+    // Store in Supabase
     const { error: upsertError } = await supabaseClient
       .from('bond_yields')
       .upsert(bondYields, {
