@@ -141,8 +141,8 @@ const ApiIntegrationDemo = () => {
               />
             </a>
 
-            <div className="bg-[#6E59A5]/5 rounded-lg p-6 mb-8">
-              <h3 className="text-xl font-semibold text-[#6E59A5] mb-4">
+            <div className="bg-[#00B6DE]/5 rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold text-[#003876] mb-4">
                 Ask Questions and Get Your Free BC Mortgage Trends Report
               </h3>
               <p className="text-gray-600 mb-4">
@@ -163,7 +163,7 @@ const ApiIntegrationDemo = () => {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="bg-[#6E59A5] hover:bg-[#7E69AB] text-white"
+                    className="bg-[#00B6DE] hover:bg-[#003876] text-white"
                   >
                     {isSubmitting ? (
                       <>
@@ -198,11 +198,11 @@ const ApiIntegrationDemo = () => {
               </form>
             </div>
 
-            <div className="bg-[#6E59A5]/5 rounded-lg p-6 mb-8">
+            <div className="bg-[#00B6DE]/5 rounded-lg p-6 mb-8">
               <div className="flex flex-col md:flex-row gap-8 items-center">
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-[#6E59A5] mb-4 flex items-center gap-2">
-                    <Download className="w-5 h-5 text-[#6E59A5]" />
+                  <h3 className="text-xl font-semibold text-[#003876] mb-4 flex items-center gap-2">
+                    <Download className="w-5 h-5 text-[#00B6DE]" />
                     Download My Mortgage Toolbox App
                   </h3>
                   <p className="text-gray-600 mb-4">
@@ -210,7 +210,7 @@ const ApiIntegrationDemo = () => {
                   </p>
                   <Button 
                     onClick={() => window.open('https://dlcapp.ca/app/beata-wojtalik', '_blank')}
-                    className="flex items-center gap-2 bg-[#6E59A5] hover:bg-[#7E69AB] text-white"
+                    className="flex items-center gap-2 bg-[#00B6DE] hover:bg-[#003876] text-white"
                   >
                     <Download className="w-4 h-4" />
                     Download App
@@ -230,7 +230,7 @@ const ApiIntegrationDemo = () => {
               <h2 className="text-2xl font-semibold text-gray-800">
                 Current Canadian Mortgage Rates{" "}
                 {data && (
-                  <span className="text-sm font-normal text-[#6E59A5]">
+                  <span className="text-sm font-normal text-[#00B6DE]">
                     (Updated on: {filteredRates[0]?.updated_at})
                   </span>
                 )}
@@ -249,13 +249,13 @@ const ApiIntegrationDemo = () => {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-[#6E59A5]/10">
-                      <TableHead className="font-semibold text-[#6E59A5]">Terms</TableHead>
-                      <TableHead className="font-semibold text-[#6E59A5]">Bank Rate</TableHead>
-                      <TableHead className="font-semibold text-[#6E59A5]">Our Rate</TableHead>
-                      <TableHead className="font-semibold text-[#6E59A5]">Monthly Bank Payment</TableHead>
-                      <TableHead className="font-semibold text-[#6E59A5]">Your Monthly Payment</TableHead>
-                      <TableHead className="font-semibold text-[#6E59A5]">Your Monthly Savings</TableHead>
+                    <TableRow className="bg-[#00B6DE]/10">
+                      <TableHead className="font-semibold text-[#003876]">Terms</TableHead>
+                      <TableHead className="font-semibold text-[#003876]">Bank Rate</TableHead>
+                      <TableHead className="font-semibold text-[#003876]">Our Rate</TableHead>
+                      <TableHead className="font-semibold text-[#003876]">Monthly Bank Payment</TableHead>
+                      <TableHead className="font-semibold text-[#003876]">Your Monthly Payment</TableHead>
+                      <TableHead className="font-semibold text-[#003876]">Your Monthly Savings</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -264,7 +264,7 @@ const ApiIntegrationDemo = () => {
                         key={rate.id}
                         className={`
                           transition-colors
-                          hover:bg-[#6E59A5]/5 
+                          hover:bg-[#00B6DE]/5 
                           cursor-pointer
                           ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                         `}
@@ -274,7 +274,7 @@ const ApiIntegrationDemo = () => {
                         <TableCell>{formatPercentage(rate.OurRate)}</TableCell>
                         <TableCell>{formatMoney(rate.BankMonthly)}</TableCell>
                         <TableCell>{formatMoney(rate.OurMonthly)}</TableCell>
-                        <TableCell className="text-[#6E59A5] font-medium">
+                        <TableCell className="text-[#00B6DE] font-medium">
                           {formatMoney(rate.Savings)}
                         </TableCell>
                       </TableRow>
