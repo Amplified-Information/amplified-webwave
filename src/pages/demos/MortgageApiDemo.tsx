@@ -1,4 +1,3 @@
-
 import { Navigation } from "@/components/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -126,8 +125,8 @@ const ApiIntegrationDemo = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
-      <div className="container mx-auto px-6 py-20">
-        <Card className="mt-8">
+      <div className="container mx-auto px-6 py-8">
+        <Card className="mt-4">
           <CardContent className="p-6">
             <a 
               href="https://cuttingedgemortgage.ca/" 
@@ -288,4 +287,3 @@ const ApiIntegrationDemo = () => {
 };
 
 export default ApiIntegrationDemo;
-
