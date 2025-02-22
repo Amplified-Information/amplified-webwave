@@ -47,6 +47,7 @@ const formatMoney = (value: string) => {
 const ApiIntegrationDemo = () => {
   const [email, setEmail] = useState("");
   const [question, setQuestion] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   const { data, isLoading, error } = useQuery({
@@ -81,6 +82,8 @@ const ApiIntegrationDemo = () => {
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
       const { error: subscribeError } = await supabase.functions.invoke('send-mortgage-report', {
         body: {
@@ -90,20 +93,27 @@ const ApiIntegrationDemo = () => {
         }
       });
 
-      if (subscribeError) throw subscribeError;
+      if (subscribeError) {
+        console.error("Subscription error:", subscribeError);
+        throw new Error(subscribeError.message);
+      }
 
       toast({
         title: "Thank you for subscribing!",
         description: "We'll send your complimentary BC mortgage trends report shortly.",
       });
+      
       setEmail("");
       setQuestion("");
     } catch (error) {
+      console.error("Form submission error:", error);
       toast({
         title: "Subscription failed",
         description: "Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -203,9 +213,17 @@ const ApiIntegrationDemo = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="max-w-md"
+                    disabled={isSubmitting}
                   />
-                  <Button type="submit">
-                    Get Free Report
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <span className="animate-spin mr-2">⠋</span>
+                        Sending...
+                      </>
+                    ) : (
+                      "Get Free Report"
+                    )}
                   </Button>
                 </div>
                 <div className="max-w-md">
@@ -215,6 +233,7 @@ const ApiIntegrationDemo = () => {
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     className="w-full"
+                    disabled={isSubmitting}
                   />
                 </div>
               </form>
