@@ -120,6 +120,12 @@ const ApiIntegrationDemo = () => {
     }
   };
 
+  const handleAppDownload = () => {
+    const appUrl = 'https://dlcapp.ca/app/beata-wojtalik';
+    window.open(appUrl, '_blank', 'noopener,noreferrer');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const filteredRates = data?.Rates.filter((rate) => parseInt(rate.id) <= 8) || [];
 
   return (
@@ -133,6 +139,7 @@ const ApiIntegrationDemo = () => {
               target="_blank" 
               rel="noopener noreferrer"
               className="block mb-8 hover:opacity-95 transition-opacity"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <img
                 src="/uploads/87c4bef0-cf92-4982-8c47-e07cce2a7334.png"
@@ -209,7 +216,7 @@ const ApiIntegrationDemo = () => {
                     Get instant access to mortgage calculators, rate comparisons, and expert advice right on your mobile device.
                   </p>
                   <Button 
-                    onClick={() => window.open('https://dlcapp.ca/app/beata-wojtalik', '_blank')}
+                    onClick={handleAppDownload}
                     className="flex items-center gap-2 bg-[#003876] hover:bg-[#00B6DE] text-white"
                   >
                     <Download className="w-4 h-4" />
