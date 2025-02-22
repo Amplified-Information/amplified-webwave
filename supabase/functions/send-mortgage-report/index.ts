@@ -13,20 +13,20 @@ const corsHeaders = {
 interface SubscribeRequest {
   email: string;
   name: string;
+  question?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("Mortgage report subscription endpoint hit with method:", req.method);
   
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     console.log("Parsing subscription request...");
-    const { email, name }: SubscribeRequest = await req.json();
-    console.log("Received subscription request for:", { email, name });
+    const { email, name, question }: SubscribeRequest = await req.json();
+    console.log("Received subscription request for:", { email, name, question });
 
     // Send confirmation email to subscriber
     await resend.emails.send({
@@ -53,6 +53,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>Hello ${name},</p>
                 <p>Thank you for requesting our BC Mortgage Trends Report. We're excited to share our insights with you!</p>
                 <p>Our team will review your request and send you the latest report within the next 24 hours.</p>
+                ${question ? `<p>We'll make sure to address your specific question: "${question}"</p>` : ''}
                 <p>The report includes:</p>
                 <ul>
                   <li>Current market analysis</li>
@@ -92,6 +93,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <li>Name: ${name}</li>
                 <li>Email: ${email}</li>
                 <li>Requested: ${new Date().toLocaleString()}</li>
+                ${question ? `<li>Specific Question: "${question}"</li>` : ''}
               </ul>
               <p>Please send them the latest report within 24 hours.</p>
             </div>

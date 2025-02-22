@@ -46,6 +46,7 @@ const formatMoney = (value: string) => {
 
 const ApiIntegrationDemo = () => {
   const [email, setEmail] = useState("");
+  const [question, setQuestion] = useState("");
   const { toast } = useToast();
   
   const { data, isLoading, error } = useQuery({
@@ -84,7 +85,8 @@ const ApiIntegrationDemo = () => {
       const { error: subscribeError } = await supabase.functions.invoke('send-mortgage-report', {
         body: {
           email,
-          name: "Mortgage Report Subscriber"
+          name: "Mortgage Report Subscriber",
+          question
         }
       });
 
@@ -95,6 +97,7 @@ const ApiIntegrationDemo = () => {
         description: "We'll send your complimentary BC mortgage trends report shortly.",
       });
       setEmail("");
+      setQuestion("");
     } catch (error) {
       toast({
         title: "Subscription failed",
@@ -191,18 +194,29 @@ const ApiIntegrationDemo = () => {
                 Subscribe to receive a complimentary report on current mortgage trends in British Columbia, 
                 including market analysis and rate predictions.
               </p>
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="max-w-md"
-                />
-                <Button type="submit">
-                  Get Free Report
-                </Button>
+              <form onSubmit={handleSubscribe} className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="max-w-md"
+                  />
+                  <Button type="submit">
+                    Get Free Report
+                  </Button>
+                </div>
+                <div className="max-w-md">
+                  <Input
+                    type="text"
+                    placeholder="Any specific questions about mortgages?"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
               </form>
             </div>
 
