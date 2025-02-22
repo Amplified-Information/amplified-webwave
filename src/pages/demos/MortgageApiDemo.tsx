@@ -173,7 +173,7 @@ const ApiIntegrationDemo = () => {
 
             <div className="bg-primary/5 rounded-lg p-6 mb-8">
               <h3 className="text-xl font-semibold text-primary mb-4">
-                Get Your Free BC Mortgage Trends Report
+                Ask Questions and Get Your Free BC Mortgage Trends Report
               </h3>
               <p className="text-gray-600 mb-4">
                 Subscribe to receive a complimentary report on current mortgage trends in British Columbia, 
