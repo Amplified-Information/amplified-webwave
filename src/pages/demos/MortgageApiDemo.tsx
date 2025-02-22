@@ -1,3 +1,4 @@
+
 import { Navigation } from "@/components/Navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -9,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { Code, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -126,36 +127,6 @@ const ApiIntegrationDemo = () => {
     <div className="min-h-screen bg-white">
       <Navigation />
       <div className="container mx-auto px-6 py-20">
-        <div className="text-center mb-12">
-          <Code className="w-12 h-12 mx-auto mb-4 text-primary" />
-          <h1 className="text-4xl font-bold mb-4">API Integration</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Connect with external services through an API call
-          </p>
-        </div>
-
-        <Card className="mt-8 mb-8">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">About This API</h2>
-            <div className="space-y-4 text-gray-600">
-              <p>
-                This demo showcases real-time integration with a Canadian mortgage rates API. 
-                The API provides up-to-date mortgage rate information, allowing for direct 
-                comparison between bank rates and our competitive offerings.
-              </p>
-              <div className="bg-primary/5 p-4 rounded-lg">
-                <h3 className="font-semibold text-primary mb-2">Key API Features:</h3>
-                <ul className="list-disc list-inside space-y-2">
-                  <li>Real-time rate updates throughout the business day</li>
-                  <li>Comprehensive comparison between bank rates and our rates</li>
-                  <li>Monthly payment calculations for different term lengths</li>
-                  <li>Potential savings calculations based on rate differences</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <Card className="mt-8">
           <CardContent className="p-6">
             <a 
@@ -317,3 +288,4 @@ const ApiIntegrationDemo = () => {
 };
 
 export default ApiIntegrationDemo;
+
