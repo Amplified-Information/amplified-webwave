@@ -172,34 +172,6 @@ const ApiIntegrationDemo = () => {
             </a>
 
             <div className="bg-primary/5 rounded-lg p-6 mb-8">
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-primary mb-4 flex items-center gap-2">
-                    <Download className="w-5 h-5" />
-                    Download My Mortgage Toolbox App
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Get instant access to mortgage calculators, rate comparisons, and expert advice right on your mobile device.
-                  </p>
-                  <Button 
-                    onClick={() => window.open('https://dlcapp.ca/app/beata-wojtalik', '_blank')}
-                    className="flex items-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download App
-                  </Button>
-                </div>
-                <div className="flex-1 max-w-[200px]">
-                  <img
-                    src="/lovable-uploads/645e0339-4570-4293-a9f9-626ada77c9e3.png"
-                    alt="Mortgage Toolbox App Pre-qualification Screenshot"
-                    className="w-full h-auto rounded-lg shadow-lg"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-primary/5 rounded-lg p-6 mb-8">
               <h3 className="text-xl font-semibold text-primary mb-4">
                 Get Your Free BC Mortgage Trends Report
               </h3>
@@ -250,6 +222,34 @@ const ApiIntegrationDemo = () => {
                   />
                 </div>
               </form>
+            </div>
+
+            <div className="bg-primary/5 rounded-lg p-6 mb-8">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-primary mb-4 flex items-center gap-2">
+                    <Download className="w-5 h-5" />
+                    Download My Mortgage Toolbox App
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Get instant access to mortgage calculators, rate comparisons, and expert advice right on your mobile device.
+                  </p>
+                  <Button 
+                    onClick={() => window.open('https://dlcapp.ca/app/beata-wojtalik', '_blank')}
+                    className="flex items-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download App
+                  </Button>
+                </div>
+                <div className="flex-1 max-w-[200px]">
+                  <img
+                    src="/lovable-uploads/645e0339-4570-4293-a9f9-626ada77c9e3.png"
+                    alt="Mortgage Toolbox App Pre-qualification Screenshot"
+                    className="w-full h-auto rounded-lg shadow-lg"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-between items-center mb-6">
