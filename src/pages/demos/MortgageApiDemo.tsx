@@ -163,7 +163,7 @@ const ApiIntegrationDemo = () => {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="bg-[#00B6DE] hover:bg-[#003876] text-white"
+                    className="bg-[#003876] hover:bg-[#00B6DE] text-white"
                   >
                     {isSubmitting ? (
                       <>
@@ -210,7 +210,7 @@ const ApiIntegrationDemo = () => {
                   </p>
                   <Button 
                     onClick={() => window.open('https://dlcapp.ca/app/beata-wojtalik', '_blank')}
-                    className="flex items-center gap-2 bg-[#00B6DE] hover:bg-[#003876] text-white"
+                    className="flex items-center gap-2 bg-[#003876] hover:bg-[#00B6DE] text-white"
                   >
                     <Download className="w-4 h-4" />
                     Download App
