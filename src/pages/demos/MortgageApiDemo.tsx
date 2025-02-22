@@ -46,6 +46,7 @@ const formatMoney = (value: string) => {
 
 const ApiIntegrationDemo = () => {
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [question, setQuestion] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -88,6 +89,7 @@ const ApiIntegrationDemo = () => {
       const { error: subscribeError } = await supabase.functions.invoke('send-mortgage-report', {
         body: {
           email,
+          phone,
           name: "Mortgage Report Subscriber",
           question
         }
@@ -104,6 +106,7 @@ const ApiIntegrationDemo = () => {
       });
       
       setEmail("");
+      setPhone("");
       setQuestion("");
     } catch (error) {
       console.error("Form submission error:", error);
@@ -225,6 +228,16 @@ const ApiIntegrationDemo = () => {
                       "Get Free Report"
                     )}
                   </Button>
+                </div>
+                <div className="max-w-md">
+                  <Input
+                    type="tel"
+                    placeholder="Phone number for quick reply (optional)"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full"
+                    disabled={isSubmitting}
+                  />
                 </div>
                 <div className="max-w-md">
                   <Input

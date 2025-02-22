@@ -13,6 +13,7 @@ const corsHeaders = {
 interface SubscribeRequest {
   email: string;
   name: string;
+  phone?: string;
   question?: string;
 }
 
@@ -25,8 +26,8 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     console.log("Parsing subscription request...");
-    const { email, name, question }: SubscribeRequest = await req.json();
-    console.log("Received subscription request for:", { email, name, question });
+    const { email, name, phone, question }: SubscribeRequest = await req.json();
+    console.log("Received subscription request for:", { email, name, phone, question });
 
     // Send confirmation email to subscriber
     await resend.emails.send({
@@ -92,10 +93,12 @@ const handler = async (req: Request): Promise<Response> => {
               <ul>
                 <li>Name: ${name}</li>
                 <li>Email: ${email}</li>
+                ${phone ? `<li>Phone: ${phone}</li>` : ''}
                 <li>Requested: ${new Date().toLocaleString()}</li>
                 ${question ? `<li>Specific Question: "${question}"</li>` : ''}
               </ul>
               <p>Please send them the latest report within 24 hours.</p>
+              ${phone ? `<p><strong>Quick Reply Requested:</strong> The subscriber has provided their phone number for a quick response.</p>` : ''}
             </div>
           </body>
         </html>
